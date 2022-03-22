@@ -9,6 +9,20 @@ public class App
     {
         Debug.Log("hello,huatuo");
 
+        var a = new
+        {
+            a = 1,
+            b = 2,
+        };
+        Debug.Log(a);
+
+        return 0;
+    }
+
+    public static int Main_1()
+    {
+        Debug.Log("hello,huatuo");
+
         var task = Task.Run(async () =>
         {
             await TestAsync();
