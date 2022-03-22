@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main.csproj", "{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotFix", "HotFix.csproj", "{694A3C1E-3962-BC0B-025E-31F979A38F43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{694A3C1E-3962-BC0B-025E-31F979A38F43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{694A3C1E-3962-BC0B-025E-31F979A38F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{694A3C1E-3962-BC0B-025E-31F979A38F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{694A3C1E-3962-BC0B-025E-31F979A38F43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

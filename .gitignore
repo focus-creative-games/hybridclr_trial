@@ -3,3 +3,5 @@
 /obj
 /Build
 /Temp
+/Build-Release
+/.vs

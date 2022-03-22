@@ -2,8 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 
+[assembly: Preserve]
 
 enum IntEnum : int
 {
@@ -310,24 +314,70 @@ public class RefTypes : MonoBehaviour
         b = new WaitForEndOfFrame();
         b = new WaitWhile(() => true);
         b = new WaitUntil(() => true);
-        b = new SkinnedMeshRenderer();
-        b = new Renderer();
-        b = Input.mousePosition;
+
+
+        TaskAwaiter aw = default;
+        var c1 = new AsyncTaskMethodBuilder();
+        var d1 = new StateMachine1();
+        c1.Start(ref d1);
+        c1.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c2 = new AsyncTaskMethodBuilder<bool>();
+
+        c2.Start(ref d1);
+        c2.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c3 = new AsyncTaskMethodBuilder<int>();
+        c3.Start(ref d1);
+        c3.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c4 = new AsyncTaskMethodBuilder<long>();
+        c4.Start(ref d1);
+        c4.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c5 = new AsyncTaskMethodBuilder<float>();
+        c5.Start(ref d1);
+        c5.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c6 = new AsyncTaskMethodBuilder<double>();
+        c6.Start(ref d1);
+        c6.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c7 = new AsyncTaskMethodBuilder<object>();
+        c7.Start(ref d1);
+        c7.AwaitUnsafeOnCompleted(ref aw, ref d1);
+        var c8 = new AsyncTaskMethodBuilder<IntEnum>();
+        c8.Start(ref d1);
+        c8.AwaitUnsafeOnCompleted(ref aw, ref d1);
         Debug.Log(b);
-        var tp = typeof(SkinnedMeshRenderer);
-        var go = new GameObject();
-        go.AddComponent(tp);
-        var c = go.GetComponent(tp) as SkinnedMeshRenderer;
-        c.receiveShadows = true;
-        var q1 = Quaternion.Euler(1, 1, 1);
-        Quaternion.Slerp(Quaternion.identity, q1, 0.5f);
-        Debug.Log(c);
-        Debug.Log(q1);
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    public static async Task TestAsync()
+    {
+        Debug.Log("async task 1");
+        await Task.Delay(3000);
+
+        Task.Delay(100).Wait();
+        Debug.Log("async task 2");
+    }
+
+    public static async Task<int> TestAsync2()
+    {
+        Debug.Log("async task 1");
+        await Task.Delay(3000);
+        var t = Task.Run(() =>
+        {
+            Debug.Log("run 2");
+        });
+        t.Wait();
+        t = Task.Run(async () =>
+        {
+            Debug.Log("run 2");
+            await Task.Delay(100);
+            Debug.Log("run 2");
+        });
+        t.Wait();
+        Debug.Log("async task 2");
+        return 0;
     }
 }

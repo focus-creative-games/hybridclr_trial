@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{7F59552A-1D4C-EC55-495A-2641520E751B}</ProjectGuid>
+    <ProjectGuid>{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Main</AssemblyName>
@@ -53,12 +53,17 @@
     <UnityVersion>2020.3.7f1c1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\Main\RefTypes.cs" />
+    <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Main\TaskHelper.cs" />
     <Compile Include="Assets\Main\ConsoleToSceen.cs" />
     <Compile Include="Assets\Main\Test\TestItem.cs" />
     <Compile Include="Assets\Main\Test\PTest.cs" />
+    <Compile Include="Assets\Main\StateMachine1.cs" />
     <Compile Include="Assets\Main\Test\UserClass.cs" />
     <Compile Include="Assets\Main\LoadDll.cs" />
+    <Compile Include="Assets\Main\RefTypes.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Main\Main.asmdef" />
@@ -287,8 +292,14 @@
     <Reference Include="UnityEditor.Graphs">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.7f1c1\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.7f1c1\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.7f1c1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Editor\SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.7f1c1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\mscorlib.dll</HintPath>

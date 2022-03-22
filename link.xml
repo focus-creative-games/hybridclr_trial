@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<linker>
+   <!--No "preserve" attribute and no types specified means preserve all-->
+  <assembly fullname="UnityEngine"/>
+  <assembly fullname="UnityEngine.CoreModule"/>
+  <assembly fullname="System"/>
+  <assembly fullname="System.Core"/>
+  <assembly fullname="mscorlib"/>
+<linker>
