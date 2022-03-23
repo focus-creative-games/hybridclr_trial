@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -35,5 +36,10 @@ public class LoadDll : MonoBehaviour
         var appType = gameAss.GetType("App");
         var mainMethod = appType.GetMethod("Main");
         mainMethod.Invoke(null, null);
+
+        // 如果是Update之类的函数，推荐先转成Delegate再调用，如
+        //var updateMethod = appType.GetMethod("Update");
+        //var updateDel = System.Delegate.CreateDelegate(typeof(Action<float>), null, updateMethod);
+        //updateMethod(deltaTime);
     }
 }
