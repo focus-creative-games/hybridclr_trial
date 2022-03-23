@@ -5,4 +5,5 @@
 /Temp
 /Build-Release
 /.vs
-/Debug
+/Build-Win64
+/Debug/huatuo_BackUpThisFolder_ButDontShipItWithYourGame

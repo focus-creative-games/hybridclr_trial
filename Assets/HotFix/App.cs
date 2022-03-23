@@ -9,14 +9,17 @@ public class App
     {
         Debug.Log("hello,huatuo");
 
-        var a = new
-        {
-            a = 1,
-            b = 2,
-        };
-        Debug.Log(a);
+        TestAsync();
 
+        Debug.Log("hello,huatuo 2");
         return 0;
+    }
+
+    public static async void TestAsync()
+    {
+        Debug.Log("async task 1");
+        await Task.Delay(10);
+        Debug.Log("async task 2");
     }
 
     public static int Main_1()
@@ -25,7 +28,7 @@ public class App
 
         var task = Task.Run(async () =>
         {
-            await TestAsync();
+            await TestAsync2();
         });
 
         task.Wait();
@@ -36,7 +39,7 @@ public class App
         return 0;
     }
 
-    public static async Task TestAsync()
+    public static async Task TestAsync2()
     {
         Debug.Log("async task 1");
         await Task.Delay(3000);
