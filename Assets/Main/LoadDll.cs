@@ -11,6 +11,10 @@ public class LoadDll : MonoBehaviour
     /// </summary>
     public bool m_loadAB = false;
 
+    /// <summary>
+    /// 这里展示的流程不是最优流程
+    /// 仅做最简单展示如何加载AssetBundle中的华佗hotfix.dll
+    /// </summary>
     private void Start()
     {
 #if !UNITY_EDITOR
