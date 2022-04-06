@@ -7,8 +7,8 @@ using UnityEngine.Networking;
 public class LoadDllFromAssetbundle : MonoBehaviour
 {
     /// <summary>
-    /// ÕâÀïÕ¹Ê¾µÄÁ÷³Ì²»ÊÇ×îÓÅÁ÷³Ì
-    /// ½ö×ö×î¼òµ¥Õ¹Ê¾ÈçºÎ¼ÓÔØAssetBundleÖĞµÄ»ªÙ¢hotfix.dll
+    /// è¿™é‡Œå±•ç¤ºçš„æµç¨‹ä¸æ˜¯æœ€ä¼˜æµç¨‹
+    /// ä»…åšæœ€ç®€å•å±•ç¤ºå¦‚ä½•åŠ è½½AssetBundleä¸­çš„åä½—hotfix.dll
     /// </summary>
     private void Start()
     {
@@ -22,9 +22,7 @@ public class LoadDllFromAssetbundle : MonoBehaviour
 
             RunMain();
         }));
-
 #else
-
         LoadGameDll();
         RunMain();
 
@@ -43,7 +41,7 @@ public class LoadDllFromAssetbundle : MonoBehaviour
 
         if (_assetBundle == null)
         {
-            Debug.LogError("ÇëÏÈÊ¹ÓÃ[HuaTuo/Build/BuildDLLAssetBundle]Éú³É¶ÔÓ¦Æ½Ì¨abÎÄ¼ş.");
+            Debug.LogError("è¯·å…ˆä½¿ç”¨[HuaTuo/Build/BuildDLLAssetBundle]ç”Ÿæˆå¯¹åº”å¹³å°abæ–‡ä»¶.");
         }
         else
         {
@@ -57,14 +55,14 @@ public class LoadDllFromAssetbundle : MonoBehaviour
     {
         if (gameAss == null)
         {
-            UnityEngine.Debug.LogError("dllÎ´¼ÓÔØ");
+            UnityEngine.Debug.LogError("dllæœªåŠ è½½");
             return;
         }
         var appType = gameAss.GetType("App");
         var mainMethod = appType.GetMethod("Main");
         mainMethod.Invoke(null, null);
 
-        // Èç¹ûÊÇUpdateÖ®ÀàµÄº¯Êı£¬ÍÆ¼öÏÈ×ª³ÉDelegateÔÙµ÷ÓÃ£¬Èç
+        // å¦‚æœæ˜¯Updateä¹‹ç±»çš„å‡½æ•°ï¼Œæ¨èå…ˆè½¬æˆDelegateå†è°ƒç”¨ï¼Œå¦‚
         //var updateMethod = appType.GetMethod("Update");
         //var updateDel = System.Delegate.CreateDelegate(typeof(Action<float>), null, updateMethod);
         //updateMethod(deltaTime);
