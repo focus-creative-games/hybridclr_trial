@@ -13,6 +13,17 @@ namespace HuaTuo
     /// </summary>
     public class HuaTuoEditorHelper
     {
+        [UnityEditor.Callbacks.DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            string hotfixDll = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
+            string target1 = Application.streamingAssetsPath + "/HotFix.dll";
+            FileStreamCopy(hotfixDll, target1);
+            // string target2 = Application.dataPath + "/../Build-Win64/build/bin/HuatuoDemo_Data/StreamingAssets/HotFix.dll";
+            //FileStreamCopy(hotfixDll, target2);
+            Debug.Log("copy hotfix.dll finish");
+        }
+        
         /// <summary>
         ///
         /// </summary>

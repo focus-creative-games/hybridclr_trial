@@ -8,6 +8,7 @@ public class LoadDll : MonoBehaviour
 {
     void Start()
     {
+        BetterStreamingAssets.Initialize();
         LoadGameDll();
         RunMain();
     }
@@ -18,25 +19,27 @@ public class LoadDll : MonoBehaviour
     {
 #if UNITY_EDITOR
         string gameDll = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
-        // ä½¿ç”¨File.ReadAllBytesæ˜¯ä¸ºäº†é¿å…Editorä¸‹gameDllæ–‡ä»¶è¢«å ç”¨å¯¼è‡´åç»­ç¼–è¯‘åæ— æ³•è¦†ç›–
+        byte[] dllBytes = File.ReadAllBytes(gameDll);
+        // Ê¹ÓÃFile.ReadAllBytesÊÇÎªÁË±ÜÃâEditorÏÂgameDllÎÄ¼ş±»Õ¼ÓÃµ¼ÖÂºóĞø±àÒëºóÎŞ·¨¸²¸Ç
 #else
-        string gameDll = Application.streamingAssetsPath + "/HotFix.dll";
+        string gameDll = "HotFix.dll";
+        byte[] dllBytes = BetterStreamingAssets.ReadAllBytes(gameDll);
 #endif
-        gameAss = System.Reflection.Assembly.Load(File.ReadAllBytes(gameDll));
+        gameAss = System.Reflection.Assembly.Load(dllBytes);
     }
 
     public void RunMain()
     {
         if (gameAss == null)
         {
-            UnityEngine.Debug.LogError("dllæœªåŠ è½½");
+            UnityEngine.Debug.LogError("dllÎ´¼ÓÔØ");
             return;
         }
         var appType = gameAss.GetType("App");
         var mainMethod = appType.GetMethod("Main");
         mainMethod.Invoke(null, null);
 
-        // å¦‚æœæ˜¯Updateä¹‹ç±»çš„å‡½æ•°ï¼Œæ¨èå…ˆè½¬æˆDelegateå†è°ƒç”¨ï¼Œå¦‚
+        // Èç¹ûÊÇUpdateÖ®ÀàµÄº¯Êı£¬ÍÆ¼öÏÈ×ª³ÉDelegateÔÙµ÷ÓÃ£¬Èç
         //var updateMethod = appType.GetMethod("Update");
         //var updateDel = System.Delegate.CreateDelegate(typeof(Action<float>), null, updateMethod);
         //updateMethod(deltaTime);

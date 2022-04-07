@@ -674,6 +674,10 @@
       <Project>{0ECD50E2-2E15-910B-2A71-B4D1804BECB9}</Project>
       <Name>Main</Name>
     </ProjectReference>
+    <ProjectReference Include="BetterStreamingAssets.csproj">
+      <Project>{5BE1B234-5929-E626-746F-A0A2724814A6}</Project>
+      <Name>BetterStreamingAssets</Name>
+    </ProjectReference>
     <ProjectReference Include="HotFix.csproj">
       <Project>{694A3C1E-3962-BC0B-025E-31F979A38F43}</Project>
       <Name>HotFix</Name>
