@@ -5,6 +5,7 @@ using UnityEngine;
 public class ConsoleToSceen : MonoBehaviour
 {
     const int maxLines = 50;
+    const int maxLineLength = 120;
     private string _logStr = "";
 
     private readonly List<string> _lines = new List<string>();
@@ -14,7 +15,26 @@ public class ConsoleToSceen : MonoBehaviour
 
     public void Log(string logString, string stackTrace, LogType type)
     {
-        _lines.AddRange(logString.Split('\n'));
+        foreach (var line in logString.Split('\n'))
+        {
+            if (line.Length <= maxLineLength)
+            {
+                _lines.Add(line);
+                continue;
+            }
+            var lineCount = line.Length / maxLineLength + 1;
+            for (int i = 0; i < lineCount; i++)
+            {
+                if ((i + 1) * maxLineLength <= line.Length)
+                {
+                    _lines.Add(line.Substring(i * maxLineLength, maxLineLength));
+                }
+                else
+                {
+                    _lines.Add(line.Substring(i * maxLineLength, line.Length - i * maxLineLength));
+                }
+            }
+        }
         if (_lines.Count > maxLines)
         {
             _lines.RemoveRange(0, _lines.Count - maxLines);
