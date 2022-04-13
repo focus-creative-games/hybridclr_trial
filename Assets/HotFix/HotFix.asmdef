@@ -4,10 +4,7 @@
     "references": [
         "GUID:44867461c7558094cab94edbb05214d9"
     ],
-    "includePlatforms": [
-        "Editor",
-        "XboxOne"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

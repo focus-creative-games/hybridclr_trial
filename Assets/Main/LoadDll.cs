@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class LoadDll : MonoBehaviour
@@ -13,33 +14,31 @@ public class LoadDll : MonoBehaviour
         RunMain();
     }
 
-    public static System.Reflection.Assembly gameAss;
+    private System.Reflection.Assembly gameAss;
 
     private void LoadGameDll()
     {
-#if UNITY_EDITOR
-        string gameDll = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
-        byte[] dllBytes = File.ReadAllBytes(gameDll);
-        // Ê¹ÓÃFile.ReadAllBytesÊÇÎªÁË±ÜÃâEditorÏÂgameDllÎÄ¼ş±»Õ¼ÓÃµ¼ÖÂºóĞø±àÒëºóÎŞ·¨¸²¸Ç
+#if !UNITY_EDITOR
+        // æ­¤ä»£ç åœ¨Androidç­‰å¹³å°ä¸‹å¹¶ä¸èƒ½å·¥ä½œï¼Œè¯·é…Œæƒ…è°ƒæ•´
+        string gameDll = Application.streamingAssetsPath + "/HotFix.dll";
+        gameAss = System.Reflection.Assembly.Load(File.ReadAllBytes(gameDll));
 #else
-        string gameDll = "HotFix.dll";
-        byte[] dllBytes = BetterStreamingAssets.ReadAllBytes(gameDll);
+        gameAss = AppDomain.CurrentDomain.GetAssemblies().First(assembly => assembly.GetName().Name == "HotFix");
 #endif
-        gameAss = System.Reflection.Assembly.Load(dllBytes);
     }
 
     public void RunMain()
     {
         if (gameAss == null)
         {
-            UnityEngine.Debug.LogError("dllÎ´¼ÓÔØ");
+            UnityEngine.Debug.LogError("dllæœªåŠ è½½");
             return;
         }
         var appType = gameAss.GetType("App");
         var mainMethod = appType.GetMethod("Main");
         mainMethod.Invoke(null, null);
 
-        // Èç¹ûÊÇUpdateÖ®ÀàµÄº¯Êı£¬ÍÆ¼öÏÈ×ª³ÉDelegateÔÙµ÷ÓÃ£¬Èç
+        // å¦‚æœæ˜¯Updateä¹‹ç±»çš„å‡½æ•°ï¼Œæ¨èå…ˆè½¬æˆDelegateå†è°ƒç”¨ï¼Œå¦‚
         //var updateMethod = appType.GetMethod("Update");
         //var updateDel = System.Delegate.CreateDelegate(typeof(Action<float>), null, updateMethod);
         //updateMethod(deltaTime);

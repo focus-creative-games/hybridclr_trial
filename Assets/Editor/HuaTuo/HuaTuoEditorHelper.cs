@@ -8,8 +8,8 @@ using FileMode = System.IO.FileMode;
 namespace HuaTuo
 {
     /// <summary>
-    /// ÕâÀï½ö½öÊÇÒ»¸öÁ÷³ÌÕ¹Ê¾
-    /// ¼òµ¥ËµÃ÷Èç¹ûÄãÏë½«huatuoµÄdll×ö³É×Ô¶¯»¯µÄ¼òµ¥ÊµÏÖ
+    /// è¿™é‡Œä»…ä»…æ˜¯ä¸€ä¸ªæµç¨‹å±•ç¤º
+    /// ç®€å•è¯´æ˜å¦‚æœä½ æƒ³å°†huatuoçš„dllåšæˆè‡ªåŠ¨åŒ–çš„ç®€å•å®ç°
     /// </summary>
     public class HuaTuoEditorHelper
     {
@@ -18,7 +18,7 @@ namespace HuaTuo
         {
             string hotfixDll = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
             string target1 = Application.streamingAssetsPath + "/HotFix.dll";
-            FileStreamCopy(hotfixDll, target1);
+            File.Copy(hotfixDll, target1, true);
             // string target2 = Application.dataPath + "/../Build-Win64/build/bin/HuatuoDemo_Data/StreamingAssets/HotFix.dll";
             //FileStreamCopy(hotfixDll, target2);
             Debug.Log("copy hotfix.dll finish");
@@ -50,7 +50,7 @@ namespace HuaTuo
                 File.Delete(_tarPath);
             }
 
-            FileStreamCopy(_dllPath, _tarPath);
+            File.Copy(_dllPath, _tarPath, true);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
@@ -95,7 +95,7 @@ namespace HuaTuo
                 File.Delete(_tarPath);
             }
 
-            FileStreamCopy(_dllPath, _tarPath);
+            File.Copy(_dllPath, _tarPath, true);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
@@ -115,23 +115,6 @@ namespace HuaTuo
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
             AssetDatabase.CopyAsset("Assets/HuaTuo/Output/huatuo", "Assets/StreamingAssets/huatuo");
-        }
-
-        public static void FileStreamCopy(string _src, string _tar)
-        {
-            using (FileStream _read = new FileStream(_src, FileMode.OpenOrCreate, FileAccess.Read))
-            {
-                using (FileStream _write = new FileStream(_tar, FileMode.OpenOrCreate, FileAccess.Write))
-                {
-                    byte[] _buffer = new byte[1024 * 1024 * 2];
-                    int _count = 0;
-
-                    while ((_count = _read.Read(_buffer, 0, _buffer.Length)) > 0)
-                    {
-                        _write.Write(_buffer, 0, _count);
-                    }
-                }
-            }
         }
     }
 }
