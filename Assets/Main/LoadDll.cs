@@ -18,13 +18,18 @@ public class LoadDll : MonoBehaviour
 
     private void LoadGameDll()
     {
+        AssetBundle dllAB = BetterStreamingAssets.LoadAssetBundle("common");
 #if !UNITY_EDITOR
         // 此代码在Android等平台下并不能工作，请酌情调整
-        string gameDll = Application.streamingAssetsPath + "/HotFix.dll";
-        gameAss = System.Reflection.Assembly.Load(File.ReadAllBytes(gameDll));
+        //string gameDll = Application.streamingAssetsPath + "/HotFix.dll";
+        //gameAss = System.Reflection.Assembly.Load(File.ReadAllBytes(gameDll));
+        TextAsset dllBytes = dllAB.LoadAsset<TextAsset>("HotFix.dll.bytes");
+        gameAss = System.Reflection.Assembly.Load(dllBytes.bytes);
 #else
         gameAss = AppDomain.CurrentDomain.GetAssemblies().First(assembly => assembly.GetName().Name == "HotFix");
 #endif
+
+        GameObject testPrefab = GameObject.Instantiate(dllAB.LoadAsset<UnityEngine.GameObject>("HotUpdatePrefab.prefab"));
     }
 
     public void RunMain()
