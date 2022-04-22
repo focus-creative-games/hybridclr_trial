@@ -1,4 +1,4 @@
-﻿#if UNITY_2020_1_OR_NEWER && !UNITY_2021_3_OR_NEWER
+﻿#if UNITY_2021_3_OR_NEWER
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -18,11 +18,11 @@ using UnityEditor.Android;
 
 namespace HuaTuo
 {
-    public class HuaTuo_BuildProcessor_2020_1_OR_NEWER : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    public class HuaTuo_BuildProcessor_2021_3_OR_NEWER : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 #if UNITY_ANDROID
         , IPostGenerateGradleAndroidProject
 #endif
-        , IProcessSceneWithReport, IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor, IIl2CppProcessor
+        , IProcessSceneWithReport, IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
     {
         /// <summary>
         /// 需要在Prefab上挂脚本的热更dll名称列表，不需要挂到Prefab上的脚本可以不放在这里
@@ -32,22 +32,11 @@ namespace HuaTuo
         /// </summary>
         static List<string> monoDllNames = new List<string>() { "UnitTest.dll"};
 
-        static MethodInfo s_BuildReport_AddMessage;
-
         int IOrderedCallback.callbackOrder => 0;
-
-        static HuaTuo_BuildProcessor_2020_1_OR_NEWER()
-        {
-            s_BuildReport_AddMessage = typeof(BuildReport).GetMethod("AddMessage", BindingFlags.Instance | BindingFlags.NonPublic);
-        }
 
         void IPreprocessBuildWithReport.OnPreprocessBuild(BuildReport report)
         {
-            if (!Application.isBatchMode && !EditorUtility.DisplayDialog("确认", "建议 Build 之前先打包 AssetBundle\r\n是否继续?", "继续", "取消"))
-            {
-                s_BuildReport_AddMessage.Invoke(report, new object[] { LogType.Exception, "用户取消", "BuildFailedException" });
-                return;
-            }
+
         }
 
         string[] IFilterBuildAssemblies.OnFilterAssemblies(BuildOptions buildOptions, string[] assemblies)
@@ -147,19 +136,6 @@ namespace HuaTuo
         string IUnityLinkerProcessor.GenerateAdditionalLinkXmlFile(BuildReport report, UnityLinkerBuildPipelineData data)
         {
             return String.Empty;
-        }
-
-        void IUnityLinkerProcessor.OnBeforeRun(BuildReport report, UnityLinkerBuildPipelineData data)
-        {
-        }
-
-        void IUnityLinkerProcessor.OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data)
-        {
-        }
-
-        void IIl2CppProcessor.OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
-        {
-
         }
 
 
