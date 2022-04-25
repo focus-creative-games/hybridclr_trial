@@ -435,9 +435,23 @@ public class RefTypes : MonoBehaviour
             new ValueTuple<IntEnum, object, double>(IntEnum.A, null, 1)
         };
     }
+
+    class RefStateMachine : IAsyncStateMachine
+    {
+        public void MoveNext()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetStateMachine(IAsyncStateMachine stateMachine)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     void RefAsyncMethod()
     {
-        var stateMachine = new StateMachine1();
+        var stateMachine = new RefStateMachine();
 
         TaskAwaiter aw = default;
         var c0 = new AsyncTaskMethodBuilder();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using FileMode = System.IO.FileMode;
@@ -13,109 +14,123 @@ namespace HuaTuo
     /// </summary>
     public class HuaTuoEditorHelper
     {
-        [UnityEditor.Callbacks.DidReloadScripts]
-        private static void OnScriptsReloaded()
+        ///// <summary>
+        /////
+        ///// </summary>
+        //[MenuItem("HuaTuo/Build/BuildDLLAssetBundle", false, 1)]
+        //public static void BuildDLLAssetBundle()
+        //{
+        //    string _dllPath = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
+        //    string _tarDir = Application.dataPath + "/HuaTuo/Temp/";
+        //    string _tarPath = $"{_tarDir}HotFix.bytes";
+        //    string _outPutPath = Application.dataPath + "/HuaTuo/Output/";
+
+        //    if (!Directory.Exists(_tarDir))
+        //    {
+        //        Directory.CreateDirectory(_tarDir);
+        //    }
+
+        //    if (!Directory.Exists(_outPutPath))
+        //    {
+        //        Directory.CreateDirectory(_outPutPath);
+        //    }
+
+        //    if (File.Exists(_tarPath))
+        //    {
+        //        File.Delete(_tarPath);
+        //    }
+
+        //    File.Copy(_dllPath, _tarPath, true);
+
+        //    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+
+        //    string _assetPath = _tarPath.Substring(_tarPath.IndexOf("Assets/", StringComparison.Ordinal));
+
+        //    List<AssetBundleBuild> _list = new List<AssetBundleBuild>();
+        //    AssetBundleBuild _ab = new AssetBundleBuild
+        //    {
+        //        assetBundleName = "huatuo",
+        //        assetNames = new[] { _assetPath }
+        //    };
+        //    _list.Add(_ab);
+
+        //    BuildPipeline.BuildAssetBundles(_outPutPath, _list.ToArray(), BuildAssetBundleOptions.None,
+        //        EditorUserBuildSettings.activeBuildTarget);
+
+        //    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+
+        //    AssetDatabase.CopyAsset("Assets/HuaTuo/Output/huatuo", "Assets/StreamingAssets/huatuo");
+        //}
+
+        public static string ToReleateAssetPath(string s)
         {
-            //string hotfixDll = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
-            //string target1 = Application.streamingAssetsPath + "/HotFix.dll";
-            //File.Copy(hotfixDll, target1, true); 
-            //string target2 = Application.dataPath + "/../build-win64/build/bin/HuatuoTest_Data/StreamingAssets/HotFix.dll";
-            //File.Copy(hotfixDll, target2, true);
-            //Debug.Log("copy hotfix.dll finish");
-            UnityEngine.Debug.Log("compile succ");
-        }
-        
-        /// <summary>
-        ///
-        /// </summary>
-        [MenuItem("HuaTuo/Build/BuildDLLAssetBundle", false, 1)]
-        public static void BuildDLLAssetBundle()
-        {
-            string _dllPath = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
-            string _tarDir = Application.dataPath + "/HuaTuo/Temp/";
-            string _tarPath = $"{_tarDir}HotFix.bytes";
-            string _outPutPath = Application.dataPath + "/HuaTuo/Output/";
-
-            if (!Directory.Exists(_tarDir))
-            {
-                Directory.CreateDirectory(_tarDir);
-            }
-
-            if (!Directory.Exists(_outPutPath))
-            {
-                Directory.CreateDirectory(_outPutPath);
-            }
-
-            if (File.Exists(_tarPath))
-            {
-                File.Delete(_tarPath);
-            }
-
-            File.Copy(_dllPath, _tarPath, true);
-
-            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
-            string _assetPath = _tarPath.Substring(_tarPath.IndexOf("Assets/", StringComparison.Ordinal));
-
-            List<AssetBundleBuild> _list = new List<AssetBundleBuild>();
-            AssetBundleBuild _ab = new AssetBundleBuild
-            {
-                assetBundleName = "huatuo",
-                assetNames = new[] { _assetPath }
-            };
-            _list.Add(_ab);
-
-            BuildPipeline.BuildAssetBundles(_outPutPath, _list.ToArray(), BuildAssetBundleOptions.None,
-                EditorUserBuildSettings.activeBuildTarget);
-
-            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
-            AssetDatabase.CopyAsset("Assets/HuaTuo/Output/huatuo", "Assets/StreamingAssets/huatuo");
+            return s.Substring(s.IndexOf("Assets/"));
         }
 
-        [MenuItem("HuaTuo/Build/BuildSceneBundle", false, 1)]
+        [MenuItem("HuaTuo/BuildBundles", false, 1)]
         public static void BuildSeneAssetBundle()
         {
-            string _dllPath = Application.dataPath + "/Scenes/HotUpdate.unity";
-            string _tarDir = Application.dataPath + "/HuaTuo/Temp/";
-            string _tarPath = $"{_tarDir}HotUpdate.bytes";
-            string _outPutPath = Application.dataPath + "/HuaTuo/Output/";
+            string tempDir = Application.dataPath + "/HuaTuo/Temp";
+            string outPutDir = Application.dataPath + "/HuaTuo/Output";
 
-            if (!Directory.Exists(_tarDir))
+            string dllPath = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
+            string dllBytesPath = $"{tempDir}/HotFix.dll.bytes";
+            string testPrefab = $"{Application.dataPath}/Prefabs/HotUpdatePrefab.prefab";
+            string testScene = $"{Application.dataPath}/Scenes/HotUpdateScene.unity";
+
+            if (!Directory.Exists(tempDir))
             {
-                Directory.CreateDirectory(_tarDir);
+                Directory.CreateDirectory(tempDir);
             }
 
-            if (!Directory.Exists(_outPutPath))
+            if (!Directory.Exists(outPutDir))
             {
-                Directory.CreateDirectory(_outPutPath);
+                Directory.CreateDirectory(outPutDir);
             }
 
-            if (File.Exists(_tarPath))
-            {
-                File.Delete(_tarPath);
-            }
 
-            File.Copy(_dllPath, _tarPath, true);
+            File.Copy(dllPath, dllBytesPath, true);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
-            string _assetPath = _tarPath.Substring(_tarPath.IndexOf("Assets/", StringComparison.Ordinal));
-
-            List<AssetBundleBuild> _list = new List<AssetBundleBuild>();
-            AssetBundleBuild _ab = new AssetBundleBuild
+            string[] notSceneAssets =
             {
-                assetBundleName = "huatuo",
-                assetNames = new[] { _assetPath }
+                dllBytesPath,
+                testPrefab,
             };
-            _list.Add(_ab);
 
-            BuildPipeline.BuildAssetBundles(_outPutPath, _list.ToArray(), BuildAssetBundleOptions.None,
+            List<AssetBundleBuild> abs = new List<AssetBundleBuild>();
+            AssetBundleBuild notSceneAb = new AssetBundleBuild
+            {
+                assetBundleName = "common",
+                assetNames = notSceneAssets.Select(s => ToReleateAssetPath(s)).ToArray(),
+            };
+            abs.Add(notSceneAb);
+
+            string[] sceneAssets =
+            {
+                testScene,
+            };
+            AssetBundleBuild sceneAb = new AssetBundleBuild
+            {
+                assetBundleName = "scene",
+                assetNames = sceneAssets.Select(s => s.Substring(s.IndexOf("Assets/"))).ToArray(),
+            };
+
+            abs.Add(sceneAb);
+
+            BuildPipeline.BuildAssetBundles(outPutDir,
+                abs.ToArray(),
+                BuildAssetBundleOptions.None,
                 EditorUserBuildSettings.activeBuildTarget);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
-            AssetDatabase.CopyAsset("Assets/HuaTuo/Output/huatuo", "Assets/StreamingAssets/huatuo");
+            foreach(var ab in abs)
+            {
+                AssetDatabase.CopyAsset(ToReleateAssetPath($"{outPutDir}/{ab.assetBundleName}"),
+                    ToReleateAssetPath($"{Application.streamingAssetsPath}/{ab.assetBundleName}"));
+            }
         }
     }
 }
