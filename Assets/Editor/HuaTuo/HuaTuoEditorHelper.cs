@@ -38,7 +38,7 @@ namespace HuaTuo
             scriptCompilationSettings.target = target;
             CreateDirIfNotExists(buildDir);
             ScriptCompilationResult scriptCompilationResult = PlayerBuildInterface.CompilePlayerScripts(scriptCompilationSettings, buildDir);
-            foreach(var ass in scriptCompilationResult.assemblies)
+            foreach (var ass in scriptCompilationResult.assemblies)
             {
                 Debug.LogFormat("compile assemblies:{0}", ass);
             }
@@ -51,10 +51,16 @@ namespace HuaTuo
             return $"{DllBuildOutputDir}/{target}";
         }
 
+        [MenuItem("HuaTuo/CompileDll/ActiveBuildTarget")]
+        public static void CompileDllActiveBuildTarget()
+        {
+            var target = EditorUserBuildSettings.activeBuildTarget;
+            CompileDll(GetDllBuildOutputDirByTarget(target), target);
+        }
+
         [MenuItem("HuaTuo/CompileDll/Win64")]
         public static void CompileDllWin64()
         {
-            //var target = EditorUserBuildSettings.activeBuildTarget;
             var target = BuildTarget.StandaloneWindows64;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
@@ -62,7 +68,6 @@ namespace HuaTuo
         [MenuItem("HuaTuo/CompileDll/Linux64")]
         public static void CompileDllLinux()
         {
-            //var target = EditorUserBuildSettings.activeBuildTarget;
             var target = BuildTarget.StandaloneLinux64;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
@@ -70,7 +75,6 @@ namespace HuaTuo
         [MenuItem("HuaTuo/CompileDll/OSX")]
         public static void CompileDllOSX()
         {
-            //var target = EditorUserBuildSettings.activeBuildTarget;
             var target = BuildTarget.StandaloneOSX;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
@@ -78,7 +82,6 @@ namespace HuaTuo
         [MenuItem("HuaTuo/CompileDll/Android")]
         public static void CompileDllAndroid()
         {
-            //var target = EditorUserBuildSettings.activeBuildTarget;
             var target = BuildTarget.Android;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
@@ -153,10 +156,7 @@ namespace HuaTuo
 
             abs.Add(sceneAb);
 
-            BuildPipeline.BuildAssetBundles(outputDir,
-                abs.ToArray(),
-                BuildAssetBundleOptions.None,
-                target);
+            BuildPipeline.BuildAssetBundles(outputDir, abs.ToArray(), BuildAssetBundleOptions.None, target);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
