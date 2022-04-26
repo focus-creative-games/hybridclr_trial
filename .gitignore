@@ -19,3 +19,5 @@
 /Assets/StreamingAssets/HotFix.dll
 /update_unity_libil2cpp.bat
 /Assets/HuaTuo
+/*.csproj
+/*.sln
