@@ -30,7 +30,7 @@ namespace HuaTuo
         /// 
         /// 另外请务必注意！： 需要挂脚本的dll的名字最好别改，因为这个列表无法热更（上线后删除或添加某些非挂脚本dll没问题）
         /// </summary>
-        static List<string> monoDllNames = new List<string>() { "UnitTest.dll"};
+        static List<string> monoDllNames = new List<string>() { "HotFix.dll"};
 
         int IOrderedCallback.callbackOrder => 0;
 

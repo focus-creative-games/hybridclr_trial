@@ -14,53 +14,6 @@ namespace HuaTuo
     /// </summary>
     public class HuaTuoEditorHelper
     {
-        ///// <summary>
-        /////
-        ///// </summary>
-        //[MenuItem("HuaTuo/Build/BuildDLLAssetBundle", false, 1)]
-        //public static void BuildDLLAssetBundle()
-        //{
-        //    string _dllPath = Application.dataPath + "/../Library/ScriptAssemblies/HotFix.dll";
-        //    string _tarDir = Application.dataPath + "/HuaTuo/Temp/";
-        //    string _tarPath = $"{_tarDir}HotFix.bytes";
-        //    string _outPutPath = Application.dataPath + "/HuaTuo/Output/";
-
-        //    if (!Directory.Exists(_tarDir))
-        //    {
-        //        Directory.CreateDirectory(_tarDir);
-        //    }
-
-        //    if (!Directory.Exists(_outPutPath))
-        //    {
-        //        Directory.CreateDirectory(_outPutPath);
-        //    }
-
-        //    if (File.Exists(_tarPath))
-        //    {
-        //        File.Delete(_tarPath);
-        //    }
-
-        //    File.Copy(_dllPath, _tarPath, true);
-
-        //    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
-        //    string _assetPath = _tarPath.Substring(_tarPath.IndexOf("Assets/", StringComparison.Ordinal));
-
-        //    List<AssetBundleBuild> _list = new List<AssetBundleBuild>();
-        //    AssetBundleBuild _ab = new AssetBundleBuild
-        //    {
-        //        assetBundleName = "huatuo",
-        //        assetNames = new[] { _assetPath }
-        //    };
-        //    _list.Add(_ab);
-
-        //    BuildPipeline.BuildAssetBundles(_outPutPath, _list.ToArray(), BuildAssetBundleOptions.None,
-        //        EditorUserBuildSettings.activeBuildTarget);
-
-        //    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
-        //    AssetDatabase.CopyAsset("Assets/HuaTuo/Output/huatuo", "Assets/StreamingAssets/huatuo");
-        //}
 
         public static string ToReleateAssetPath(string s)
         {
