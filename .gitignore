@@ -21,3 +21,5 @@
 /Assets/HuaTuo
 /*.csproj
 /*.sln
+/Build-Win64-2
+/Build-Android2

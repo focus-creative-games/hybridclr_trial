@@ -73,7 +73,7 @@ namespace HuaTuo
 
         void IPostprocessBuildWithReport.OnPostprocessBuild(BuildReport report)
         {
-            AddBackHotFixAssembliesToJson(report, null);
+            AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
         }
 
 #if UNITY_ANDROID
@@ -91,12 +91,8 @@ namespace HuaTuo
              * 不在此列表中的dll在资源反序列化时无法被找到其类型
              * 因此 OnFilterAssemblies 中移除的条目需要再加回来
              */
-#if UNITY_ANDROID
-            string[] jsonFiles = new string[] { "Temp/gradleOut/unityLibrary/src/main/assets/bin/Data/ScriptingAssemblies.json" }; // report.files 不包含 Temp/gradleOut 等目录
-#else
-            // 直接出包和输出vs工程时路径不同，report.summary.outputPath 记录的是前者路径
-            string[] jsonFiles = Directory.GetFiles(Path.GetDirectoryName(report.summary.outputPath), "ScriptingAssemblies.json", SearchOption.AllDirectories);
-#endif
+
+            string[] jsonFiles = Directory.GetFiles(Path.GetDirectoryName(path), "ScriptingAssemblies.json", SearchOption.AllDirectories);
 
             if (jsonFiles.Length == 0)
             {
