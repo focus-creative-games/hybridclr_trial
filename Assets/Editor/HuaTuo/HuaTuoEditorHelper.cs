@@ -116,25 +116,33 @@ namespace HuaTuo
         /// <param name="target"></param>
         private static void BuildAssetBundles(string tempDir, string outputDir, BuildTarget target)
         {
-            CompileDll(GetDllBuildOutputDirByTarget(target), target);
-
-            string dllPath = $"{GetDllBuildOutputDirByTarget(target)}/HotFix.dll";
-            string dllBytesPath = $"{tempDir}/HotFix.dll.bytes";
-            string testPrefab = $"{Application.dataPath}/Prefabs/HotUpdatePrefab.prefab";
-            string testScene = $"{Application.dataPath}/Scenes/HotUpdateScene.unity";
-
             CreateDirIfNotExists(tempDir);
             CreateDirIfNotExists(outputDir);
 
-            File.Copy(dllPath, dllBytesPath, true);
+            List<string> notSceneAssets = new List<string>();
 
+            CompileDll(GetDllBuildOutputDirByTarget(target), target);
+
+            var hotfixDlls = new List<string>()
+            {
+                "HotFix.dll",
+                "HotFix2.dll",
+            };
+
+            foreach(var dll in hotfixDlls)
+            {
+                string dllPath = $"{GetDllBuildOutputDirByTarget(target)}/{dll}";
+                string dllBytesPath = $"{tempDir}/{dll}.bytes";
+                File.Copy(dllPath, dllBytesPath, true);
+                notSceneAssets.Add(dllBytesPath);
+            }
+
+
+            string testPrefab = $"{Application.dataPath}/Prefabs/HotUpdatePrefab.prefab";
+            notSceneAssets.Add(testPrefab);
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
-            string[] notSceneAssets =
-            {
-                dllBytesPath,
-                testPrefab,
-            };
+
 
             List<AssetBundleBuild> abs = new List<AssetBundleBuild>();
             AssetBundleBuild notSceneAb = new AssetBundleBuild
@@ -144,6 +152,8 @@ namespace HuaTuo
             };
             abs.Add(notSceneAb);
 
+
+            string testScene = $"{Application.dataPath}/Scenes/HotUpdateScene.unity";
             string[] sceneAssets =
             {
                 testScene,

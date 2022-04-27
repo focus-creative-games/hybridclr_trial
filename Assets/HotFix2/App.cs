@@ -11,6 +11,9 @@ public class App
     {
         Debug.Log("hello, huatuo");
 
+        var go = new GameObject("HotFix2");
+        go.AddComponent<CreateByHotFix2>();
+
         return 0;
     }
 }
