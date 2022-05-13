@@ -25,14 +25,14 @@ namespace HuaTuo
         [InitializeOnLoadMethod]
         private static void Setup()
         {
-            var linkAdds = string.Join(" ", HuaTuo_BuildProcessor_2020_1_OR_NEWER.s_allHotUpdateDllNames
-                .Select(s => $"--include-assembly={Path.Combine(Environment.CurrentDirectory, $"Temp/StagingArea/Data/Managed/{s}").Replace('\\', '/')}"));
-            var envVar = Environment.GetEnvironmentVariable("UNITYLINKER_ADDITIONAL_ARGS");
+            //var linkAdds = string.Join(" ", HuaTuo_BuildProcessor_2020_1_OR_NEWER.s_allHotUpdateDllNames
+            //    .Select(s => $"--include-assembly={Path.Combine(Environment.CurrentDirectory, $"Temp/StagingArea/Data/Managed/{s}").Replace('\\', '/')}"));
+            //var envVar = Environment.GetEnvironmentVariable("UNITYLINKER_ADDITIONAL_ARGS");
 
-            if (envVar != linkAdds)
-            {
-                Environment.SetEnvironmentVariable("UNITYLINKER_ADDITIONAL_ARGS", linkAdds);
-            }
+            //if (envVar != linkAdds)
+            //{
+            //    Environment.SetEnvironmentVariable("UNITYLINKER_ADDITIONAL_ARGS", linkAdds);
+            //}
         }
 
         private static void CreateDirIfNotExists(string dirName)
