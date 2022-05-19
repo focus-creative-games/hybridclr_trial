@@ -242,36 +242,38 @@ namespace HuaTuo
             var target = BuildTarget.iOS;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
-
+        
         [MenuItem("HuaTuo/Generate/MethodBridge_X64")]
         public static void MethodBridge_X86()
         {
             //var target = EditorUserBuildSettings.activeBuildTarget;
-
+            string outputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_x64.cpp";
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = CallConventionType.X64,
                 Assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList(),
-                OutputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_x64.cpp",
+                OutputFile = outputFile,
             });
 
             g.PrepareMethods();
             g.Generate();
-
+            Debug.LogFormat("== output:{0} ==", outputFile);
         }
 
         [MenuItem("HuaTuo/Generate/MethodBridge_Arm64")]
         public static void MethodBridge_Arm64()
         {
+            string outputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_arm64.cpp";
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = CallConventionType.Arm64,
                 Assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList(),
-                OutputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_arm64.cpp",
+                OutputFile = outputFile,
             });
 
             g.PrepareMethods();
             g.Generate();
+            Debug.LogFormat("== output:{0} ==", outputFile);
         }
     }
 }

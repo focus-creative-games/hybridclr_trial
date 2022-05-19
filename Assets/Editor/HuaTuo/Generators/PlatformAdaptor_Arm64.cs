@@ -14,17 +14,17 @@ namespace HuaTuo.Generators
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
         {
             { typeof(void), new TypeInfo(typeof(void), ParamOrReturnType.VOID)},
-            { typeof(bool), new TypeInfo(typeof(bool), ParamOrReturnType.I8_U8)},
-            { typeof(byte), new TypeInfo(typeof(byte), ParamOrReturnType.I8_U8)},
-            { typeof(sbyte), new TypeInfo(typeof(sbyte), ParamOrReturnType.I8_U8) },
-            { typeof(short), new TypeInfo(typeof(short), ParamOrReturnType.I8_U8) },
-            { typeof(ushort), new TypeInfo(typeof(ushort), ParamOrReturnType.I8_U8) },
-            { typeof(char), new TypeInfo(typeof(char), ParamOrReturnType.I8_U8) },
-            { typeof(int), new TypeInfo(typeof(int), ParamOrReturnType.I8_U8) },
-            { typeof(uint), new TypeInfo(typeof(uint), ParamOrReturnType.I8_U8) },
+            { typeof(bool), new TypeInfo(typeof(bool), ParamOrReturnType.I1_U1)},
+            { typeof(byte), new TypeInfo(typeof(byte), ParamOrReturnType.I1_U1)},
+            { typeof(sbyte), new TypeInfo(typeof(sbyte), ParamOrReturnType.I1_U1) },
+            { typeof(short), new TypeInfo(typeof(short), ParamOrReturnType.I2_U2) },
+            { typeof(ushort), new TypeInfo(typeof(ushort), ParamOrReturnType.I2_U2) },
+            { typeof(char), new TypeInfo(typeof(char), ParamOrReturnType.I2_U2) },
+            { typeof(int), new TypeInfo(typeof(int), ParamOrReturnType.I4_U4) },
+            { typeof(uint), new TypeInfo(typeof(uint), ParamOrReturnType.I4_U4) },
             { typeof(long), new TypeInfo(typeof(long), ParamOrReturnType.I8_U8) },
             { typeof(ulong), new TypeInfo(typeof(ulong), ParamOrReturnType.I8_U8)},
-            { typeof(float), new TypeInfo(typeof(float), ParamOrReturnType.R8)},
+            { typeof(float), new TypeInfo(typeof(float), ParamOrReturnType.R4)},
             { typeof(double), new TypeInfo(typeof(double), ParamOrReturnType.R8)},
             { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
             { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
@@ -164,12 +164,42 @@ namespace HuaTuo.Generators
             }
 
         }
+        public IEnumerable<MethodBridgeSig> PrepareCommon1()
+        {
+            // (void + int32 + int64 + float + double) * (int32 + int64 + float + double) * (0 - 20) = 420
+            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
+            TypeInfo typeInt = new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
+            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
+            TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
+            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
+            int maxParamCount = 20;
+
+            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
+            {
+                var rt = new ReturnInfo() { Type = returnType };
+                foreach (var argType in new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble })
+                {
+                    for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
+                    {
+                        var paramInfos = new List<ParamInfo>();
+                        for (int i = 0; i < paramCount; i++)
+                        {
+                            paramInfos.Add(new ParamInfo() { Type = argType });
+                        }
+                        var mbs = new MethodBridgeSig() { Method = null, ReturnInfo = rt, ParamInfos = paramInfos };
+                        yield return mbs;
+                    }
+                }
+            }
+        }
 
         public IEnumerable<MethodBridgeSig> PrepareCommon2()
         {
-            // (void + int64 + float + v2f + v3f + v4f + s2) * (int64 + float + v2f + v3f + v4f + s2 + sr) ^ (0 - 2) = 399
+            // (void + int32 + int64 + float + double + v2f + v3f + v4f + s2) * (int32 + int64 + float + double + v2f + v3f + v4f + s2 + sr) ^ (0 - 2) = 399
             TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
+            TypeInfo typeInt = new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
             TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
+            TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
             TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
             TypeInfo typeV2f = new TypeInfo(typeof(Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2);
             TypeInfo typeV3f = new TypeInfo(typeof(Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3);
@@ -179,9 +209,9 @@ namespace HuaTuo.Generators
 
             int maxParamCount = 2;
 
-            var argTypes = new TypeInfo[] { typeLong, typeDouble, typeV2f, typeV3f, typeV4f, typeStructLe16, typeStructRef };
+            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f, typeStructLe16, typeStructRef };
             int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeLong, typeDouble, typeV2f, typeV3f, typeV4f, typeStructRef })
+            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f, typeStructRef })
             {
                 var rt = new ReturnInfo() { Type = returnType };
                 for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
@@ -206,7 +236,11 @@ namespace HuaTuo.Generators
 
         public override IEnumerable<MethodBridgeSig> GetPreserveMethods()
         {
-            foreach(var method in PrepareCommon2())
+            foreach (var method in PrepareCommon1())
+            {
+                yield return method;
+            }
+            foreach (var method in PrepareCommon2())
             {
                 yield return method;
             }

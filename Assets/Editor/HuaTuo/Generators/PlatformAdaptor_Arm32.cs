@@ -18,12 +18,12 @@ namespace HuaTuo.Generators
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
         {
             { typeof(void), new TypeInfo(typeof(void), ParamOrReturnType.VOID)},
-            { typeof(bool), new TypeInfo(typeof(bool), ParamOrReturnType.U1)},
-            { typeof(byte), new TypeInfo(typeof(byte), ParamOrReturnType.U1)},
-            { typeof(sbyte), new TypeInfo(typeof(sbyte), ParamOrReturnType.I1) },
-            { typeof(short), new TypeInfo(typeof(short), ParamOrReturnType.I2) },
-            { typeof(ushort), new TypeInfo(typeof(ushort), ParamOrReturnType.U2) },
-            { typeof(char), new TypeInfo(typeof(char), ParamOrReturnType.U2) },
+            { typeof(bool), new TypeInfo(typeof(bool), ParamOrReturnType.I1_U1)},
+            { typeof(byte), new TypeInfo(typeof(byte), ParamOrReturnType.I1_U1)},
+            { typeof(sbyte), new TypeInfo(typeof(sbyte), ParamOrReturnType.I1_U1) },
+            { typeof(short), new TypeInfo(typeof(short), ParamOrReturnType.I2_U2) },
+            { typeof(ushort), new TypeInfo(typeof(ushort), ParamOrReturnType.I2_U2) },
+            { typeof(char), new TypeInfo(typeof(char), ParamOrReturnType.I2_U2) },
             { typeof(int), new TypeInfo(typeof(int), ParamOrReturnType.I4_U4) },
             { typeof(uint), new TypeInfo(typeof(uint), ParamOrReturnType.I4_U4) },
             { typeof(long), new TypeInfo(typeof(long), ParamOrReturnType.I8_U8) },

@@ -9,10 +9,10 @@ namespace HuaTuo.Generators
     public enum ParamOrReturnType
     {
         VOID,
-        I1,
-        U1,
-        I2,
-        U2,
+        I1_U1,
+        //U1,
+        I2_U2,
+        //U2,
         I4_U4,
         I8_U8,
         //I_U,

@@ -239,8 +239,6 @@ namespace HuaTuo.Generators
             Directory.CreateDirectory(Path.GetDirectoryName(_outputFile));
 
             frr.Commit(_outputFile);
-
-            Debug.Log("== generate finish ==");
         }
 
     }

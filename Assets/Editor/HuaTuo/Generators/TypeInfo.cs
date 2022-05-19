@@ -9,7 +9,6 @@ namespace HuaTuo.Generators
     {
 
         public static readonly TypeInfo s_void = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-        public static readonly TypeInfo s_objetPtrRef = new TypeInfo(null, ParamOrReturnType.OBJECT_PTR_REF);
         public static readonly TypeInfo s_i8u8 = new TypeInfo(null, ParamOrReturnType.I8_U8);
         public static readonly TypeInfo s_valueTypeAsParam = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
@@ -52,10 +51,8 @@ namespace HuaTuo.Generators
         public int QuadWordNum => PorType switch
         {
             ParamOrReturnType.VOID => 0,
-            ParamOrReturnType.I1 => 1,
-            ParamOrReturnType.U1 => 1,
-            ParamOrReturnType.I2 => 1,
-            ParamOrReturnType.U2 => 1,
+            ParamOrReturnType.I1_U1 => 1,
+            ParamOrReturnType.I2_U2 => 1,
             ParamOrReturnType.I4_U4 => 1,
             ParamOrReturnType.I8_U8 => 1,
             ParamOrReturnType.R4 => 1,
@@ -77,10 +74,8 @@ namespace HuaTuo.Generators
             return PorType switch
             {
                 ParamOrReturnType.VOID => "v",
-                ParamOrReturnType.I1 => "i1",
-                ParamOrReturnType.U1 => "u1",
-                ParamOrReturnType.I2 => "i2",
-                ParamOrReturnType.U2 => "u2",
+                ParamOrReturnType.I1_U1 => "i1",
+                ParamOrReturnType.I2_U2 => "i2",
                 ParamOrReturnType.I4_U4 => "i4",
                 ParamOrReturnType.I8_U8 => "i8",
                 ParamOrReturnType.R4 => "r4",
@@ -103,10 +98,8 @@ namespace HuaTuo.Generators
             return PorType switch
             {
                 ParamOrReturnType.VOID => "void",
-                ParamOrReturnType.I1 => "int8_t",
-                ParamOrReturnType.U1 => "uint8_t",
-                ParamOrReturnType.I2 => "int16_t",
-                ParamOrReturnType.U2 => "uint16_t",
+                ParamOrReturnType.I1_U1 => "int8_t",
+                ParamOrReturnType.I2_U2 => "int16_t",
                 ParamOrReturnType.I4_U4 => "int32_t",
                 ParamOrReturnType.I8_U8 => "int64_t",
                 ParamOrReturnType.R4 => "float",
