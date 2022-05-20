@@ -88,22 +88,21 @@ namespace HuaTuo.Generators
             return _methodList;
         }
 
-        private MethodBridgeSig CreateMethodBridgeSig(MethodInfo method)
+        private MethodBridgeSig CreateMethodBridgeSig(bool isStatic, ParameterInfo returnType, ParameterInfo[] parameters)
         {
             var paramInfos = new List<ParamInfo>();
-            if (!method.IsStatic)
+            if (!isStatic)
             {
                 // FIXME arm32 is s_i4u4
                 paramInfos.Add(new ParamInfo() { Type = TypeInfo.s_i8u8 });
             }
-            foreach(var paramInfo in method.GetParameters())
+            foreach (var paramInfo in parameters)
             {
                 paramInfos.Add(new ParamInfo() { Type = _platformAdaptor.Create(paramInfo, false) });
             }
             var mbs = new MethodBridgeSig()
             {
-                Method = method,
-                ReturnInfo = new ReturnInfo() { Type = _platformAdaptor.Create(method.ReturnParameter, true)},
+                ReturnInfo = new ReturnInfo() { Type = returnType != null ? _platformAdaptor.Create(returnType, true) : TypeInfo.s_void },
                 ParamInfos = paramInfos,
             };
             return mbs;
@@ -119,6 +118,7 @@ namespace HuaTuo.Generators
 
         public void PrepareFromAssemblies()
         {
+            var typeDel = typeof(Delegate);
             foreach (var ass in _assemblies)
             {
                 //Debug.Log("prepare assembly:" + ass.FullName);
@@ -128,13 +128,28 @@ namespace HuaTuo.Generators
                     {
                         continue;
                     }
-                    foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public
+    | BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
                     {
-                        if (!method.IsGenericMethodDefinition)
+                        if (method.IsGenericMethodDefinition)
                         {
-                            var mbs = CreateMethodBridgeSig(method);
-                            AddMethod(mbs);
+                            continue;
                         }
+                        var mbs = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
+                        AddMethod(mbs);
+                        if (typeDel.IsAssignableFrom(type) && method.Name == "Invoke")
+                        {
+
+                            var mbs2 = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                            AddMethod(mbs2);
+                        }
+                    }
+
+                    foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
+| BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
+                    {
+                        var mbs = CreateMethodBridgeSig(false, null, method.GetParameters());
+                        AddMethod(mbs);
                     }
                 }
             }
@@ -160,7 +175,7 @@ namespace HuaTuo.Generators
                         {
                             paramInfos.Add(new ParamInfo() { Type = argType });
                         }
-                        var mbs = new MethodBridgeSig() { Method = null, ReturnInfo = rt, ParamInfos =  paramInfos};
+                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos =  paramInfos};
                         AddMethod(mbs);
                     }
                 }
@@ -195,7 +210,7 @@ namespace HuaTuo.Generators
                             paramInfos.Add(new ParamInfo { Type = argTypes[c % paramTypeNum] });
                             c /= paramTypeNum;
                         }
-                        var mbs = new MethodBridgeSig() { Method = null, ReturnInfo = rt, ParamInfos = paramInfos };
+                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
                         AddMethod(mbs);
                     }
                 }

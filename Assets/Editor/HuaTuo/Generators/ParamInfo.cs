@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,7 +59,24 @@ namespace HuaTuo.Generators
 
         public int GetParamSlotNum(CallConventionType canv)
         {
-             return Type.PorType == ParamOrReturnType.VOID ? 0 : 1;
+            switch(Type.PorType)
+            {
+                case ParamOrReturnType.VOID: return 0;
+                case ParamOrReturnType.ARM64_HFA_FLOAT_3: return 2;
+                case ParamOrReturnType.ARM64_HFA_FLOAT_4: return 2;
+                case ParamOrReturnType.ARM64_HFA_DOUBLE_2: return 2;
+                case ParamOrReturnType.ARM64_HFA_DOUBLE_3: return 3;
+                case ParamOrReturnType.ARM64_HFA_DOUBLE_4: return 4;
+                case ParamOrReturnType.ARM64_HVA_8:
+                case ParamOrReturnType.ARM64_HVA_16: throw new NotSupportedException();
+                case ParamOrReturnType.STRUCTURE_SIZE_LE_16: return 2; // size <= 16
+                case ParamOrReturnType.STRUCTURE_SIZE_GT_16: return (Type.Size + 7) / 8;
+                default:
+                    {
+                        Debug.Assert(Type.PorType < ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
+                        return 1;
+                    }
+            }
         }
     }
 }

@@ -186,7 +186,7 @@ namespace HuaTuo.Generators
                         {
                             paramInfos.Add(new ParamInfo() { Type = argType });
                         }
-                        var mbs = new MethodBridgeSig() { Method = null, ReturnInfo = rt, ParamInfos = paramInfos };
+                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
                         yield return mbs;
                     }
                 }
@@ -227,7 +227,7 @@ namespace HuaTuo.Generators
                             paramInfos.Add(new ParamInfo { Type = argTypes[c % paramTypeNum] });
                             c /= paramTypeNum;
                         }
-                        var mbs = new MethodBridgeSig() { Method = null, ReturnInfo = rt, ParamInfos = paramInfos };
+                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
                         yield return mbs;
                     }
                 }
@@ -248,7 +248,9 @@ namespace HuaTuo.Generators
 
         protected override void GenMethod(MethodBridgeSig method, List<string> lines)
         {
-            int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(CallConventionType.X64)) + method.ReturnInfo.GetParamSlotNum(CallConventionType.X64);
+            //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
+            int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
+
 
 
             string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
@@ -267,38 +269,6 @@ namespace HuaTuo.Generators
     }}
 ";
 
-            //if (method.ReturnInfo.PassReturnAsParam)
-            {
-//                string paramAndReturnListStr = string.Join(", ", new string[] { "void* __ret" }.Concat(method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" })));
-//                string paramAndReturnNameListStr = string.Join(", ", new string[] { "__ret" }.Concat(method.ParamInfos.Select(p => p.Managed2NativeParamValue(this.CallConventionType)).Concat(new string[] { "method" })));
-
-//                lines.Add($@"
-//static void __Native2ManagedCall_{method.CreateCallSigName()}({paramAndReturnListStr})
-//{{
-//    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => p.Native2ManagedParamValue(this.CallConventionType)))} }};
-//    Interpreter::Execute(method, args, __ret);
-//}}
-
-//static void __Native2ManagedCall_AdjustorThunk_{method.CreateCallSigName()}({paramAndReturnListStr})
-//{{
-//    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject)" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
-//    Interpreter::Execute(method, args, __ret);
-//}}
-
-//static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* method, uint16_t* argVarIndexs, StackObject* localVarBase, void* __ret)
-//{{
-//    if (huatuo::metadata::IsInstanceMethod(method) && !localVarBase[argVarIndexs[0]].obj)
-//    {{
-//        il2cpp::vm::Exception::RaiseNullReferenceException();
-//    }}
-//    Interpreter::RuntimeClassCCtorInit(method);
-//    typedef void (*NativeMethod)({paramListStr});
-//    asm(""mov x8, %[ret]"" :: [ret] ""r"" (__ret) :);
-//    ((NativeMethod)(method->methodPointer))({paramNameListStr});
-//}}
-//");
-            }
-            //else
             {
                 lines.Add($@"
 static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_{method.CreateCallSigName()}({paramListStr})

@@ -13,8 +13,6 @@ namespace HuaTuo.Generators
 
         public List<ParamInfo> ParamInfos { get; set; }
 
-        public MethodInfo Method { get; set; }
-
         public void Init()
         {
             for(int i = 0; i < ParamInfos.Count; i++)
