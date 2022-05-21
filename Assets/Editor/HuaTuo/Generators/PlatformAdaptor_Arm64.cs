@@ -82,60 +82,75 @@ namespace HuaTuo.Generators
             }
         }
 
-        private static TypeInfo CreateValueType(Type type, bool returnValue)
+        public class HFATypeInfo
         {
-            int typeSize = ComputeSizeOf(type);
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
-            if (fields.Length < 2 || fields.Length > 4)
-            {
-                return CreateNormalValueTypeBySize(type, typeSize, returnValue);
-            }
+            public Type Type { get; set; }
 
-            // FIXME 未处理 HSV
-            Type fieldType = null;
-            bool isHFA = true;
-            foreach(var field in fields)
+            public int Count { get; set; }
+        }
+
+        private static bool IsNotHFAFastCheck(int typeSize)
+        {
+            return typeSize != 8 && typeSize != 12 && typeSize != 16 && typeSize != 24 && typeSize != 32;
+        }
+
+        private static bool ComputHFATypeInfo0(Type type, HFATypeInfo typeInfo)
+        {
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (var field in fields)
             {
-                if (field.FieldType != fieldType)
+                Type ftype = field.FieldType;
+                if (ftype != typeof(float) && ftype != typeof(double))
                 {
-                    if (fieldType == null)
+                    if (!ftype.IsPrimitive && ftype.IsValueType)
                     {
-                        fieldType = field.FieldType;
-                        if (fieldType != typeof(float) && fieldType != typeof(double))
+                        if (!ComputHFATypeInfo0(ftype, typeInfo))
                         {
-                            isHFA = false;
-                            break;
+                            return false;
                         }
                     }
                     else
                     {
-                        isHFA = false;
-                        break;
+                        return false;
                     }
+                }
+                else if (ftype == typeInfo.Type || typeInfo.Type == null)
+                {
+                    typeInfo.Type = ftype;
+                    ++typeInfo.Count;
+                }
+                else
+                {
+                    return false;
                 }
             }
-            if (isHFA)
+            return typeInfo.Count <= 4;
+        }
+
+        public static bool ComputHFATypeInfo(Type type, int typeSize, out HFATypeInfo typeInfo)
+        {
+            typeInfo = new HFATypeInfo();
+            if (IsNotHFAFastCheck(typeSize))
             {
-                if (fieldType == typeof(float))
-                {
-                    if (typeSize != fields.Length * 4)
-                    {
-                        isHFA = false;
-                    }
-                }
-                else if (fieldType == typeof(double))
-                {
-                    if (typeSize != fields.Length * 8)
-                    {
-                        isHFA = false;
-                    }
-                }
+                return false;
             }
-            if (isHFA)
+            bool ok = ComputHFATypeInfo0(type, typeInfo);
+            if (ok && typeInfo.Count >= 2 && typeInfo.Count <= 4)
             {
-                if (fieldType == typeof(float))
+                int fieldSize = typeInfo.Type == typeof(float) ? 4 : 8;
+                return typeSize == fieldSize * typeInfo.Count;
+            }
+            return false;
+        }
+
+        public static TypeInfo CreateValueType(Type type, bool returnValue)
+        {
+            int typeSize = ComputeSizeOf(type);
+            if (ComputHFATypeInfo(type, typeSize, out HFATypeInfo hfaTypeInfo))
+            {
+                if (hfaTypeInfo.Type == typeof(float))
                 {
-                    switch(fields.Length)
+                    switch(hfaTypeInfo.Count)
                     {
                         case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_2);
                         case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_3);
@@ -143,19 +158,16 @@ namespace HuaTuo.Generators
                         default: throw new NotSupportedException();
                     }
                 }
-                else if (fieldType == typeof(double))
+                else
                 {
-                    switch (fields.Length)
+                    Debug.Assert(hfaTypeInfo.Type == typeof(double));
+                    switch (hfaTypeInfo.Count)
                     {
                         case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_2);
                         case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_3);
                         case 4: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_4);
                         default: throw new NotSupportedException();
                     }
-                }
-                else
-                {
-                    throw new Exception();
                 }
             }
             else

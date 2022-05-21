@@ -235,8 +235,12 @@ namespace HuaTuo.Generators
             }
             PrepareFromAssemblies();
 
-            var methodsByName = _methodSet.ToDictionary(e => e.CreateCallSigName(), e => e);
-            _methodList = methodsByName.Values.ToList();
+            var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
+            foreach(var method in _methodSet)
+            {
+                sortedMethods.Add(method.CreateCallSigName(), method);
+            }
+            _methodList = sortedMethods.Values.ToList();
         }
 
         public void Generate()
