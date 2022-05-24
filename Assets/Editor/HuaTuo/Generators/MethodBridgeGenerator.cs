@@ -116,41 +116,51 @@ namespace HuaTuo.Generators
             }
         }
 
-        public void PrepareFromAssemblies()
+        private void ScanType(Type type)
         {
             var typeDel = typeof(Delegate);
+            if (type.IsGenericTypeDefinition)
+            {
+                return;
+            }
+            foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public
+| BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
+            {
+                if (method.IsGenericMethodDefinition)
+                {
+                    continue;
+                }
+                var mbs = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
+                AddMethod(mbs);
+                if (typeDel.IsAssignableFrom(type) && method.Name == "Invoke")
+                {
+
+                    var mbs2 = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                    AddMethod(mbs2);
+                }
+            }
+
+            foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
+| BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
+            {
+                var mbs = CreateMethodBridgeSig(false, null, method.GetParameters());
+                AddMethod(mbs);
+            }
+
+            foreach(var subType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                ScanType(subType);
+            }
+        }
+
+        public void PrepareFromAssemblies()
+        {
             foreach (var ass in _assemblies)
             {
                 //Debug.Log("prepare assembly:" + ass.FullName);
                 foreach (var type in ass.GetTypes())
                 {
-                    if (type.IsGenericTypeDefinition)
-                    {
-                        continue;
-                    }
-                    foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public
-    | BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
-                    {
-                        if (method.IsGenericMethodDefinition)
-                        {
-                            continue;
-                        }
-                        var mbs = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
-                        AddMethod(mbs);
-                        if (typeDel.IsAssignableFrom(type) && method.Name == "Invoke")
-                        {
-
-                            var mbs2 = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
-                            AddMethod(mbs2);
-                        }
-                    }
-
-                    foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
-| BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
-                    {
-                        var mbs = CreateMethodBridgeSig(false, null, method.GetParameters());
-                        AddMethod(mbs);
-                    }
+                    ScanType(type);
                 }
             }
         }
@@ -217,11 +227,23 @@ namespace HuaTuo.Generators
             }
         }
 
-        public List<Type> PrepareCustomGenericTypes()
+        private void PrepareMethodsFromCustomeGenericTypes()
+        {
+            foreach(var type in PrepareCustomGenericTypes())
+            {
+                ScanType(type);
+            }
+        }
+
+        /// <summary>
+        /// 暂时没有仔细扫描泛型，如果运行时发现有生成缺失，先手动在此添加类
+        /// </summary>
+        /// <returns></returns>
+        private List<Type> PrepareCustomGenericTypes()
         {
             return new List<Type>
             {
-
+                typeof(Dictionary<int, UnitTest.ValueTypeSize20>),
             };
         }
 
@@ -229,6 +251,7 @@ namespace HuaTuo.Generators
         {
             PrepareCommon1();
             PrepareCommon2();
+            PrepareMethodsFromCustomeGenericTypes();
             foreach(var method in _platformAdaptor.GetPreserveMethods())
             {
                 AddMethod(method);
