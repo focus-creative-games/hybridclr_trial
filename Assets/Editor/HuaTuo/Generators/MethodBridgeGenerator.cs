@@ -243,7 +243,6 @@ namespace HuaTuo.Generators
         {
             return new List<Type>
             {
-                typeof(Dictionary<int, UnitTest.ValueTypeSize20>),
             };
         }
 
