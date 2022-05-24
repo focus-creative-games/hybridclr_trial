@@ -65,7 +65,7 @@ namespace HuaTuo.Generators
             }
             for(int i = 0; i < ParamInfos.Count; i++)
             {
-                if (ParamInfos[i].Equals(other.ParamInfos[i]))
+                if (!ParamInfos[i].Type.Equals(other.ParamInfos[i].Type))
                 {
                     return false;
                 }
