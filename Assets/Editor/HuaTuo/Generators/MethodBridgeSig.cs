@@ -3,12 +3,69 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HuaTuo.Generators
 {
     public class MethodBridgeSig : IEquatable<MethodBridgeSig>
     {
+
+        private readonly static Regex s_sigPattern = new Regex(@"^(v|i1|i2|i4|i8|r4|r8|sr|vf2|vf3|vf4|vd2|vd3|vd4|s2|S\d+)+$");
+
+        public static MethodBridgeSig CreateBySignatuer(string sigName)
+        {
+            var re = s_sigPattern.Match(sigName);
+            if (!re.Success)
+            {
+                throw new ArgumentException($"{sigName} is not valid signature");
+            }
+            
+            var mbs = new MethodBridgeSig() { ParamInfos = new List<ParamInfo>()};
+            var sigs = re.Groups[1].Captures;
+            mbs.ReturnInfo = new ReturnInfo() { Type = CreateTypeInfoBySignature(sigs[0].Value)};
+            for(int i = 1; i < sigs.Count; i++)
+            {
+                mbs.ParamInfos.Add(new ParamInfo() { Type = CreateTypeInfoBySignature(sigs[i].Value)});
+            }
+            return mbs;
+        }
+
+
+        private static TypeInfo CreateTypeInfoBySignature(string sigName)
+        {
+            switch(sigName)
+            {
+                case "v": return new TypeInfo(typeof(void), ParamOrReturnType.VOID);
+                case "i1": return new TypeInfo(typeof(sbyte), ParamOrReturnType.I1_U1);
+                case "i2": return new TypeInfo(typeof(short), ParamOrReturnType.I2_U2);
+                case "i4": return new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
+                case "i8": return new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
+                case "r4": return new TypeInfo(typeof(float), ParamOrReturnType.R4);
+                case "r8": return new TypeInfo(typeof(double), ParamOrReturnType.R8);
+                case "sr": return new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
+                case "vf2": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_FLOAT_2);
+                case "vf3": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_FLOAT_3);
+                case "vf4": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_FLOAT_4);
+                case "vd2": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_DOUBLE_2);
+                case "vd3": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_DOUBLE_3);
+                case "vd4": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_DOUBLE_4);
+                case "s2": return new TypeInfo(null, ParamOrReturnType.STRUCTURE_SIZE_LE_16);
+                default:
+                    {
+                        if (sigName.StartsWith("S"))
+                        {
+                            return new TypeInfo(null, ParamOrReturnType.STRUCTURE_SIZE_GT_16, int.Parse(sigName.Substring(1)));
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"invalid signature:{sigName}");
+                        }
+                    }
+            }
+        }
+
+
         public ReturnInfo ReturnInfo { get; set; }
 
         public List<ParamInfo> ParamInfos { get; set; }

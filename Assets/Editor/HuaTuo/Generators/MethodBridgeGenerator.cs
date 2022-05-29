@@ -243,6 +243,20 @@ namespace HuaTuo.Generators
         {
             return new List<Type>
             {
+                typeof(Action<int, string, Vector3>),
+            };
+        }
+
+        /// <summary>
+        /// 如果提示缺失桥接函数，将提示缺失的签名加入到下列列表是简单的做法
+        /// </summary>
+        /// <returns></returns>
+        private List<string> PrepareCustomMethodSignatures()
+        {
+            return new List<string>
+            {
+                // "vi8i8",
+                "S108i8i8",
             };
         }
 
@@ -251,6 +265,10 @@ namespace HuaTuo.Generators
             PrepareCommon1();
             PrepareCommon2();
             PrepareMethodsFromCustomeGenericTypes();
+            foreach(var methodSig in PrepareCustomMethodSignatures())
+            {
+                AddMethod(MethodBridgeSig.CreateBySignatuer(methodSig));
+            }
             foreach(var method in _platformAdaptor.GetPreserveMethods())
             {
                 AddMethod(method);
