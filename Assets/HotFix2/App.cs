@@ -41,11 +41,17 @@ public class App
     /// </summary>
     public static unsafe void LoadMetadataForAOTAssembly()
     {
-        // 可以加载任意aot assembly的对应的dll。这里以最常用的mscorlib.dll举例
+        // 可以加载任意aot assembly的对应的dll。但要求dll必须与unity build过程中生成的裁剪后的dll一致，而不能直接使用
+        // 原始dll。
+        // 这些dll可以在目录 Temp\StagingArea\Il2Cpp\Managed 下找到。
+        // 对于Win Standalone，也可以在 build目录的 {Project}/Managed目录下找到。
+        // 对于Android及其他target, 导出工程中并没有这些dll，因此还是得去 Temp\StagingArea\Il2Cpp\Managed 获取。
+        //
+        // 这里以最常用的mscorlib.dll举例
         //
         // 加载打包时 unity在build目录下生成的 裁剪过的 mscorlib，注意，不能为原始mscorlib
         //
-        string mscorelib = @$"{Application.dataPath}/../build-win64-2020.3.33/huatuo/Managed/mscorlib.dll";
+        string mscorelib = @$"{Application.dataPath}/../Temp/StagingArea/Il2Cpp/Managed/mscorlib.dll";
         byte[] dllBytes = File.ReadAllBytes(mscorelib);
 
         fixed (byte* ptr = dllBytes)
