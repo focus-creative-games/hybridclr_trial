@@ -16,11 +16,15 @@ public class App
 {
     public static int Main()
     {
+#if !UNITY_EDITOR
+        LoadMetadataForAOTAssembly();
+#endif
         Debug.Log("hello, huatuo");
 
         var go = new GameObject("HotFix2");
         go.AddComponent<CreateByHotFix2>();
 
+        TestAOTGeneric();
         return 0;
     }
 
@@ -51,7 +55,8 @@ public class App
         //
         // 加载打包时 unity在build目录下生成的 裁剪过的 mscorlib，注意，不能为原始mscorlib
         //
-        string mscorelib = @$"{Application.dataPath}/../Temp/StagingArea/Il2Cpp/Managed/mscorlib.dll";
+        //string mscorelib = @$"{Application.dataPath}/../Temp/StagingArea/Il2Cpp/Managed/mscorlib.dll";
+        string mscorelib = Path.Combine(Application.streamingAssetsPath, "mscorlib.dll");
         byte[] dllBytes = File.ReadAllBytes(mscorelib);
 
         fixed (byte* ptr = dllBytes)
