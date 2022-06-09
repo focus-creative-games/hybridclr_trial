@@ -26,6 +26,7 @@ namespace HuaTuo
 #endif
         , IProcessSceneWithReport, IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
     {
+        private const string mscorlibName = "mscorlib.dll";
         /// <summary>
         /// 需要在Prefab上挂脚本的热更dll名称列表，不需要挂到Prefab上的脚本可以不放在这里
         /// 但放在这里的dll即使勾选了 AnyPlatform 也会在打包过程中被排除
@@ -74,13 +75,18 @@ namespace HuaTuo
             // 由于 Android 平台在 OnPostprocessBuild 调用时已经生成完 apk 文件，因此需要提前调用
             AddBackHotFixAssembliesToJson(null, path);
         }
-#else
-        public void OnPostprocessBuild(BuildReport report)
-        {
-            AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
-        }
 #endif
 
+        public void OnPostprocessBuild(BuildReport report)
+        {
+#if !UNITY_ANDROID
+
+            AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
+#endif
+            var projectProject = Path.GetFullPath(".");
+            File.Delete(Path.Combine(projectProject, "Assets", "StreamingAssets", mscorlibName));
+        }
+        
         private void AddBackHotFixAssembliesToJson(BuildReport report, string path)
         {
             /*
@@ -114,7 +120,6 @@ namespace HuaTuo
             }
         }
 
-
         public void OnProcessScene(Scene scene, BuildReport report)
         {
 
@@ -122,7 +127,16 @@ namespace HuaTuo
 
         public void OnPostBuildPlayerScriptDLLs(BuildReport report)
         {
-
+            var projectProject = Path.GetFullPath(".");
+            foreach (string newPath in Directory.GetFiles(Path.Combine(projectProject, "Temp", "StagingArea"), "*.*", SearchOption.AllDirectories))
+            {
+                if (newPath.Contains(mscorlibName))
+                {
+                    Debug.Log($"[BuildProcessor] {newPath}");
+                    // windows path: Temp\StagingArea\Data\Managed\mscorlib.dll
+                    File.Copy(newPath, Path.Combine(projectProject, "Assets", "StreamingAssets", mscorlibName));
+                }
+            }
         }
 
         public string GenerateAdditionalLinkXmlFile(BuildReport report, UnityLinkerBuildPipelineData data)
