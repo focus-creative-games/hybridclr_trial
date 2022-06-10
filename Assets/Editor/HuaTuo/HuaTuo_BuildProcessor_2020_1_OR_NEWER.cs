@@ -26,7 +26,6 @@ namespace HuaTuo
 #endif
         , IProcessSceneWithReport, IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
     {
-        private const string mscorlibName = "mscorlib.dll";
         /// <summary>
         /// 需要在Prefab上挂脚本的热更dll名称列表，不需要挂到Prefab上的脚本可以不放在这里
         /// 但放在这里的dll即使勾选了 AnyPlatform 也会在打包过程中被排除
@@ -38,7 +37,6 @@ namespace HuaTuo
             "HotFix.dll",
         };
 
-
         /// <summary>
         /// 所有热更新dll列表
         /// </summary>
@@ -47,6 +45,15 @@ namespace HuaTuo
             // 这里放除了s_monoHotUpdateDllNames以外的脚本不需要挂到资源上的dll列表
             "HotFix2.dll",
         }).ToList();
+
+        /// <summary>
+        /// 需要拷贝的裁剪dll，在裁剪完成后自动拷贝到 Assets/StreamingAssets 目录，这样在打包时即会包含这些dll
+        /// </summary>
+        static List<string> s_copyDllName = new List<string>
+        {
+            "mscorlib.dll",
+        };
+
 
         public int callbackOrder => 0;
 
@@ -84,7 +91,10 @@ namespace HuaTuo
             AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
 #endif
             var projectProject = Path.GetFullPath(".");
-            File.Delete(Path.Combine(projectProject, "Assets", "StreamingAssets", mscorlibName));
+            foreach(var name in s_copyDllName)
+            {
+                File.Delete(Path.Combine(projectProject, "Assets", "StreamingAssets", name));
+            }
         }
         
         private void AddBackHotFixAssembliesToJson(BuildReport report, string path)
@@ -128,13 +138,16 @@ namespace HuaTuo
         public void OnPostBuildPlayerScriptDLLs(BuildReport report)
         {
             var projectProject = Path.GetFullPath(".");
-            foreach (string newPath in Directory.GetFiles(Path.Combine(projectProject, "Temp", "StagingArea"), "*.*", SearchOption.AllDirectories))
+            foreach (var name in s_copyDllName)
             {
-                if (newPath.Contains(mscorlibName))
+                var dllPath = Path.Combine(projectProject, "Temp", "StagingArea", "Data", "Managed", name);
+                if (File.Exists(dllPath))
                 {
-                    Debug.Log($"[BuildProcessor] {newPath}");
-                    // windows path: Temp\StagingArea\Data\Managed\mscorlib.dll
-                    File.Copy(newPath, Path.Combine(projectProject, "Assets", "StreamingAssets", mscorlibName));
+                    File.Copy(dllPath, Path.Combine(projectProject, "Assets", "StreamingAssets", name), true);
+                }
+                else
+                {
+                    Debug.LogWarning($"can not find the strip dll, path = {dllPath}");
                 }
             }
         }

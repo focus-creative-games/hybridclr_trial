@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 struct MyValue
 {
@@ -56,14 +57,51 @@ public class App
         // 加载打包时 unity在build目录下生成的 裁剪过的 mscorlib，注意，不能为原始mscorlib
         //
         //string mscorelib = @$"{Application.dataPath}/../Temp/StagingArea/Il2Cpp/Managed/mscorlib.dll";
+        List<string> dllNameList = new List<string>
+        {
+            "mscorlib.dll",
+        };
+        foreach (var name in dllNameList)
+        {
+#if PLATFORM_ANDROID
+            byte[] dllBytes = GetTextForStreamingAssets(name);
+#else
         string mscorelib = Path.Combine(Application.streamingAssetsPath, "mscorlib.dll");
         byte[] dllBytes = File.ReadAllBytes(mscorelib);
-
-        fixed (byte* ptr = dllBytes)
-        {
-            // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
-            int err = Huatuo.HuatuoApi.LoadMetadataForAOTAssembly((IntPtr)ptr, dllBytes.Length);
-            Debug.Log("LoadMetadataForAOTAssembly. ret:" + err);
+#endif
+            fixed (byte* ptr = dllBytes)
+            {
+                // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
+                int err = Huatuo.HuatuoApi.LoadMetadataForAOTAssembly((IntPtr)ptr, dllBytes.Length);
+                Debug.Log("LoadMetadataForAOTAssembly. ret:" + err);
+            }
         }
     }
+
+    /// <summary>
+    /// 通过UnityWebRequest获取本地StreamingAssets文件夹中的文件
+    /// </summary>
+    /// <param name="path">StreamingAssets文件夹中文件名字加后缀</param>
+    /// <returns></returns>
+    public static byte[] GetTextForStreamingAssets(string path)
+    {
+        var uri = new System.Uri(Path.Combine(Application.streamingAssetsPath, path));
+        UnityWebRequest request = UnityWebRequest.Get(uri);
+        request.SendWebRequest();//读取数据
+        if (request.error == null)
+        {
+            while (true)
+            {
+                if (request.downloadHandler.isDone)//是否读取完数据
+                {
+                    return request.downloadHandler.data;
+                }
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 }
