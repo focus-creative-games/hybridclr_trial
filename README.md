@@ -35,6 +35,8 @@ huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下�
 进入场景后，Main场景中的LoadDll会按顺序加载StreamingAssets目录下common AssetBundle里的HotFix.dll和HotFix2.dll，其中HotFix2.dll依赖HotFix.dll。
 接着运行HotFix2.dll里的App::Main函数。
 
+注意！多热更新dll不是必须的！大多数项目完全可以只有HotFix.dll这一个热更新模块。纯粹出于演示才故意设计了两个热更新模块。
+
 ### 体验热更新
 
 以Win64为例，其他平台同理。
