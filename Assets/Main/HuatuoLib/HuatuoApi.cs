@@ -12,7 +12,7 @@ namespace Huatuo
     {
 #if UNITY_STANDALONE_WIN
         private const string dllName = "GameAssembly";
-#elif UNITY_IOS
+#elif UNITY_IOS || UNITY_STANDALONE_OSX
     private const string dllName = "__Internal";
 #else
     private const string dllName = "il2cpp";
