@@ -2,11 +2,14 @@
 
 一个示例热更新项目。
 
-想了解更多，请加 QQ群: 651188171（huatuo c#热更新）。
+想了解更多，请加 QQ群: 
+
+- huatuo c#热更新 开发交流群：651188171
+- huatuo使用疑难咨询：651188171
 
 你可以使用发布的包来体验huatuo热更新功能。
 
-**示例项目使用 Unity 2020.3.33(任意后缀子版本如f1、f1c1都可以) 版本**，需要精确匹配。
+**示例项目使用 Unity 2020.3.33(任意后缀子版本如f1、f1c1、f1c2都可以) 版本**，需要精确匹配。
 
 ## 目录介绍
 
@@ -18,7 +21,7 @@
 
 huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下，无需打包。
 
-如何打包出一个可热更新的包，请先参阅 [快速上手](https://github.com/focus-creative-games/huatuo/blob/main/docs/start_up.md)。
+如何打包出一个可热更新的包，请先参阅 [快速开始](https://focus-creative-games.github.io/huatuo/start_up/)。
 
 ### 运行流程
 
@@ -37,7 +40,7 @@ huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下�
 以Win64为例，其他平台同理。
 
 - 打包主工程
-  - 点击菜单 Huatuo/BuildBundles/Win64，生成Win64目标的AssetBundle，生成的AssetBundle文件会自动复制到StreamingAssets目录下
+  - 点击菜单`Huatuo/BuildBundles/Win64`，生成Win64目标的AssetBundle，生成的AssetBundle文件会自动复制到StreamingAssets目录下
   - Build打包 Win64平台的目录
   - 运行，会看到打出 hello, huatuo.prefab
 - 更新ab包
