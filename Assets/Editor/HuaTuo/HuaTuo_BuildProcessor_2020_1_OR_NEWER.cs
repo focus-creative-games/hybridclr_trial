@@ -24,7 +24,7 @@ namespace HuaTuo
 #else
         , IPostprocessBuildWithReport
 #endif
-        , IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
+        , IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor, IIl2CppProcessor
     {
 
 
@@ -192,6 +192,23 @@ namespace HuaTuo
 
         public void OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data)
         {
+        }
+
+        public void OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
+        {
+            var projDir = Path.GetDirectoryName(Application.dataPath);
+            var dstPath = $"{projDir}/HuatuoData/AssembliesPostIl2CppStrip/{data.target}";
+
+            Directory.CreateDirectory(dstPath);
+
+            string srcStripDllPath = projDir + "/" + (data.target == BuildTarget.Android ?  "Temp/StagingArea/assets/bin/Data/Managed": "Temp/StagingArea/Data/Managed/");
+
+            foreach(var fileFullPath in Directory.GetFiles(srcStripDllPath, "*.dll"))
+            {
+                var file = Path.GetFileName(fileFullPath);
+                Debug.Log($"copy strip dll {fileFullPath} ==> {dstPath}/{file}");
+                File.Copy($"{fileFullPath}", $"{dstPath}/{file}", true);
+            }
         }
 
 
