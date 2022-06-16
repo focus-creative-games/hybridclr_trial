@@ -44,7 +44,8 @@ huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下�
 - 安装huatuo
   - 进入HuatuoData目录
   - 运行 init_huatuo_repos.bat 或 相应 .sh
-  - 进行 set_version_xxx.bat 或 相应 .sh。选择与你匹配的版本。如果没有，自己切换到正确的分支。[支持的版本与分支对应关系](https://focus-creative-games.github.io/huatuo/support_versions/)
+  - 运行 set_version_xxx.bat 或 相应 .sh。选择与你匹配的版本。如果没有，自己切换到正确的分支。[支持的版本与分支对应关系](https://focus-creative-games.github.io/huatuo/support_versions/)
+  - 运行 init_local_il2cpp_data.bat或者相应.sh文件。注意！需要修改脚本，正确设置你的unity安装路径！
 - 打包主工程
   - 点击菜单`Huatuo/BuildBundles/Win64`，生成Win64目标的AssetBundle，生成的AssetBundle文件会自动复制到StreamingAssets目录下
   - Build打包 Win64平台的目录
