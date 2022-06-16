@@ -16,25 +16,6 @@ namespace HuaTuo
     /// </summary>
     public class HuaTuoEditorHelper
     {
-        /// <summary>
-        /// 打包时，将热更新脚本自动加入到link include的assembly列表，对于普通类，就不会出现因为类型裁剪导致热更新dll运行时
-        /// 报 TypeMissing的错误了。
-        /// 但====注意====，这个办法只是方便新手体验热更新。打包后，热更新dll新增类型引用，如果被裁剪了，依然会报错的。
-        /// 因此正式的工作流，还是得靠link.xml里preserve你想要的类，后续我们会提供更正式的工作流及相关工具。
-        /// 另外，这个办法只能解决普通类裁剪的问题，不能解决AOT泛型函数实例化缺失的问题。
-        /// </summary>
-        [InitializeOnLoadMethod]
-        private static void Setup()
-        {
-            //var linkAdds = string.Join(" ", HuaTuo_BuildProcessor_2020_1_OR_NEWER.s_allHotUpdateDllNames
-            //    .Select(s => $"--include-assembly={Path.Combine(Environment.CurrentDirectory, $"Temp/StagingArea/Data/Managed/{s}").Replace('\\', '/')}"));
-            //var envVar = Environment.GetEnvironmentVariable("UNITYLINKER_ADDITIONAL_ARGS");
-
-            //if (envVar != linkAdds)
-            //{
-            //    Environment.SetEnvironmentVariable("UNITYLINKER_ADDITIONAL_ARGS", linkAdds);
-            //}
-        }
 
         private static void CreateDirIfNotExists(string dirName)
         {

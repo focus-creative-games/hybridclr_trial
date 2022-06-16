@@ -56,6 +56,11 @@ rd /s /q %LIBIL2CPP_PATH%
 xcopy /q /i /e %IL2CPP_HUATUO_REPO%\libil2cpp %LIBIL2CPP_PATH%
 xcopy /q /i /e %HUATUO_REPO%\huatuo %LIBIL2CPP_PATH%\huatuo
 
+rem 务必清除缓存，不然build仍然使用旧版本。
+rem 只影响直接build的情况，不影响导出工程的情形。
+echo 清除 Library\Il2cppBuildCache 缓存目录
+rd /s /q ..\Library\Il2cppBuildCache
+
 echo 初始化成功
 
 :EXIT

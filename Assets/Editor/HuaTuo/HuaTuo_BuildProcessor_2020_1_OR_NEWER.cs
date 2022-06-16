@@ -24,8 +24,26 @@ namespace HuaTuo
 #else
         , IPostprocessBuildWithReport
 #endif
-        , IProcessSceneWithReport, IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
+        , IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
     {
+
+
+        [InitializeOnLoadMethod]
+        private static void Setup()
+        {
+            ///
+            /// unity允许使用UNITY_IL2CPP_PATH环境变量指定il2cpp的位置，因此我们不再直接修改安装位置的il2cpp，
+            /// 而是在本地目录
+            ///
+            var projDir = Path.GetDirectoryName(Application.dataPath);
+            var localIl2cppDir = $"{projDir}/HuatuoData/LocalIl2CppData/il2cpp";
+            if (!Directory.Exists(localIl2cppDir))
+            {
+                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，请手动执行 {projDir}/HuatuoData 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
+            }
+            Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
+        }
+
         /// <summary>
         /// 需要在Prefab上挂脚本的热更dll名称列表，不需要挂到Prefab上的脚本可以不放在这里
         /// 但放在这里的dll即使勾选了 AnyPlatform 也会在打包过程中被排除
@@ -49,30 +67,25 @@ namespace HuaTuo
             "HotFix2.dll",
         }).ToList();
 
-        /// <summary>
-        /// 需要拷贝的裁剪dll，在裁剪完成后自动拷贝到 Assets/StreamingAssets 目录，这样在打包时即会包含这些dll
-        /// </summary>
-        static List<string> s_copyDllName = new List<string>
-        {
-            "mscorlib.dll",
-        };
+        ///// <summary>
+        ///// 需要拷贝的裁剪dll，在裁剪完成后自动拷贝到 Assets/StreamingAssets 目录，这样在打包时即会包含这些dll
+        ///// </summary>
+        //static List<string> s_copyDllName = new List<string>
+        //{
+        //    "mscorlib.dll",
+        //};
 
 
         public int callbackOrder => 0;
 
         private static void BuildExceptionEventHandler(object sender, UnhandledExceptionEventArgs e)
         {
-            Debug.Log($"build error, clear il2cpp path");
-            Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", "");
+
         }
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", "");
-            //var il2cpp = Environment.GetEnvironmentVariable("UNITY_IL2CPP_PATH");
-            //Debug.Log($"build error, clear {il2cpp}");
 
-            AppDomain.CurrentDomain.UnhandledException += BuildExceptionEventHandler;
         }
 
         public string[] OnFilterAssemblies(BuildOptions buildOptions, string[] assemblies)
@@ -103,13 +116,11 @@ namespace HuaTuo
 
             AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
 #endif
-            var projectProject = Path.GetFullPath(".");
-            foreach(var name in s_copyDllName)
-            {
-                File.Delete(Path.Combine(projectProject, "Assets", "StreamingAssets", name));
-            }
-            Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", "");
-            AppDomain.CurrentDomain.UnhandledException -= BuildExceptionEventHandler;
+            //var projectProject = Path.GetFullPath(".");
+            //foreach(var name in s_copyDllName)
+            //{
+            //    File.Delete(Path.Combine(projectProject, "Assets", "StreamingAssets", name));
+            //}
         }
         
         private void AddBackHotFixAssembliesToJson(BuildReport report, string path)
@@ -145,26 +156,22 @@ namespace HuaTuo
             }
         }
 
-        public void OnProcessScene(Scene scene, BuildReport report)
-        {
-
-        }
 
         public void OnPostBuildPlayerScriptDLLs(BuildReport report)
         {
             var projectProject = Path.GetFullPath(".");
-            foreach (var name in s_copyDllName)
-            {
-                var dllPath = Path.Combine(projectProject, "Temp", "StagingArea", "Data", "Managed", name);
-                if (File.Exists(dllPath))
-                {
-                    File.Copy(dllPath, Path.Combine(projectProject, "Assets", "StreamingAssets", name), true);
-                }
-                else
-                {
-                    Debug.LogWarning($"can not find the strip dll, path = {dllPath}");
-                }
-            }
+            //foreach (var name in s_copyDllName)
+            //{
+            //    var dllPath = Path.Combine(projectProject, "Temp", "StagingArea", "Data", "Managed", name);
+            //    if (File.Exists(dllPath))
+            //    {
+            //        File.Copy(dllPath, Path.Combine(projectProject, "Assets", "StreamingAssets", name), true);
+            //    }
+            //    else
+            //    {
+            //        Debug.LogWarning($"can not find the strip dll, path = {dllPath}");
+            //    }
+            //}
         }
 
         public string GenerateAdditionalLinkXmlFile(BuildReport report, UnityLinkerBuildPipelineData data)
@@ -174,13 +181,13 @@ namespace HuaTuo
 
         public void OnBeforeRun(BuildReport report, UnityLinkerBuildPipelineData data)
         {
-            // 注意，此处使用的环境变量，指定il2cpp目录
-            // 如果要屏蔽或者修改环境变量，需要清理缓存
-            // 缓存路径为 Library/Il2cppBuildCache
-            // 再通过shell脚本安装或更新时，该缓存会自动清理
-            var il2cppPath = Path.Combine(Path.GetFullPath("unity_il2cpp_with_huatuo"), "project_il2cpp", "il2cpp");
-            Debug.Log($"il2cpp path {il2cppPath}");
-            Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", il2cppPath);
+            //// 注意，此处使用的环境变量，指定il2cpp目录
+            //// 如果要屏蔽或者修改环境变量，需要清理缓存
+            //// 缓存路径为 Library/Il2cppBuildCache
+            //// 再通过shell脚本安装或更新时，该缓存会自动清理
+            //var il2cppPath = Path.Combine(Path.GetFullPath("unity_il2cpp_with_huatuo"), "project_il2cpp", "il2cpp");
+            //Debug.Log($"il2cpp path {il2cppPath}");
+            //Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", il2cppPath);
         }
 
         public void OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data)

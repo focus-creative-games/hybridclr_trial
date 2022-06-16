@@ -17,15 +17,16 @@ public class App
 {
     public static int Main()
     {
-#if !UNITY_EDITOR
-        LoadMetadataForAOTAssembly();
-#endif
         Debug.Log("hello, huatuo");
-
         var go = new GameObject("HotFix2");
         go.AddComponent<CreateByHotFix2>();
 
-        TestAOTGeneric();
+        // 补充AOT元数据请自己手动调用。
+        // 由于当前 mscorlib.dll 未打入 common ab包，
+        // 直接调用会出错。请自己修改打包脚本，将裁剪后的mscorlib.dll
+        // 打入 common 
+        //LoadMetadataForAOTAssembly();
+        //TestAOTGeneric();
         return 0;
     }
 
@@ -57,18 +58,19 @@ public class App
         // 加载打包时 unity在build目录下生成的 裁剪过的 mscorlib，注意，不能为原始mscorlib
         //
         //string mscorelib = @$"{Application.dataPath}/../Temp/StagingArea/Il2Cpp/Managed/mscorlib.dll";
-        List<string> dllNameList = new List<string>
+
+        /// 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
+        /// 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
+        /// 
+        List<string> aotDllList = new List<string>
         {
             "mscorlib.dll",
         };
-        foreach (var name in dllNameList)
+
+        AssetBundle dllAB = BetterStreamingAssets.LoadAssetBundle("common");
+        foreach (var aotDllName in aotDllList)
         {
-#if PLATFORM_ANDROID
-            byte[] dllBytes = GetTextForStreamingAssets(name);
-#else
-        string mscorelib = Path.Combine(Application.streamingAssetsPath, "mscorlib.dll");
-        byte[] dllBytes = File.ReadAllBytes(mscorelib);
-#endif
+            byte[] dllBytes = dllAB.LoadAsset<TextAsset>(aotDllName).bytes;
             fixed (byte* ptr = dllBytes)
             {
                 // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
@@ -78,30 +80,6 @@ public class App
         }
     }
 
-    /// <summary>
-    /// 通过UnityWebRequest获取本地StreamingAssets文件夹中的文件
-    /// </summary>
-    /// <param name="path">StreamingAssets文件夹中文件名字加后缀</param>
-    /// <returns></returns>
-    public static byte[] GetTextForStreamingAssets(string path)
-    {
-        var uri = new System.Uri(Path.Combine(Application.streamingAssetsPath, path));
-        UnityWebRequest request = UnityWebRequest.Get(uri);
-        request.SendWebRequest();//读取数据
-        if (request.error == null)
-        {
-            while (true)
-            {
-                if (request.downloadHandler.isDone)//是否读取完数据
-                {
-                    return request.downloadHandler.data;
-                }
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
+
 
 }

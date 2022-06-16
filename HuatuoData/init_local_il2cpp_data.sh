@@ -56,4 +56,10 @@ rm -rf "$LIBIL2CPP_PATH"
 cp -r "$IL2CPP_HUATUO_REPO/libil2cpp" "$LIBIL2CPP_PATH"
 cp -r "$HUATUO_REPO/huatuo" "$LIBIL2CPP_PATH/huatuo"
 
+# 务必清除缓存，不然build仍然使用旧版本。
+# 只影响直接build的情况，不影响导出工程的情形。
+
+echo 清除 Library/Il2cppBuildCache 缓存目录
+rm -rf ../Library/Il2cppBuildCache
+
 echo 初始化成功
