@@ -45,6 +45,6 @@ public class LoadDll : MonoBehaviour
         // 如果是Update之类的函数，推荐先转成Delegate再调用，如
         //var updateMethod = appType.GetMethod("Update");
         //var updateDel = System.Delegate.CreateDelegate(typeof(Action<float>), null, updateMethod);
-        //updateMethod(deltaTime);
+        //updateDel(deltaTime);
     }
 }
