@@ -53,7 +53,7 @@ namespace Huatuo
         /// 注意：多热更新dll不是必须的！大多数项目完全可以只有HotFix.dll这一个热更新模块,纯粹出于演示才故意设计了两个热更新模块。
         /// 另外，是否热更新跟dll名毫无关系，凡是不打包到主工程的，都可以是热更新dll。
         /// </summary>
-        static List<string> s_monoHotUpdateDllNames = new List<string>()
+        public static List<string> s_monoHotUpdateDllNames = new List<string>()
         {
             "HotFix.dll",
         };
