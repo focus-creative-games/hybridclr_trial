@@ -8,4 +8,6 @@ cd il2cpp_huatuo_repo
 git pull
 
 
+echo succ
+
 pause

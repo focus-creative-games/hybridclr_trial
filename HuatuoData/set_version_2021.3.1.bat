@@ -4,4 +4,6 @@ cd il2cpp_huatuo_repo
 
 git switch %BRANCH%
 
+echo succ
+
 pause

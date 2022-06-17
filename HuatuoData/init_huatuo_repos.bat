@@ -12,5 +12,7 @@ cd il2cpp_huatuo_repo
 
 git switch %DEFAULT_VERSION%
 
+echo succ
+
 pause
 
