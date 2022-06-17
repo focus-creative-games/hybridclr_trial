@@ -65,6 +65,13 @@ public class App
         List<string> aotDllList = new List<string>
         {
             "mscorlib.dll",
+            "System.Core.dll", // 如果使用了Linq，需要这个
+            // "Newtonsoft.Json.dll",
+            // "protobuf-net.dll",
+            // "Google.Protobuf.dll",
+            // "MongoDB.Bson.dll",
+            // "DOTween.Modules.dll",
+            // "UniTask.dll",
         };
 
         AssetBundle dllAB = BetterStreamingAssets.LoadAssetBundle("common");

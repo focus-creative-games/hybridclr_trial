@@ -41,7 +41,7 @@ huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下�
 
 以Win64为例，其他平台同理。
 
-- 安装huatuo
+- 安装huatuo （安装huatuo的原理请看 [快速上手](https://focus-creative-games.github.io/huatuo/start_up)）
   - 进入HuatuoData目录
   - 运行 init_huatuo_repos.bat 或 相应 .sh
   - 运行 set_version_xxx.bat 或 相应 .sh。选择与你匹配的版本。如果没有，自己切换到正确的分支。[支持的版本与分支对应关系](https://focus-creative-games.github.io/huatuo/support_versions/)
