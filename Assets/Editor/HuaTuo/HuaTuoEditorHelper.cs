@@ -1,4 +1,4 @@
-using HuaTuo.Generators;
+using Huatuo.Generators;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,13 +8,13 @@ using UnityEditor.Build.Player;
 using UnityEngine;
 using FileMode = System.IO.FileMode;
 
-namespace HuaTuo
+namespace Huatuo
 {
     /// <summary>
     /// 这里仅仅是一个流程展示
     /// 简单说明如果你想将huatuo的dll做成自动化的简单实现
     /// </summary>
-    public class HuaTuoEditorHelper
+    public class HuatuoEditorHelper
     {
 
         private static void CreateDirIfNotExists(string dirName)
@@ -46,49 +46,49 @@ namespace HuaTuo
             }
         }
 
-        public static string DllBuildOutputDir => Path.GetFullPath($"{Application.dataPath}/../Temp/HuaTuo/build");
+        public static string DllBuildOutputDir => Path.GetFullPath($"{Application.dataPath}/../Temp/Huatuo/build");
 
         public static string GetDllBuildOutputDirByTarget(BuildTarget target)
         {
             return $"{DllBuildOutputDir}/{target}";
         }
 
-        [MenuItem("HuaTuo/CompileDll/ActiveBuildTarget")]
+        [MenuItem("Huatuo/CompileDll/ActiveBuildTarget")]
         public static void CompileDllActiveBuildTarget()
         {
             var target = EditorUserBuildSettings.activeBuildTarget;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/CompileDll/Win64")]
+        [MenuItem("Huatuo/CompileDll/Win64")]
         public static void CompileDllWin64()
         {
             var target = BuildTarget.StandaloneWindows64;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/CompileDll/Linux64")]
+        [MenuItem("Huatuo/CompileDll/Linux64")]
         public static void CompileDllLinux()
         {
             var target = BuildTarget.StandaloneLinux64;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/CompileDll/OSX")]
+        [MenuItem("Huatuo/CompileDll/OSX")]
         public static void CompileDllOSX()
         {
             var target = BuildTarget.StandaloneOSX;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/CompileDll/Android")]
+        [MenuItem("Huatuo/CompileDll/Android")]
         public static void CompileDllAndroid()
         {
             var target = BuildTarget.Android;
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/CompileDll/IOS")]
+        [MenuItem("Huatuo/CompileDll/IOS")]
         public static void CompileDllIOS()
         {
             //var target = EditorUserBuildSettings.activeBuildTarget;
@@ -97,7 +97,7 @@ namespace HuaTuo
         }
 
 
-        public static string AssetBundleOutputDir => Application.dataPath + "/HuaTuo/Output";
+        public static string AssetBundleOutputDir => Application.dataPath + "/Huatuo/Output";
 
         public static string GetAssetBundleOutputDirByTarget(BuildTarget target)
         {
@@ -106,7 +106,7 @@ namespace HuaTuo
 
         public static string GetAssetBundleTempDirByTarget(BuildTarget target)
         {
-            return $"{Application.dataPath}/HuaTuo/AssetBundleTemp/{target}";
+            return $"{Application.dataPath}/Huatuo/AssetBundleTemp/{target}";
         }
 
         /// <summary>
@@ -182,49 +182,49 @@ namespace HuaTuo
             }
         }
 
-        [MenuItem("HuaTuo/BuildBundles/ActiveBuildTarget")]
+        [MenuItem("Huatuo/BuildBundles/ActiveBuildTarget")]
         public static void BuildSeneAssetBundleActiveBuildTarget()
         {
             var target = EditorUserBuildSettings.activeBuildTarget;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/BuildBundles/Win64")]
+        [MenuItem("Huatuo/BuildBundles/Win64")]
         public static void BuildSeneAssetBundleWin64()
         {
             var target = BuildTarget.StandaloneWindows64;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/BuildBundles/OSX")]
+        [MenuItem("Huatuo/BuildBundles/OSX")]
         public static void BuildSeneAssetBundleOSX64()
         {
             var target = BuildTarget.StandaloneOSX;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/BuildBundles/Linux64")]
+        [MenuItem("Huatuo/BuildBundles/Linux64")]
         public static void BuildSeneAssetBundleLinux64()
         {
             var target = BuildTarget.StandaloneLinux64;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/BuildBundles/Android")]
+        [MenuItem("Huatuo/BuildBundles/Android")]
         public static void BuildSeneAssetBundleAndroid()
         {
             var target = BuildTarget.Android;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HuaTuo/BuildBundles/IOS")]
+        [MenuItem("Huatuo/BuildBundles/IOS")]
         public static void BuildSeneAssetBundleIOS()
         {
             var target = BuildTarget.iOS;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
         
-        [MenuItem("HuaTuo/Generate/MethodBridge_X64")]
+        [MenuItem("Huatuo/Generate/MethodBridge_X64")]
         public static void MethodBridge_X86()
         {
             //var target = EditorUserBuildSettings.activeBuildTarget;
@@ -241,7 +241,7 @@ namespace HuaTuo
             Debug.LogFormat("== output:{0} ==", outputFile);
         }
 
-        [MenuItem("HuaTuo/Generate/MethodBridge_Arm64")]
+        [MenuItem("Huatuo/Generate/MethodBridge_Arm64")]
         public static void MethodBridge_Arm64()
         {
             string outputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_arm64.cpp";

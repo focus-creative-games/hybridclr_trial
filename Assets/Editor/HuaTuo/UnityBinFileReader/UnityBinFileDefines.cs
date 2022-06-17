@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using static HuaTuo.Editor.GlobalManagers.UnityBinUtils;
+using static Huatuo.Editor.GlobalManagers.UnityBinUtils;
 
-namespace HuaTuo.Editor.GlobalManagers
+namespace Huatuo.Editor.GlobalManagers
 {
     public struct FileHeader
     {

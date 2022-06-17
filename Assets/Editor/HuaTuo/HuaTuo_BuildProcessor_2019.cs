@@ -12,14 +12,14 @@ using System;
 using UnityEditor.UnityLinker;
 using System.Reflection;
 using UnityEditor.Il2Cpp;
-using HuaTuo.Editor.GlobalManagers;
+using Huatuo.Editor.GlobalManagers;
 #if UNITY_ANDROID
 using UnityEditor.Android;
 #endif
 
-namespace HuaTuo
+namespace Huatuo
 {
-    public class HuaTuo_BuildProcessor_2019 : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    public class Huatuo_BuildProcessor_2019 : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 #if UNITY_ANDROID
         , IPostGenerateGradleAndroidProject
 #endif
@@ -37,7 +37,7 @@ namespace HuaTuo
 
         int IOrderedCallback.callbackOrder => 0;
 
-        static HuaTuo_BuildProcessor_2019()
+        static Huatuo_BuildProcessor_2019()
         {
             s_BuildReport_AddMessage = typeof(BuildReport).GetMethod("AddMessage", BindingFlags.Instance | BindingFlags.NonPublic);
         }

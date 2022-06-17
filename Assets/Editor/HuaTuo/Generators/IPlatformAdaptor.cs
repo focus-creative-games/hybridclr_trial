@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HuaTuo.Generators
+namespace Huatuo.Generators
 {
     public interface IPlatformAdaptor
     {

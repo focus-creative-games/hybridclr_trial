@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HuaTuo.Generators
+namespace Huatuo.Generators
 {
     internal class PlatformAdaptor_Arm32 : PlatformAdaptorBase
     {

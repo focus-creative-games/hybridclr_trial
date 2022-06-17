@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace HuaTuo.Generators
+namespace Huatuo.Generators
 {
     public enum CallConventionType
     {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace HuaTuo.Generators
+namespace Huatuo.Generators
 {
     public class MethodBridgeSig : IEquatable<MethodBridgeSig>
     {
