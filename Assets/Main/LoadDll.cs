@@ -16,9 +16,11 @@ public class LoadDll : MonoBehaviour
 
     private System.Reflection.Assembly gameAss;
 
+    public static AssetBundle AssemblyAssetBundle { get; private set; }
+
     private void LoadGameDll()
     {
-        AssetBundle dllAB = BetterStreamingAssets.LoadAssetBundle("common");
+        AssetBundle dllAB = AssemblyAssetBundle = BetterStreamingAssets.LoadAssetBundle("common");
 #if !UNITY_EDITOR
         TextAsset dllBytes1 = dllAB.LoadAsset<TextAsset>("HotFix.dll.bytes");
         System.Reflection.Assembly.Load(dllBytes1.bytes);

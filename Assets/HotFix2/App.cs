@@ -17,6 +17,12 @@ public class App
 {
     public static int Main()
     {
+#if !UNITY_EDITOR
+        LoadMetadataForAOTAssembly();
+#endif
+        // 测试补充元数据后使用 AOT泛型
+        TestAOTGeneric();
+
         Debug.Log("hello, huatuo");
         var go = new GameObject("HotFix2");
         go.AddComponent<CreateByHotFix2>();
@@ -25,13 +31,12 @@ public class App
         // 由于当前 mscorlib.dll 未打入 common ab包，
         // 直接调用会出错。请自己修改打包脚本，将裁剪后的mscorlib.dll
         // 打入 common 
-        //LoadMetadataForAOTAssembly();
-        //TestAOTGeneric();
+
         return 0;
     }
 
     /// <summary>
-    /// 测试 aot泛型，这个代码大家自己主动调吧
+    /// 测试 aot泛型
     /// </summary>
     public static void TestAOTGeneric()
     {
@@ -65,6 +70,7 @@ public class App
         List<string> aotDllList = new List<string>
         {
             "mscorlib.dll",
+            "System.dll",
             "System.Core.dll", // 如果使用了Linq，需要这个
             // "Newtonsoft.Json.dll",
             // "protobuf-net.dll",
@@ -74,7 +80,7 @@ public class App
             // "UniTask.dll",
         };
 
-        AssetBundle dllAB = BetterStreamingAssets.LoadAssetBundle("common");
+        AssetBundle dllAB = LoadDll.AssemblyAssetBundle;
         foreach (var aotDllName in aotDllList)
         {
             byte[] dllBytes = dllAB.LoadAsset<TextAsset>(aotDllName).bytes;
@@ -82,7 +88,7 @@ public class App
             {
                 // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
                 int err = Huatuo.HuatuoApi.LoadMetadataForAOTAssembly((IntPtr)ptr, dllBytes.Length);
-                Debug.Log("LoadMetadataForAOTAssembly. ret:" + err);
+                Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. ret:{err}");
             }
         }
     }

@@ -139,6 +139,21 @@ namespace Huatuo
                 notSceneAssets.Add(dllBytesPath);
             }
 
+            var aotDlls = new string[]
+            {
+                "mscorlib.dll",
+                "System.dll",
+                "System.Core.dll", // 如果使用了Linq，需要这个
+            };
+
+            string aotDllDir = $"{Application.dataPath}/../HuatuoData/AssembliesPostIl2CppStrip/{target}";
+            foreach (var dll in aotDlls)
+            {
+                string dllPath = $"{aotDllDir}/{dll}";
+                string dllBytesPath = $"{tempDir}/{dll}.bytes";
+                File.Copy(dllPath, dllBytesPath, true);
+                notSceneAssets.Add(dllBytesPath);
+            }
 
             string testPrefab = $"{Application.dataPath}/Prefabs/HotUpdatePrefab.prefab";
             notSceneAssets.Add(testPrefab);
