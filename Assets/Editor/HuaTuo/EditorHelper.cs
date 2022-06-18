@@ -14,7 +14,7 @@ namespace Huatuo
     /// 这里仅仅是一个流程展示
     /// 简单说明如果你想将huatuo的dll做成自动化的简单实现
     /// </summary>
-    public class HuatuoEditorHelper
+    public class EditorHelper
     {
 
         private static void CreateDirIfNotExists(string dirName)
@@ -96,8 +96,17 @@ namespace Huatuo
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
+        public static string HuatuoBuildCacheDir => Application.dataPath + "/HuatuoBuildCache";
 
-        public static string AssetBundleOutputDir => Application.dataPath + "/Huatuo/Output";
+        public static string AssetBundleOutputDir => $"{HuatuoBuildCacheDir}/AssetBundleOutput";
+
+        public static string AssetBundleSourceDataTempDir => $"{HuatuoBuildCacheDir}/AssetBundleSourceData";
+
+        public static string HuatuoDataDir => $"{Application.dataPath}/../HuatuoData";
+
+        public static string AssembliesPostIl2CppStripDir => $"{HuatuoDataDir}/AssembliesPostIl2CppStrip";
+
+        public static string MethodBridgeCppDir => $"{HuatuoDataDir}/LocalIl2CppData/il2cpp/libil2cpp/huatuo/interpreter";
 
         public static string GetAssetBundleOutputDirByTarget(BuildTarget target)
         {
@@ -106,7 +115,7 @@ namespace Huatuo
 
         public static string GetAssetBundleTempDirByTarget(BuildTarget target)
         {
-            return $"{Application.dataPath}/Huatuo/AssetBundleTemp/{target}";
+            return $"{AssetBundleSourceDataTempDir}/{target}";
         }
 
         /// <summary>
@@ -146,7 +155,7 @@ namespace Huatuo
                 "System.Core.dll", // 如果使用了Linq，需要这个
             };
 
-            string aotDllDir = $"{Application.dataPath}/../HuatuoData/AssembliesPostIl2CppStrip/{target}";
+            string aotDllDir = $"{AssembliesPostIl2CppStripDir}/{target}";
             foreach (var dll in aotDlls)
             {
                 string dllPath = $"{aotDllDir}/{dll}";
@@ -243,12 +252,22 @@ namespace Huatuo
             var target = BuildTarget.iOS;
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
-        
+
+        private static void CleanIl2CppBuildCache()
+        {
+            string il2cppBuildCachePath = $"{Application.dataPath}/../Library/Il2cppBuildCache";
+            if (!Directory.Exists(il2cppBuildCachePath))
+            {
+                return;
+            }
+            Debug.Log($"clean il2cpp build cache:{il2cppBuildCachePath}");
+            Directory.Delete(il2cppBuildCachePath, true);
+        }
+
         [MenuItem("Huatuo/Generate/MethodBridge_X64")]
         public static void MethodBridge_X86()
         {
-            //var target = EditorUserBuildSettings.activeBuildTarget;
-            string outputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_x64.cpp";
+            string outputFile = $"{MethodBridgeCppDir}/MethodBridge_x64.cpp";
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = CallConventionType.X64,
@@ -259,12 +278,13 @@ namespace Huatuo
             g.PrepareMethods();
             g.Generate();
             Debug.LogFormat("== output:{0} ==", outputFile);
+            CleanIl2CppBuildCache();
         }
 
         [MenuItem("Huatuo/Generate/MethodBridge_Arm64")]
         public static void MethodBridge_Arm64()
         {
-            string outputFile = $"{Application.dataPath}/../Library/Huatuo/MethodBridge_arm64.cpp";
+            string outputFile = $"{MethodBridgeCppDir}/MethodBridge_arm64.cpp";
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = CallConventionType.Arm64,
@@ -275,6 +295,7 @@ namespace Huatuo
             g.PrepareMethods();
             g.Generate();
             Debug.LogFormat("== output:{0} ==", outputFile);
+            CleanIl2CppBuildCache();
         }
     }
 }

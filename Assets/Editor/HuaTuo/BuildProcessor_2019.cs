@@ -19,7 +19,7 @@ using UnityEditor.Android;
 
 namespace Huatuo
 {
-    public class Huatuo_BuildProcessor_2019 : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    public class BuildProcessor_2019 : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 #if UNITY_ANDROID
         , IPostGenerateGradleAndroidProject
 #endif
