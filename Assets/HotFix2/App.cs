@@ -42,8 +42,7 @@ public class App
     {
         var arr = new List<MyValue>();
         arr.Add(new MyValue() { x = 1, y = 10, s = "abc" });
-        var e = arr[0];
-        Debug.LogFormat("x:{0} y:{1} s:{2}", e.x, e.y, e.s);
+        Debug.Log("AOT泛型补充元数据机制测试正常");
     }
 
     /// <summary>
