@@ -20,48 +20,48 @@ public class App
 #if !UNITY_EDITOR
         LoadMetadataForAOTAssembly();
 #endif
-        // ²âÊÔ²¹³äÔªÊı¾İºóÊ¹ÓÃ AOT·ºĞÍ
+        // æµ‹è¯•è¡¥å……å…ƒæ•°æ®åä½¿ç”¨ AOTæ³›å‹
         TestAOTGeneric();
 
         Debug.Log("hello, huatuo");
         var go = new GameObject("HotFix2");
         go.AddComponent<CreateByHotFix2>();
 
-        // ²¹³äAOTÔªÊı¾İÇë×Ô¼ºÊÖ¶¯µ÷ÓÃ¡£
-        // ÓÉÓÚµ±Ç° mscorlib.dll Î´´òÈë common ab°ü£¬
-        // Ö±½Óµ÷ÓÃ»á³ö´í¡£Çë×Ô¼ºĞŞ¸Ä´ò°ü½Å±¾£¬½«²Ã¼ôºóµÄmscorlib.dll
-        // ´òÈë common 
+        // è¡¥å……AOTå…ƒæ•°æ®è¯·è‡ªå·±æ‰‹åŠ¨è°ƒç”¨ã€‚
+        // ç”±äºå½“å‰ mscorlib.dll æœªæ‰“å…¥ common abåŒ…ï¼Œ
+        // ç›´æ¥è°ƒç”¨ä¼šå‡ºé”™ã€‚è¯·è‡ªå·±ä¿®æ”¹æ‰“åŒ…è„šæœ¬ï¼Œå°†è£å‰ªåçš„mscorlib.dll
+        // æ‰“å…¥ common 
 
         return 0;
     }
 
     /// <summary>
-    /// ²âÊÔ aot·ºĞÍ
+    /// æµ‹è¯• aotæ³›å‹
     /// </summary>
     public static void TestAOTGeneric()
     {
         var arr = new List<MyValue>();
         arr.Add(new MyValue() { x = 1, y = 10, s = "abc" });
-        Debug.Log("AOT·ºĞÍ²¹³äÔªÊı¾İ»úÖÆ²âÊÔÕı³£");
+        Debug.Log("AOTæ³›å‹è¡¥å……å…ƒæ•°æ®æœºåˆ¶æµ‹è¯•æ­£å¸¸");
     }
 
     /// <summary>
-    /// Îªaot assembly¼ÓÔØÔ­Ê¼metadata£¬ Õâ¸ö´úÂë·Åaot»òÕßÈÈ¸üĞÂ¶¼ĞĞ¡£
-    /// Ò»µ©¼ÓÔØºó£¬Èç¹ûAOT·ºĞÍº¯Êı¶ÔÓ¦nativeÊµÏÖ²»´æÔÚ£¬Ôò×Ô¶¯Ìæ»»Îª½âÊÍÄ£Ê½Ö´ĞĞ
+    /// ä¸ºaot assemblyåŠ è½½åŸå§‹metadataï¼Œ è¿™ä¸ªä»£ç æ”¾aotæˆ–è€…çƒ­æ›´æ–°éƒ½è¡Œã€‚
+    /// ä¸€æ—¦åŠ è½½åï¼Œå¦‚æœAOTæ³›å‹å‡½æ•°å¯¹åº”nativeå®ç°ä¸å­˜åœ¨ï¼Œåˆ™è‡ªåŠ¨æ›¿æ¢ä¸ºè§£é‡Šæ¨¡å¼æ‰§è¡Œ
     /// </summary>
     public static unsafe void LoadMetadataForAOTAssembly()
     {
-        // ¿ÉÒÔ¼ÓÔØÈÎÒâaot assemblyµÄ¶ÔÓ¦µÄdll¡£µ«ÒªÇódll±ØĞëÓëunity build¹ı³ÌÖĞÉú³ÉµÄ²Ã¼ôºóµÄdllÒ»ÖÂ£¬¶ø²»ÄÜÖ±½ÓÊ¹ÓÃÔ­Ê¼dll¡£
-        // ÎÒÃÇÔÚHuatuo_BuildProcessor_xxxÀïÌí¼ÓÁË´¦Àí´úÂë£¬ÕâĞ©²Ã¼ôºóµÄdllÔÚ´ò°üÊ±×Ô¶¯±»¸´ÖÆµ½ {ÏîÄ¿Ä¿Â¼}/HuatuoData/AssembliesPostIl2CppStrip/{Target} Ä¿Â¼¡£
+        // å¯ä»¥åŠ è½½ä»»æ„aot assemblyçš„å¯¹åº”çš„dllã€‚ä½†è¦æ±‚dllå¿…é¡»ä¸unity buildè¿‡ç¨‹ä¸­ç”Ÿæˆçš„è£å‰ªåçš„dllä¸€è‡´ï¼Œè€Œä¸èƒ½ç›´æ¥ä½¿ç”¨åŸå§‹dllã€‚
+        // æˆ‘ä»¬åœ¨Huatuo_BuildProcessor_xxxé‡Œæ·»åŠ äº†å¤„ç†ä»£ç ï¼Œè¿™äº›è£å‰ªåçš„dllåœ¨æ‰“åŒ…æ—¶è‡ªåŠ¨è¢«å¤åˆ¶åˆ° {é¡¹ç›®ç›®å½•}/HuatuoData/AssembliesPostIl2CppStrip/{Target} ç›®å½•ã€‚
 
-        /// ×¢Òâ£¬²¹³äÔªÊı¾İÊÇ¸øAOT dll²¹³äÔªÊı¾İ£¬¶ø²»ÊÇ¸øÈÈ¸üĞÂdll²¹³äÔªÊı¾İ¡£
-        /// ÈÈ¸üĞÂdll²»È±ÔªÊı¾İ£¬²»ĞèÒª²¹³ä£¬Èç¹ûµ÷ÓÃLoadMetadataForAOTAssembly»á·µ»Ø´íÎó
+        /// æ³¨æ„ï¼Œè¡¥å……å…ƒæ•°æ®æ˜¯ç»™AOT dllè¡¥å……å…ƒæ•°æ®ï¼Œè€Œä¸æ˜¯ç»™çƒ­æ›´æ–°dllè¡¥å……å…ƒæ•°æ®ã€‚
+        /// çƒ­æ›´æ–°dllä¸ç¼ºå…ƒæ•°æ®ï¼Œä¸éœ€è¦è¡¥å……ï¼Œå¦‚æœè°ƒç”¨LoadMetadataForAOTAssemblyä¼šè¿”å›é”™è¯¯
         /// 
         List<string> aotDllList = new List<string>
         {
             "mscorlib.dll",
             "System.dll",
-            "System.Core.dll", // Èç¹ûÊ¹ÓÃÁËLinq£¬ĞèÒªÕâ¸ö
+            "System.Core.dll", // å¦‚æœä½¿ç”¨äº†Linqï¼Œéœ€è¦è¿™ä¸ª
             // "Newtonsoft.Json.dll",
             // "protobuf-net.dll",
             // "Google.Protobuf.dll",
@@ -76,7 +76,7 @@ public class App
             byte[] dllBytes = dllAB.LoadAsset<TextAsset>(aotDllName).bytes;
             fixed (byte* ptr = dllBytes)
             {
-                // ¼ÓÔØassembly¶ÔÓ¦µÄdll£¬»á×Ô¶¯ÎªËühook¡£Ò»µ©aot·ºĞÍº¯ÊıµÄnativeº¯Êı²»´æÔÚ£¬ÓÃ½âÊÍÆ÷°æ±¾´úÂë
+                // åŠ è½½assemblyå¯¹åº”çš„dllï¼Œä¼šè‡ªåŠ¨ä¸ºå®ƒhookã€‚ä¸€æ—¦aotæ³›å‹å‡½æ•°çš„nativeå‡½æ•°ä¸å­˜åœ¨ï¼Œç”¨è§£é‡Šå™¨ç‰ˆæœ¬ä»£ç 
                 int err = Huatuo.HuatuoApi.LoadMetadataForAOTAssembly((IntPtr)ptr, dllBytes.Length);
                 Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. ret:{err}");
             }
