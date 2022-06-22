@@ -27,7 +27,7 @@ namespace Huatuo
         , IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor, IIl2CppProcessor
     {
 
-
+#if !UNITY_IOS
         [InitializeOnLoadMethod]
         private static void Setup()
         {
@@ -43,6 +43,7 @@ namespace Huatuo
             }
             Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
         }
+#endif
 
         /// <summary>
         /// 需要在Prefab上挂脚本的热更dll名称列表，不需要挂到Prefab上的脚本可以不放在这里
@@ -212,7 +213,7 @@ namespace Huatuo
         }
 
 
-#if UNITY_IOS
+#if   UNITY_IOS
     // hook UnityEditor.BuildCompletionEventsHandler.ReportPostBuildCompletionInfo() ? 因为没有 mac 打包平台因此不清楚
 #endif
     }

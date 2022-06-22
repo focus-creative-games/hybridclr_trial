@@ -37,7 +37,6 @@ namespace Huatuo
             ScriptCompilationSettings scriptCompilationSettings = new ScriptCompilationSettings();
             scriptCompilationSettings.group = group;
             scriptCompilationSettings.target = target;
-            scriptCompilationSettings.options = ScriptCompilationOptions.DevelopmentBuild;
             CreateDirIfNotExists(buildDir);
             ScriptCompilationResult scriptCompilationResult = PlayerBuildInterface.CompilePlayerScripts(scriptCompilationSettings, buildDir);
             foreach (var ass in scriptCompilationResult.assemblies)
