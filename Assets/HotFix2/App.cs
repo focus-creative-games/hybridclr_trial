@@ -27,11 +27,6 @@ public class App
         var go = new GameObject("HotFix2");
         go.AddComponent<CreateByHotFix2>();
 
-        // 补充AOT元数据请自己手动调用。
-        // 由于当前 mscorlib.dll 未打入 common ab包，
-        // 直接调用会出错。请自己修改打包脚本，将裁剪后的mscorlib.dll
-        // 打入 common 
-
         return 0;
     }
 
