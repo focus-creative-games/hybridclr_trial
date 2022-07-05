@@ -1,9 +1,9 @@
 
-rem git clone https://github.com/focus-creative-games/huatuo
-git clone https://gitee.com/focus-creative-games/huatuo huatuo_repo
+rem git clone https://github.com/focus-creative-games/HybridCLR
+git clone https://gitee.com/focus-creative-games/HybridCLR huatuo_repo
 
 rem git clone https://github.com/pirunxi/il2cpp_huatuo
-git clone https://gitee.com/juvenior/il2cpp_huatuo il2cpp_huatuo_repo
+git clone https://gitee.com/juvenior/il2cpp_plus il2cpp_huatuo_repo
 
 
 rem set default branch
