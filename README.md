@@ -16,12 +16,13 @@
 - Assets Unity项目目录
   - Main AOT主包模块
   - Hotfix 热更新模块
+- HuatuoData 包含HybridCLR的il2cpp本地安装目录
 
 ## 使用介绍
 
 huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下，无需打包。
 
-如何打包出一个可热更新的包，请先参阅 [快速开始](https://focus-creative-games.github.io/huatuo/start_up/)。
+如何打包出一个可热更新的包，请先参阅 [快速开始](https://focus-creative-games.github.io/hybridclr/start_up/)。
 
 ### 运行流程
 
@@ -41,7 +42,7 @@ huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下�
 
 以Win64为例，其他平台同理。
 
-- 安装huatuo （安装huatuo的原理请看 [快速上手](https://focus-creative-games.github.io/huatuo/start_up)）
+- 安装huatuo （安装huatuo的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/)）
   - 进入HuatuoData目录
   - 酌情修改 init_local_il2cpp_data.bat(或.sh)文件中代码
     - `set IL2CPP_BRANCH=2020.3.33` 改成你的版本（目前只有2020.3.33或2021.3.1）
