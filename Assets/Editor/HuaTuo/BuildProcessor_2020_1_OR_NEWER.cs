@@ -42,7 +42,7 @@ namespace Huatuo
             var localIl2cppDir = $"{projDir}/HuatuoData/LocalIl2CppData/il2cpp";
             if (!Directory.Exists(localIl2cppDir))
             {
-                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，请手动执行 {projDir}/HuatuoData 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
+                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请手动执行一次 {projDir}/HuatuoData 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
             }
             Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
         }

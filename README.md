@@ -43,9 +43,11 @@ huatuo为c++实现，只有打包后才可使用。日常开发在编辑器下�
 
 - 安装huatuo （安装huatuo的原理请看 [快速上手](https://focus-creative-games.github.io/huatuo/start_up)）
   - 进入HuatuoData目录
-  - 运行 init_huatuo_repos.bat 或 相应 .sh
-  - 运行 set_version_xxx.bat 或 相应 .sh。选择与你匹配的版本。如果没有，自己切换到正确的分支。[支持的版本与分支对应关系](https://focus-creative-games.github.io/huatuo/support_versions/)
-  - 运行 init_local_il2cpp_data.bat或者相应.sh文件。注意！需要修改脚本，正确设置你的unity安装路径！
+  - 酌情修改 init_local_il2cpp_data.bat(或.sh)文件中代码
+    - `set IL2CPP_BRANCH=2020.3.33` 改成你的版本（目前只有2020.3.33或2021.3.1）
+    - `set IL2CPP_PATH=<你的Unity editor的il2cpp目录的路径>` 改成你的Unity安装目录
+  - 运行 init_local_il2cpp_data.bat 或.sh 文件 创建本地il2cpp目录，即 LocalIl2CppData 目录。
+  - 至此完成包含HybridCLR的本地il2cpp安装
 - 打包主工程
   
   - 由于ab包依赖裁剪后的dll，因此首先需要build工程
