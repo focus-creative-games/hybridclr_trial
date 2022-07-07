@@ -34,19 +34,19 @@ if [ ! -d "$IL2CPP" ]; then
 fi
 
 # 接下来替换 il2cpp目录下的libil2cpp为 huatuo修改后的版本
-# 需要使用 {https://gitee.com/juvenior/il2cpp_huatuo}/libil2cpp 替换 il2cpp/libil2cpp目录
-# 需要使用 {https://gitee.com/focus-creative-games/huatuo}/huatuo 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/huatuo
+# 需要使用 {https://gitee.com/focus-creative-games/il2cpp_plus}/libil2cpp 替换 il2cpp/libil2cpp目录
+# 需要使用 {https://gitee.com/focus-creative-games/hybridclr}/huatuo 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/huatuo
 
 HUATUO_REPO=huatuo_repo
 
 if [ ! -d "$HUATUO_REPO" ] ; then
-    echo 未安装huatuo https://gitee.com/focus-creative-games/huatuo,请运行 init_huatuo_repos.bat or init_huatuo_repos.sh
+    echo 未安装hybridclr https://gitee.com/focus-creative-games/hybridclr,请运行 init_huatuo_repos.bat or init_huatuo_repos.sh
     exit 1
 fi
 
 IL2CPP_HUATUO_REPO=il2cpp_huatuo_repo
 if [ ! -d "$IL2CPP_HUATUO_REPO" ]; then
-    echo 未安装il2cpp_huatuo https://gitee.com/juvenior/il2cpp_huatuo ,请运行 init_huatuo_repos.bat or init_huatuo_repos.sh
+    echo 未安装il2cpp_plus https://gitee.com/focus-creative-games/il2cpp_plus ,请运行 init_huatuo_repos.bat or init_huatuo_repos.sh
     exit 1
 fi
 
