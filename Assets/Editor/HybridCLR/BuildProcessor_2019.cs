@@ -12,12 +12,12 @@ using System;
 using UnityEditor.UnityLinker;
 using System.Reflection;
 using UnityEditor.Il2Cpp;
-using Huatuo.Editor.GlobalManagers;
+using HybridCLR.Editor.GlobalManagers;
 #if UNITY_ANDROID
 using UnityEditor.Android;
 #endif
 
-namespace Huatuo
+namespace HybridCLR
 {
     public class BuildProcessor_2019 : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 #if UNITY_ANDROID

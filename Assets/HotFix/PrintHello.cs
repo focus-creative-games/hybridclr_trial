@@ -10,7 +10,7 @@ public class PrintHello : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.LogFormat("hello, huatuo. {0}", text);
+        Debug.LogFormat("hello, HybridCLR. {0}", text);
     }
 
     // Update is called once per frame

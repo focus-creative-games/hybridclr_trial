@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Huatuo.Generators
+namespace HybridCLR.Generators
 {
     internal abstract class PlatformAdaptorBase : IPlatformAdaptor
     {

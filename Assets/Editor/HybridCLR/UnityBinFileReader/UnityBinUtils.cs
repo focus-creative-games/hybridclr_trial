@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using System.Text;
 
-namespace Huatuo.Editor.GlobalManagers
+namespace HybridCLR.Editor.GlobalManagers
 {
     public static class UnityBinUtils
     {

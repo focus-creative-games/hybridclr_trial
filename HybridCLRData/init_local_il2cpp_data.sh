@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# clone huatuo仓库,国内推荐用 gitee
+# clone hybridclr仓库,国内推荐用 gitee
 # git clone https://github.com/focus-creative-games/hybridclr
-git clone https://gitee.com/focus-creative-games/hybridclr huatuo_repo
+git clone https://gitee.com/focus-creative-games/hybridclr
 
 # git clone https://github.com/focus-creative-games/il2cpp_plus
-git clone https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_huatuo_repo
+git clone https://gitee.com/focus-creative-games/il2cpp_plus
 
 
 # 设置默认分支为2020.3.33，避免很多人忘了切分支
 IL2CPP_BRANCH=2020.3.33
 
-cd il2cpp_huatuo_repo
+cd il2cpp_plus
 
 git switch $IL2CPP_BRANCH
 
@@ -50,20 +50,20 @@ if [ ! -d "$IL2CPP" ]; then
     cp -r "$IL2CPP_PATH" "$IL2CPP"
 fi
 
-# 接下来替换 il2cpp目录下的libil2cpp为 huatuo修改后的版本
+# 接下来替换 il2cpp目录下的libil2cpp为 hybridclr修改后的版本
 # 需要使用 {https://gitee.com/focus-creative-games/il2cpp_plus}/libil2cpp 替换 il2cpp/libil2cpp目录
-# 需要使用 {https://gitee.com/focus-creative-games/hybridclr}/huatuo 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/huatuo
+# 需要使用 {https://gitee.com/focus-creative-games/hybridclr}/hybridclr 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/hybridclr
 
-HUATUO_REPO=huatuo_repo
+HUATUO_REPO=hybridclr
 
 if [ ! -d "$HUATUO_REPO" ] ; then
-    echo 未安装hybridclr https://gitee.com/focus-creative-games/hybridclr,请运行 init_huatuo_repos.bat or init_huatuo_repos.sh
+    echo 未安装hybridclr https://gitee.com/focus-creative-games/hybridclr
     exit 1
 fi
 
-IL2CPP_HUATUO_REPO=il2cpp_huatuo_repo
+IL2CPP_HUATUO_REPO=il2cpp_plus
 if [ ! -d "$IL2CPP_HUATUO_REPO" ]; then
-    echo 未安装il2cpp_plus https://gitee.com/focus-creative-games/il2cpp_plus ,请运行 init_huatuo_repos.bat or init_huatuo_repos.sh
+    echo 未安装il2cpp_plus https://gitee.com/focus-creative-games/il2cpp_plus
     exit 1
 fi
 

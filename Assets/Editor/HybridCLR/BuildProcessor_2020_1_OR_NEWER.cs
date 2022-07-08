@@ -16,7 +16,7 @@ using UnityEditor.Il2Cpp;
 using UnityEditor.Android;
 #endif
 
-namespace Huatuo
+namespace HybridCLR
 {
     public class BuildProcessor_2020_1_OR_NEWER : IPreprocessBuildWithReport
 #if UNITY_ANDROID
@@ -39,10 +39,10 @@ namespace Huatuo
             /// 而是在本地目录
             ///
             var projDir = Path.GetDirectoryName(Application.dataPath);
-            var localIl2cppDir = $"{projDir}/HuatuoData/LocalIl2CppData/il2cpp";
+            var localIl2cppDir = $"{projDir}/HybridCLRData/LocalIl2CppData/il2cpp";
             if (!Directory.Exists(localIl2cppDir))
             {
-                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请手动执行一次 {projDir}/HuatuoData 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
+                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请手动执行一次 {projDir}/HybridCLRData 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
             }
             Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
         }
@@ -212,7 +212,7 @@ namespace Huatuo
         private void CopyStripDlls(BuildTarget target)
         {
             var projDir = Path.GetDirectoryName(Application.dataPath);
-            var dstPath = $"{projDir}/HuatuoData/AssembliesPostIl2CppStrip/{target}";
+            var dstPath = $"{projDir}/HybridCLRData/AssembliesPostIl2CppStrip/{target}";
 
             Directory.CreateDirectory(dstPath);
 

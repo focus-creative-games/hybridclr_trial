@@ -7,7 +7,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 
-namespace Huatuo.Editor.GlobalManagers
+namespace HybridCLR.Editor.GlobalManagers
 {
     /// <summary>
     /// Unity 生成的二进制文件(本代码不支持5.x之前的版本)
