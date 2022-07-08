@@ -101,17 +101,17 @@ namespace HybridCLR
             CompileDll(GetDllBuildOutputDirByTarget(target), target);
         }
 
-        public static string HuatuoBuildCacheDir => Application.dataPath + "/HybridCLRBuildCache";
+        public static string HybridCLRBuildCacheDir => Application.dataPath + "/HybridCLRBuildCache";
 
-        public static string AssetBundleOutputDir => $"{HuatuoBuildCacheDir}/AssetBundleOutput";
+        public static string AssetBundleOutputDir => $"{HybridCLRBuildCacheDir}/AssetBundleOutput";
 
-        public static string AssetBundleSourceDataTempDir => $"{HuatuoBuildCacheDir}/AssetBundleSourceData";
+        public static string AssetBundleSourceDataTempDir => $"{HybridCLRBuildCacheDir}/AssetBundleSourceData";
 
-        public static string HuatuoDataDir => $"{Application.dataPath}/../HybridCLRData";
+        public static string HybridCLRDataDir => $"{Application.dataPath}/../HybridCLRData";
 
-        public static string AssembliesPostIl2CppStripDir => $"{HuatuoDataDir}/AssembliesPostIl2CppStrip";
+        public static string AssembliesPostIl2CppStripDir => $"{HybridCLRDataDir}/AssembliesPostIl2CppStrip";
 
-        public static string MethodBridgeCppDir => $"{HuatuoDataDir}/LocalIl2CppData/il2cpp/libil2cpp/huatuo/interpreter";
+        public static string MethodBridgeCppDir => $"{HybridCLRDataDir}/LocalIl2CppData/il2cpp/libil2cpp/huatuo/interpreter";
 
         public static string GetAssetBundleOutputDirByTarget(BuildTarget target)
         {
