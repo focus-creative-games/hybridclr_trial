@@ -28,15 +28,15 @@ namespace HybridCLR.Generators
             {
                 case CallConventionType.X64:
                     {
-                        return IsNative2ManagedByAddress ? $"(void*)&__arg{Index}" : $"*(void**)&__arg{Index}";
+                        return IsNative2ManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
                     }
                 case CallConventionType.Arm64:
                     {
-                        return IsNative2ManagedByAddress ? $"(void*)&__arg{Index}" : $"*(void**)&__arg{Index}";
+                        return IsNative2ManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
                     }
-                case CallConventionType.Arm32:
+                case CallConventionType.Armv7:
                     {
-                        throw new NotImplementedException();
+                        return IsNative2ManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
                     }
                 default:
                     throw new NotSupportedException();
@@ -70,7 +70,10 @@ namespace HybridCLR.Generators
                 case ParamOrReturnType.ARM64_HVA_8:
                 case ParamOrReturnType.ARM64_HVA_16: throw new NotSupportedException();
                 case ParamOrReturnType.STRUCTURE_SIZE_LE_16: return 2; // size <= 16
-                case ParamOrReturnType.STRUCTURE_SIZE_GT_16: return (Type.Size + 7) / 8;
+                case ParamOrReturnType.STRUCTURE_ALIGN1:
+                case ParamOrReturnType.STRUCTURE_ALIGN2:
+                case ParamOrReturnType.STRUCTURE_ALIGN4:
+                case ParamOrReturnType.STRUCTURE_ALIGN8: return (Type.Size + 7) / 8;
                 default:
                     {
                         Debug.Assert(Type.PorType < ParamOrReturnType.STRUCTURE_AS_REF_PARAM);

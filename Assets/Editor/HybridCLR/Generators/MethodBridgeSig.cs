@@ -11,7 +11,7 @@ namespace HybridCLR.Generators
     public class MethodBridgeSig : IEquatable<MethodBridgeSig>
     {
 
-        private readonly static Regex s_sigPattern = new Regex(@"^(v|i1|i2|i4|i8|r4|r8|sr|vf2|vf3|vf4|vd2|vd3|vd4|s2|S\d+)+$");
+        private readonly static Regex s_sigPattern = new Regex(@"^(v|i1|i2|i4|i8|r4|r8|sr|vf2|vf3|vf4|vd2|vd3|vd4|s2|S\d+|A\d+|B\d+|C\d+)+$");
 
         public static MethodBridgeSig CreateBySignatuer(string sigName)
         {
@@ -55,12 +55,21 @@ namespace HybridCLR.Generators
                     {
                         if (sigName.StartsWith("S"))
                         {
-                            return new TypeInfo(null, ParamOrReturnType.STRUCTURE_SIZE_GT_16, int.Parse(sigName.Substring(1)));
+                            return new TypeInfo(null, ParamOrReturnType.STRUCTURE_ALIGN1, int.Parse(sigName.Substring(1)));
                         }
-                        else
+                        if (sigName.StartsWith("A"))
                         {
-                            throw new ArgumentException($"invalid signature:{sigName}");
+                            return new TypeInfo(null, ParamOrReturnType.STRUCTURE_ALIGN2, int.Parse(sigName.Substring(1)));
                         }
+                        if (sigName.StartsWith("B"))
+                        {
+                            return new TypeInfo(null, ParamOrReturnType.STRUCTURE_ALIGN4, int.Parse(sigName.Substring(1)));
+                        }
+                        if (sigName.StartsWith("C"))
+                        {
+                            return new TypeInfo(null, ParamOrReturnType.STRUCTURE_ALIGN8, int.Parse(sigName.Substring(1)));
+                        }
+                        throw new ArgumentException($"invalid signature:{sigName}");
                     }
             }
         }

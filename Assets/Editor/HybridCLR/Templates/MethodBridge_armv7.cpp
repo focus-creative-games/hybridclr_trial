@@ -14,7 +14,7 @@
 
 using namespace huatuo::interpreter;
 
-#if HUATUO_TARGET_ARM64
+#if HUATUO_TARGET_ARMV7
 //!!!{{INVOKE_STUB
 
 //!!!}}INVOKE_STUB

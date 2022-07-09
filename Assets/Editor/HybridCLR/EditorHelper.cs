@@ -302,5 +302,22 @@ namespace HybridCLR
             Debug.LogFormat("== output:{0} ==", outputFile);
             CleanIl2CppBuildCache();
         }
+
+        [MenuItem("HybridCLR/Generate/MethodBridge_Armv7")]
+        public static void MethodBridge_Armv7()
+        {
+            string outputFile = $"{MethodBridgeCppDir}/MethodBridge_armv7.cpp";
+            var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
+            {
+                CallConvention = CallConventionType.Armv7,
+                Assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(s => !s.GetName().Name.Contains("Editor")).ToList(),
+                OutputFile = outputFile,
+            });
+
+            g.PrepareMethods();
+            g.Generate();
+            Debug.LogFormat("== output:{0} ==", outputFile);
+            CleanIl2CppBuildCache();
+        }
     }
 }

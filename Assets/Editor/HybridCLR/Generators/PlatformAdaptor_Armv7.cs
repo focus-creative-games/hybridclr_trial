@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace HybridCLR.Generators
 {
-    internal class PlatformAdaptor_Arm64 : PlatformAdaptorBase
+    internal class PlatformAdaptor_Armv7 : PlatformAdaptorBase
     {
 
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
@@ -26,25 +26,23 @@ namespace HybridCLR.Generators
             { typeof(ulong), new TypeInfo(typeof(ulong), ParamOrReturnType.I8_U8)},
             { typeof(float), new TypeInfo(typeof(float), ParamOrReturnType.R4)},
             { typeof(double), new TypeInfo(typeof(double), ParamOrReturnType.R8)},
-            { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
-            { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
-            { typeof(Vector2), new TypeInfo(typeof(Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2) },
-            { typeof(Vector3), new TypeInfo(typeof(Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3) },
-            { typeof(Vector4), new TypeInfo(typeof(Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4) },
-            { typeof(System.Numerics.Vector2), new TypeInfo(typeof(System.Numerics.Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2) },
-            { typeof(System.Numerics.Vector3), new TypeInfo(typeof(System.Numerics.Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3) },
-            { typeof(System.Numerics.Vector4), new TypeInfo(typeof(System.Numerics.Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4) },
+            { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I4_U4)},
+            { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I4_U4)},
         };
 
-        public CallConventionType CallConventionType { get; } = CallConventionType.Arm64;
 
-        public override bool IsArch32 => false;
+
+
+
+        public CallConventionType CallConventionType { get; } = CallConventionType.Armv7;
+
+        public override bool IsArch32 => true;
 
         public override TypeInfo CreateTypeInfo(Type type, bool returnValue)
         {
             if (type.IsByRef)
             {
-                return TypeInfo.s_i8u8;
+                return TypeInfo.s_i4u4;
             }
             if (type == typeof(void))
             {
@@ -52,7 +50,7 @@ namespace HybridCLR.Generators
             }
             if (!type.IsValueType)
             {
-                return TypeInfo.s_i8u8;
+                return TypeInfo.s_i4u4;
             }
             if (s_typeInfoCaches.TryGetValue(type, out var cache))
             {
@@ -62,126 +60,11 @@ namespace HybridCLR.Generators
             {
                 return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
             }
-            var ti = CreateValueType(type, returnValue);
+            var ti = CreateValueType(type);
             // s_typeInfoCaches.Add(type, ti);
             return ti;
         }
 
-        private static TypeInfo CreateNormalValueTypeBySize(Type type, int typeSize, bool returnValue)
-        {
-            if (typeSize <= 8)
-            {
-                return new TypeInfo(type, ParamOrReturnType.I8_U8);
-            }
-            if (typeSize <= 16)
-            {
-                return new TypeInfo(type, ParamOrReturnType.STRUCTURE_SIZE_LE_16);
-            }
-            else if(returnValue)
-            {
-                //return new TypeInfo(type, ParamOrReturnType.STRUCTURE_ALIGN1, typeSize);
-                return CreateValueType(type);
-            }
-            else
-            {
-                return TypeInfo.s_valueTypeAsParam;
-            }
-        }
-
-        public class HFATypeInfo
-        {
-            public Type Type { get; set; }
-
-            public int Count { get; set; }
-        }
-
-        private static bool IsNotHFAFastCheck(int typeSize)
-        {
-            return typeSize != 8 && typeSize != 12 && typeSize != 16 && typeSize != 24 && typeSize != 32;
-        }
-
-        private static bool ComputHFATypeInfo0(Type type, HFATypeInfo typeInfo)
-        {
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (var field in fields)
-            {
-                Type ftype = field.FieldType;
-                if (ftype != typeof(float) && ftype != typeof(double))
-                {
-                    if (!ftype.IsPrimitive && ftype.IsValueType)
-                    {
-                        if (!ComputHFATypeInfo0(ftype, typeInfo))
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else if (ftype == typeInfo.Type || typeInfo.Type == null)
-                {
-                    typeInfo.Type = ftype;
-                    ++typeInfo.Count;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return typeInfo.Count <= 4;
-        }
-
-        public static bool ComputHFATypeInfo(Type type, int typeSize, out HFATypeInfo typeInfo)
-        {
-            typeInfo = new HFATypeInfo();
-            if (IsNotHFAFastCheck(typeSize))
-            {
-                return false;
-            }
-            bool ok = ComputHFATypeInfo0(type, typeInfo);
-            if (ok && typeInfo.Count >= 2 && typeInfo.Count <= 4)
-            {
-                int fieldSize = typeInfo.Type == typeof(float) ? 4 : 8;
-                return typeSize == fieldSize * typeInfo.Count;
-            }
-            return false;
-        }
-
-        private static TypeInfo CreateValueType(Type type, bool returnValue)
-        {
-            (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch64(type);
-            if (ComputHFATypeInfo(type, typeSize, out HFATypeInfo hfaTypeInfo))
-            {
-                if (hfaTypeInfo.Type == typeof(float))
-                {
-                    switch(hfaTypeInfo.Count)
-                    {
-                        case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_2);
-                        case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_3);
-                        case 4: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_4);
-                        default: throw new NotSupportedException();
-                    }
-                }
-                else
-                {
-                    Debug.Assert(hfaTypeInfo.Type == typeof(double));
-                    switch (hfaTypeInfo.Count)
-                    {
-                        case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_2);
-                        case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_3);
-                        case 4: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_4);
-                        default: throw new NotSupportedException();
-                    }
-                }
-            }
-            else
-            {
-                return CreateNormalValueTypeBySize(type, typeSize, returnValue);
-            }
-
-        }
         public IEnumerable<MethodBridgeSig> PrepareCommon1()
         {
             // (void + int32 + int64 + float + double) * (int32 + int64 + float + double) * (0 - 20) = 420
@@ -219,17 +102,13 @@ namespace HybridCLR.Generators
             TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
             TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
             TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            TypeInfo typeV2f = new TypeInfo(typeof(Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2);
-            TypeInfo typeV3f = new TypeInfo(typeof(Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3);
-            TypeInfo typeV4f = new TypeInfo(typeof(Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4);
-            TypeInfo typeStructLe16 = new TypeInfo(null, ParamOrReturnType.STRUCTURE_SIZE_LE_16);
-            TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
+            //TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
             int maxParamCount = 2;
 
-            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f, typeStructLe16, typeStructRef };
+            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble };
             int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f, typeStructRef })
+            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
             {
                 var rt = new ReturnInfo() { Type = returnType };
                 for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)

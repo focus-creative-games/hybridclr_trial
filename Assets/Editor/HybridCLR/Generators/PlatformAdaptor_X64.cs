@@ -30,9 +30,10 @@ namespace HybridCLR.Generators
             { typeof(double), new TypeInfo(typeof(double), ParamOrReturnType.R8)},
         };
 
-        public override TypeInfo Create(ParameterInfo param, bool returnValue)
+        public override bool IsArch32 => false;
+
+        public override TypeInfo CreateTypeInfo(Type type, bool returnValue)
         {
-            var type = param.ParameterType;
             if (type.IsByRef)
             {
                 return TypeInfo.s_i8u8;
@@ -49,15 +50,20 @@ namespace HybridCLR.Generators
             {
                 return cache;
             }
-            int size = ComputeSizeOf(type);
+            if (type.IsEnum)
+            {
+                return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
+            }
+            (int size, _) = ComputeSizeAndAligmentOfArch64(type);
             //Debug.LogFormat("type:{0} size:{1}", type, size);
-            switch(size)
+            switch (size)
             {
                 case 1:
                 case 2:
                 case 4:
                 case 8: return new TypeInfo(type, ParamOrReturnType.I8_U8);
-                default: return returnValue ? new TypeInfo(type, ParamOrReturnType.STRUCTURE_SIZE_GT_16, size) :
+                default:
+                    return returnValue ? CreateValueType(type) :
                         new TypeInfo(type, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
             }
         }
@@ -100,7 +106,7 @@ static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_{method.Creat
 
 static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_AdjustorThunk_{method.CreateCallSigName()}({paramListStr})
 {{
-    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject)" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
+    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"(uint64_t)(*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject))" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
     StackObject* ret = {(method.ReturnInfo.IsVoid ? "nullptr" : "args + " + method.ParamInfos.Count)};
     Interpreter::Execute(method, args, ret);
     {(!method.ReturnInfo.IsVoid ? $"return *({method.ReturnInfo.Type.GetTypeName()}*)ret;" : "")}
@@ -123,7 +129,7 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
 #ifdef HUATUO_UNITY_2021_OR_NEW
 static void __Invoke_instance_{method.CreateCallSigName()}(Il2CppMethodPointer __methodPtr, const MethodInfo* __method, void* __this, void** __args, void* __ret)
 {{
-    StackObject args[{totalQuadWordNum + 1}] = {{ AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
+    StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
     ConvertInvokeArgs(args+1, __method, __args);
     Interpreter::Execute(__method, args, __ret);
 }}
@@ -137,7 +143,7 @@ static void __Invoke_static_{method.CreateCallSigName()}(Il2CppMethodPointer __m
 #else
 static void* __Invoke_instance_{method.CreateCallSigName()}(Il2CppMethodPointer __methodPtr, const MethodInfo* __method, void* __this, void** __args)
 {{
-    StackObject args[{totalQuadWordNum + 1}] = {{ AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
+    StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
     ConvertInvokeArgs(args+1, __method, __args);
     StackObject* ret = {(!method.ReturnInfo.IsVoid ? "args + " + (method.ParamInfos.Count + 1) : "nullptr")};
     Interpreter::Execute(__method, args, ret);

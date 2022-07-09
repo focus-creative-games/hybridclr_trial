@@ -9,7 +9,9 @@ namespace HybridCLR.Generators
 {
     public interface IPlatformAdaptor
     {
-        TypeInfo Create(ParameterInfo param, bool returnValue);
+        bool IsArch32 { get; }
+
+        TypeInfo CreateTypeInfo(Type type, bool returnValue);
 
         IEnumerable<MethodBridgeSig> GetPreserveMethods();
 

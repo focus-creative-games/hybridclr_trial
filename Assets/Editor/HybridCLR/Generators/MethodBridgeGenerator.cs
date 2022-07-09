@@ -13,7 +13,7 @@ namespace HybridCLR.Generators
     public enum CallConventionType
     {
         X64,
-        Arm32,
+        Armv7,
         Arm64,
     }
 
@@ -59,7 +59,7 @@ namespace HybridCLR.Generators
         {
             return type switch
             {
-                CallConventionType.Arm32 => new PlatformAdaptor_Arm32(),
+                CallConventionType.Armv7 => new PlatformAdaptor_Armv7(),
                 CallConventionType.Arm64 => new PlatformAdaptor_Arm64(),
                 CallConventionType.X64 => new PlatformAdaptor_X64(),
                 _ => throw new NotSupportedException(),
@@ -71,7 +71,7 @@ namespace HybridCLR.Generators
             string tplFile = _callConvention switch
             {
                 CallConventionType.X64 => "x64",
-                CallConventionType.Arm32 => "arm32",
+                CallConventionType.Armv7 => "armv7",
                 CallConventionType.Arm64 => "arm64",
                 _ => throw new NotSupportedException(),
             };
@@ -94,15 +94,15 @@ namespace HybridCLR.Generators
             if (!isStatic)
             {
                 // FIXME arm32 is s_i4u4
-                paramInfos.Add(new ParamInfo() { Type = TypeInfo.s_i8u8 });
+                paramInfos.Add(new ParamInfo() { Type = _platformAdaptor.IsArch32 ? TypeInfo.s_i4u4 : TypeInfo.s_i8u8 });
             }
             foreach (var paramInfo in parameters)
             {
-                paramInfos.Add(new ParamInfo() { Type = _platformAdaptor.Create(paramInfo, false) });
+                paramInfos.Add(new ParamInfo() { Type = _platformAdaptor.CreateTypeInfo(paramInfo.ParameterType, false) });
             }
             var mbs = new MethodBridgeSig()
             {
-                ReturnInfo = new ReturnInfo() { Type = returnType != null ? _platformAdaptor.Create(returnType, true) : TypeInfo.s_void },
+                ReturnInfo = new ReturnInfo() { Type = returnType != null ? _platformAdaptor.CreateTypeInfo(returnType.ParameterType, true) : TypeInfo.s_void },
                 ParamInfos = paramInfos,
             };
             return mbs;
@@ -255,7 +255,6 @@ namespace HybridCLR.Generators
         {
             return new List<string>
             {
-                // "vi8i8",
                 "S108i8i8",
             };
         }

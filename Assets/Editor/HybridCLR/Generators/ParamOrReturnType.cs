@@ -30,6 +30,9 @@ namespace HybridCLR.Generators
         ARM64_HVA_8,
         ARM64_HVA_16,
         STRUCTURE_SIZE_LE_16, // size <= 16
-        STRUCTURE_SIZE_GT_16, // size > 16
+        STRUCTURE_ALIGN1, // size > 16
+        STRUCTURE_ALIGN2,
+        STRUCTURE_ALIGN4,
+        STRUCTURE_ALIGN8,
     }
 }
