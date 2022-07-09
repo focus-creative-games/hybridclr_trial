@@ -296,5 +296,22 @@ namespace Huatuo
             Debug.LogFormat("== output:{0} ==", outputFile);
             CleanIl2CppBuildCache();
         }
+
+        [MenuItem("Huatuo/Generate/MethodBridge_Armv7")]
+        public static void MethodBridge_Armv7()
+        {
+            string outputFile = $"{Application.dataPath}/../HuatuoData/LocalIl2CppData/il2cpp/libil2cpp/huatuo/interpreter/MethodBridge_armv7.cpp";
+            var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
+            {
+                CallConvention = CallConventionType.Armv7,
+                Assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(s => !s.GetName().Name.Contains("Editor")).ToList(),
+                OutputFile = outputFile,
+            });
+
+            g.PrepareMethods();
+            g.Generate();
+            Debug.LogFormat("== output:{0} ==", outputFile);
+            CleanIl2CppBuildCache();
+        }
     }
 }

@@ -33,7 +33,8 @@ namespace Huatuo.Generators
             {
                 resultContent = TemplateUtil.ReplaceRegion(resultContent, c.Key, c.Value);
             }
-            File.WriteAllText(outputFile, resultContent, Encoding.UTF8);
+            var utf8WithoutBOM = new System.Text.UTF8Encoding(false);
+            File.WriteAllText(outputFile, resultContent, utf8WithoutBOM);
         }
     }
 }

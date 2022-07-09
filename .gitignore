@@ -36,3 +36,5 @@
 /Assets/HuatuoBuildCache
 /Assets/StreamingAssets
 /Release-Win64
+/Build-Android64
+/Build-AndroidV7

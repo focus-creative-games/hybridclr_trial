@@ -9,6 +9,7 @@ namespace Huatuo.Generators
     {
 
         public static readonly TypeInfo s_void = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
+        public static readonly TypeInfo s_i4u4 = new TypeInfo(null, ParamOrReturnType.I4_U4);
         public static readonly TypeInfo s_i8u8 = new TypeInfo(null, ParamOrReturnType.I8_U8);
         public static readonly TypeInfo s_valueTypeAsParam = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
@@ -65,7 +66,10 @@ namespace Huatuo.Generators
             ParamOrReturnType.ARM64_HFA_DOUBLE_3 => 1,
             ParamOrReturnType.ARM64_HFA_DOUBLE_4 => 1,
             ParamOrReturnType.STRUCTURE_SIZE_LE_16 => 1,
-            ParamOrReturnType.STRUCTURE_SIZE_GT_16 => 1,
+            ParamOrReturnType.STRUCTURE_ALIGN1 => 1,
+            ParamOrReturnType.STRUCTURE_ALIGN2 => 1,
+            ParamOrReturnType.STRUCTURE_ALIGN4 => 1,
+            ParamOrReturnType.STRUCTURE_ALIGN8 => 1,
             _ => throw new NotSupportedException(),
         };
 
@@ -88,7 +92,10 @@ namespace Huatuo.Generators
                 ParamOrReturnType.ARM64_HFA_DOUBLE_3 => "vd3",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_4 => "vd4",
                 ParamOrReturnType.STRUCTURE_SIZE_LE_16 => "s2",
-                ParamOrReturnType.STRUCTURE_SIZE_GT_16 => "S" + Size,
+                ParamOrReturnType.STRUCTURE_ALIGN1 => "S" + Size,
+                ParamOrReturnType.STRUCTURE_ALIGN2 => "A" + Size,
+                ParamOrReturnType.STRUCTURE_ALIGN4 => "B" + Size,
+                ParamOrReturnType.STRUCTURE_ALIGN8 => "C" + Size,
                 _ => throw new NotSupportedException(PorType.ToString()),
             };
         }
@@ -112,7 +119,10 @@ namespace Huatuo.Generators
                 ParamOrReturnType.ARM64_HFA_DOUBLE_3 => "HtVector3d",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_4 => "HtVector4d",
                 ParamOrReturnType.STRUCTURE_SIZE_LE_16 => "ValueTypeSize16",
-                ParamOrReturnType.STRUCTURE_SIZE_GT_16 => $"ValueTypeSize<{Size}>",
+                ParamOrReturnType.STRUCTURE_ALIGN1 => $"ValueTypeSize<{Size}>",
+                ParamOrReturnType.STRUCTURE_ALIGN2 => $"ValueTypeSizeAlign2<{Size}>",
+                ParamOrReturnType.STRUCTURE_ALIGN4 => $"ValueTypeSizeAlign4<{Size}>",
+                ParamOrReturnType.STRUCTURE_ALIGN8 => $"ValueTypeSizeAlign8<{Size}>",
                 _ => throw new NotImplementedException(PorType.ToString()),
             };
         }

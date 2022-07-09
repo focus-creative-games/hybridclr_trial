@@ -38,9 +38,10 @@ namespace Huatuo.Generators
 
         public CallConventionType CallConventionType { get; } = CallConventionType.Arm64;
 
-        public override TypeInfo Create(ParameterInfo param, bool returnValue)
+        public override bool IsArch32 => false;
+
+        public override TypeInfo CreateTypeInfo(Type type, bool returnValue)
         {
-            var type = param.ParameterType;
             if (type.IsByRef)
             {
                 return TypeInfo.s_i8u8;
@@ -56,6 +57,10 @@ namespace Huatuo.Generators
             if (s_typeInfoCaches.TryGetValue(type, out var cache))
             {
                 return cache;
+            }
+            if (type.IsEnum)
+            {
+                return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
             }
             var ti = CreateValueType(type, returnValue);
             // s_typeInfoCaches.Add(type, ti);
@@ -74,7 +79,8 @@ namespace Huatuo.Generators
             }
             else if(returnValue)
             {
-                return new TypeInfo(type, ParamOrReturnType.STRUCTURE_SIZE_GT_16, typeSize);
+                //return new TypeInfo(type, ParamOrReturnType.STRUCTURE_ALIGN1, typeSize);
+                return CreateValueType(type);
             }
             else
             {
@@ -143,9 +149,9 @@ namespace Huatuo.Generators
             return false;
         }
 
-        public static TypeInfo CreateValueType(Type type, bool returnValue)
+        private static TypeInfo CreateValueType(Type type, bool returnValue)
         {
-            int typeSize = ComputeSizeOf(type);
+            (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch64(type);
             if (ComputHFATypeInfo(type, typeSize, out HFATypeInfo hfaTypeInfo))
             {
                 if (hfaTypeInfo.Type == typeof(float))
@@ -293,7 +299,7 @@ static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_{method.Creat
 
 static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_AdjustorThunk_{method.CreateCallSigName()}({paramListStr})
 {{
-    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject)" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
+    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"(uint64_t)(*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject))" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
     StackObject* ret = {(method.ReturnInfo.IsVoid ? "nullptr" : "args + " + method.ParamInfos.Count)};
     Interpreter::Execute(method, args, ret);
     {(!method.ReturnInfo.IsVoid ? $"return *({method.ReturnInfo.Type.GetTypeName()}*)ret;" : "")}
@@ -316,7 +322,7 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
 #ifdef HUATUO_UNITY_2021_OR_NEW
 static void __Invoke_instance_{method.CreateCallSigName()}(Il2CppMethodPointer __methodPtr, const MethodInfo* __method, void* __this, void** __args, void* __ret)
 {{
-    StackObject args[{totalQuadWordNum + 1}] = {{ AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
+    StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
     ConvertInvokeArgs(args+1, __method, __args);
     Interpreter::Execute(__method, args, __ret);
 }}
@@ -330,7 +336,7 @@ static void __Invoke_static_{method.CreateCallSigName()}(Il2CppMethodPointer __m
 #else
 static void* __Invoke_instance_{method.CreateCallSigName()}(Il2CppMethodPointer __methodPtr, const MethodInfo* __method, void* __this, void** __args)
 {{
-    StackObject args[{totalQuadWordNum + 1}] = {{ AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
+    StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
     ConvertInvokeArgs(args+1, __method, __args);
     StackObject* ret = {(!method.ReturnInfo.IsVoid ? "args + " + (method.ParamInfos.Count + 1) : "nullptr")};
     Interpreter::Execute(__method, args, ret);
