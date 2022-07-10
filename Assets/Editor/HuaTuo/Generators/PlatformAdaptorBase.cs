@@ -45,7 +45,7 @@ namespace Huatuo.Generators
             if (customSize != clrSize)
             {
                 s_calculator64.SizeAndAligmentOf(t);
-                throw new Exception($"type:{t} size calculate error. clr:{sizeAndAligment} custom:{customSize}");
+                throw new Exception($"type:{t} size calculate error. HybridCLR Comput:{sizeAndAligment} CLR:{clrSize}");
             }
             _typeSizeCache64.Add(t, sizeAndAligment);
             return sizeAndAligment;
