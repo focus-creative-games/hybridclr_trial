@@ -67,25 +67,25 @@ namespace HybridCLR.Generators
 			bool useSLSize = true;
 			foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
 			{
-				if (IsIgnoreField(field))
-                {
-					continue;
-                }
 				// add size of the type
 				var (fs, fa) = SizeAndAligmentOf(field.FieldType);
 				fa = Math.Min(fa, packAligment);
 				if (fa > maxAligment)
                 {
 					maxAligment = fa;
-                }
+				}
+				if (IsIgnoreField(field))
+				{
+					continue;
+				}
 				if (sa != null && sa.Value == LayoutKind.Explicit)
-                {
+				{
 					int offset = field.GetCustomAttribute<FieldOffsetAttribute>().Value;
 					totalSize = Math.Max(totalSize, offset + fs);
 					if (offset > sa.Size)
-                    {
+					{
 						useSLSize = false;
-                    }
+					}
                 }
 				else
 				{
@@ -94,6 +94,10 @@ namespace HybridCLR.Generators
 						totalSize = (totalSize + fa - 1) / fa * fa;
 					}
 					totalSize += fs;
+					if (sa != null && sa.Value == LayoutKind.Sequential && totalSize > sa.Size)
+                    {
+						useSLSize = false;
+                    }
 				}
 			}
 			if (totalSize == 0)
