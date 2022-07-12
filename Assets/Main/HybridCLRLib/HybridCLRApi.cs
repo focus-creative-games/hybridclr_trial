@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HybridCLR
 {
-    public static class HybridCLRApi
+    public static class RuntimeApi
     {
 #if UNITY_STANDALONE_WIN
         private const string dllName = "GameAssembly";

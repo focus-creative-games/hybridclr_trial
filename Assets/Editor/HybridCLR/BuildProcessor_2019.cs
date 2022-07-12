@@ -37,7 +37,7 @@ namespace HybridCLR
 
         int IOrderedCallback.callbackOrder => 0;
 
-        static Huatuo_BuildProcessor_2019()
+        static BuildProcessor_2019()
         {
             s_BuildReport_AddMessage = typeof(BuildReport).GetMethod("AddMessage", BindingFlags.Instance | BindingFlags.NonPublic);
         }

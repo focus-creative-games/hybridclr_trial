@@ -189,13 +189,7 @@ namespace HybridCLR
 
         public void OnBeforeRun(BuildReport report, UnityLinkerBuildPipelineData data)
         {
-            //// 注意，此处使用的环境变量，指定il2cpp目录
-            //// 如果要屏蔽或者修改环境变量，需要清理缓存
-            //// 缓存路径为 Library/Il2cppBuildCache
-            //// 再通过shell脚本安装或更新时，该缓存会自动清理
-            //var il2cppPath = Path.Combine(Path.GetFullPath("unity_il2cpp_with_huatuo"), "project_il2cpp", "il2cpp");
-            //Debug.Log($"il2cpp path {il2cppPath}");
-            //Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", il2cppPath);
+
         }
 
         public void OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data)

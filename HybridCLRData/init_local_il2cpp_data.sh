@@ -2,16 +2,16 @@
 
 # clone hybridclr仓库,国内推荐用 gitee
 # git clone https://github.com/focus-creative-games/hybridclr
-git clone https://gitee.com/focus-creative-games/hybridclr
+git clone https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
 # git clone https://github.com/focus-creative-games/il2cpp_plus
-git clone https://gitee.com/focus-creative-games/il2cpp_plus
+git clone https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
 
 
 # 设置默认分支为2020.3.33，避免很多人忘了切分支
 IL2CPP_BRANCH=2020.3.33
 
-cd il2cpp_plus
+cd il2cpp_plus_repo
 
 git switch $IL2CPP_BRANCH
 
@@ -20,7 +20,7 @@ cd ..
 # 请修改为你所用Unity的il2cpp目录
 # 一般像这样 C:\Program Files\Unity\Hub\Editor\2020.3.33f1c2\Editor\Data\il2cpp
 
-IL2CPP_PATH='/c/Program Files/Unity/Hub/Editor/2020.3.33f1c2/Editor/Data/il2cpp'
+IL2CPP_PATH='/c/Program Files/Unity/Hub/Editor/2020.3.33f1/Editor/Data/il2cpp'
 
 if [ ! -d "$IL2CPP_PATH" ] ; then
     echo "你未指定正确的il2cpp路径"
@@ -54,24 +54,14 @@ fi
 # 需要使用 {https://gitee.com/focus-creative-games/il2cpp_plus}/libil2cpp 替换 il2cpp/libil2cpp目录
 # 需要使用 {https://gitee.com/focus-creative-games/hybridclr}/hybridclr 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/hybridclr
 
-HUATUO_REPO=hybridclr
-
-if [ ! -d "$HUATUO_REPO" ] ; then
-    echo 未安装hybridclr https://gitee.com/focus-creative-games/hybridclr
-    exit 1
-fi
-
-IL2CPP_HUATUO_REPO=il2cpp_plus
-if [ ! -d "$IL2CPP_HUATUO_REPO" ]; then
-    echo 未安装il2cpp_plus https://gitee.com/focus-creative-games/il2cpp_plus
-    exit 1
-fi
+HYBRIDCLR_REPO_DIR=hybridclr_repo
+IL2CPP_PLUS_REPO_DIR=il2cpp_plus_repo
 
 LIBIL2CPP_PATH=$LOCAL_IL2CPP_DATA/il2cpp/libil2cpp
 rm -rf "$LIBIL2CPP_PATH"
 
-cp -r "$IL2CPP_HUATUO_REPO/libil2cpp" "$LIBIL2CPP_PATH"
-cp -r "$HUATUO_REPO/huatuo" "$LIBIL2CPP_PATH/huatuo"
+cp -r "$IL2CPP_PLUS_REPO_DIR/libil2cpp" "$LIBIL2CPP_PATH"
+cp -r "$HYBRIDCLR_REPO_DIR/huatuo" "$LIBIL2CPP_PATH/huatuo"
 
 # 务必清除缓存，不然build仍然使用旧版本。
 # 只影响直接build的情况，不影响导出工程的情形。

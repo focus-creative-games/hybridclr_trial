@@ -12,10 +12,11 @@ namespace HybridCLR
 {
     /// <summary>
     /// 这里仅仅是一个流程展示
-    /// 简单说明如果你想将huatuo的dll做成自动化的简单实现
+    /// 简单说明如果你想将HybridCLR的dll做成自动化的简单实现
     /// </summary>
     public class EditorHelper
     {
+
         private static void CreateDirIfNotExists(string dirName)
         {
             if (!Directory.Exists(dirName))
@@ -43,15 +44,15 @@ namespace HybridCLR
             ScriptCompilationSettings scriptCompilationSettings = new ScriptCompilationSettings();
             scriptCompilationSettings.group = group;
             scriptCompilationSettings.target = target;
-            CleanDirectory(buildDir);
+            CreateDirIfNotExists(buildDir);
             ScriptCompilationResult scriptCompilationResult = PlayerBuildInterface.CompilePlayerScripts(scriptCompilationSettings, buildDir);
             foreach (var ass in scriptCompilationResult.assemblies)
             {
-                Debug.LogFormat("compile assemblies:{0}", ass);
+                Debug.LogFormat("compile assemblies:{1}/{0}", ass, buildDir);
             }
         }
 
-        public static string DllBuildOutputDir => Path.GetFullPath($"{Application.dataPath}/../Temp/HybridCLR/build");
+        public static string DllBuildOutputDir => $"{HybridCLRDataDir}/HotFixDlls";
 
         public static string GetDllBuildOutputDirByTarget(BuildTarget target)
         {
@@ -107,7 +108,7 @@ namespace HybridCLR
 
         public static string AssetBundleSourceDataTempDir => $"{HybridCLRBuildCacheDir}/AssetBundleSourceData";
 
-        public static string HybridCLRDataDir => $"{Application.dataPath}/../HybridCLRData";
+        public static string HybridCLRDataDir => $"{Directory.GetParent(Application.dataPath)}/HybridCLRData";
 
         public static string AssembliesPostIl2CppStripDir => $"{HybridCLRDataDir}/AssembliesPostIl2CppStrip";
 
@@ -132,8 +133,8 @@ namespace HybridCLR
         /// <param name="target"></param>
         private static void BuildAssetBundles(string tempDir, string outputDir, BuildTarget target)
         {
-            CleanDirectory(tempDir);
-            CleanDirectory(outputDir);
+            CreateDirIfNotExists(tempDir);
+            CreateDirIfNotExists(outputDir);
 
             List<string> notSceneAssets = new List<string>();
 
@@ -260,7 +261,7 @@ namespace HybridCLR
 
         private static void CleanIl2CppBuildCache()
         {
-            string il2cppBuildCachePath = $"{Application.dataPath}/../Library/Il2cppBuildCache";
+            string il2cppBuildCachePath = $"{Directory.GetParent(Application.dataPath)}/Library/Il2cppBuildCache";
             if (!Directory.Exists(il2cppBuildCachePath))
             {
                 return;
@@ -306,7 +307,7 @@ namespace HybridCLR
         [MenuItem("HybridCLR/Generate/MethodBridge_Armv7")]
         public static void MethodBridge_Armv7()
         {
-            string outputFile = $"{MethodBridgeCppDir}/MethodBridge_armv7.cpp";
+            string outputFile = $"{MethodBridgeCppDir}//MethodBridge_armv7.cpp";
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = CallConventionType.Armv7,

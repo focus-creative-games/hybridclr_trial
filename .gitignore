@@ -30,11 +30,12 @@
 /Build-Android-2021.3.1
 /Release
 /HybridCLRData/LocalIl2CppData/
-/HybridCLRData/il2cpp_plus/
-/HybridCLRData/hybridclr/
+/HybridCLRData/il2cpp_plus_repo/
+/HybridCLRData/hybridclr_repo/
+/HybridCLRData/HotFixDlls/
 /HybridCLRData/AssembliesPostIl2CppStrip/
-/Assets/HybridCLRBuildCache
 /Assets/StreamingAssets
 /Release-Win64
 /Build-Android64
 /Build-AndroidV7
+/Assets/HybridCLRBuildCache
