@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Huatuo.Generators
+namespace HybridCLR.Generators
 {
     public class FileRegionReplace
     {

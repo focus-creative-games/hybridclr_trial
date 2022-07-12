@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Huatuo
+namespace HybridCLR
 {
-    public static class HuatuoApi
+    public static class RuntimeApi
     {
 #if UNITY_STANDALONE_WIN
         private const string dllName = "GameAssembly";

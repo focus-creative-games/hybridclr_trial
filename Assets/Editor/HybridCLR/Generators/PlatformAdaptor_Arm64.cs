@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Huatuo.Generators
+namespace HybridCLR.Generators
 {
     internal class PlatformAdaptor_Arm64 : PlatformAdaptorBase
     {

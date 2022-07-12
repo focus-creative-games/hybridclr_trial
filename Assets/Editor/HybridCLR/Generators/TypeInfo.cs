@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace Huatuo.Generators
+namespace HybridCLR.Generators
 {
     public class TypeInfo : IEquatable<TypeInfo>
     {

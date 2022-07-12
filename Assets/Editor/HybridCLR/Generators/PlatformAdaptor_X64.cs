@@ -6,43 +6,37 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Huatuo.Generators
+namespace HybridCLR.Generators
 {
-    internal class PlatformAdaptor_Armv7 : PlatformAdaptorBase
+    internal class PlatformAdaptor_X64 : PlatformAdaptorBase
     {
+        public CallConventionType CallConventionType { get; } = CallConventionType.X64;
 
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
         {
-            { typeof(void), new TypeInfo(typeof(void), ParamOrReturnType.VOID)},
-            { typeof(bool), new TypeInfo(typeof(bool), ParamOrReturnType.I1_U1)},
-            { typeof(byte), new TypeInfo(typeof(byte), ParamOrReturnType.I1_U1)},
-            { typeof(sbyte), new TypeInfo(typeof(sbyte), ParamOrReturnType.I1_U1) },
-            { typeof(short), new TypeInfo(typeof(short), ParamOrReturnType.I2_U2) },
-            { typeof(ushort), new TypeInfo(typeof(ushort), ParamOrReturnType.I2_U2) },
-            { typeof(char), new TypeInfo(typeof(char), ParamOrReturnType.I2_U2) },
-            { typeof(int), new TypeInfo(typeof(int), ParamOrReturnType.I4_U4) },
-            { typeof(uint), new TypeInfo(typeof(uint), ParamOrReturnType.I4_U4) },
+            { typeof(bool), new TypeInfo(typeof(bool), ParamOrReturnType.I8_U8)},
+            { typeof(byte), new TypeInfo(typeof(byte), ParamOrReturnType.I8_U8)},
+            { typeof(sbyte), new TypeInfo(typeof(sbyte), ParamOrReturnType.I8_U8) },
+            { typeof(short), new TypeInfo(typeof(short), ParamOrReturnType.I8_U8) },
+            { typeof(ushort), new TypeInfo(typeof(ushort), ParamOrReturnType.I8_U8) },
+            { typeof(char), new TypeInfo(typeof(char), ParamOrReturnType.I8_U8) },
+            { typeof(int), new TypeInfo(typeof(int), ParamOrReturnType.I8_U8) },
+            { typeof(uint), new TypeInfo(typeof(uint), ParamOrReturnType.I8_U8) },
             { typeof(long), new TypeInfo(typeof(long), ParamOrReturnType.I8_U8) },
             { typeof(ulong), new TypeInfo(typeof(ulong), ParamOrReturnType.I8_U8)},
-            { typeof(float), new TypeInfo(typeof(float), ParamOrReturnType.R4)},
+            { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
+            { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
+            { typeof(float), new TypeInfo(typeof(float), ParamOrReturnType.R8)},
             { typeof(double), new TypeInfo(typeof(double), ParamOrReturnType.R8)},
-            { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I4_U4)},
-            { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I4_U4)},
         };
 
-
-
-
-
-        public CallConventionType CallConventionType { get; } = CallConventionType.Armv7;
-
-        public override bool IsArch32 => true;
+        public override bool IsArch32 => false;
 
         public override TypeInfo CreateTypeInfo(Type type, bool returnValue)
         {
             if (type.IsByRef)
             {
-                return TypeInfo.s_i4u4;
+                return TypeInfo.s_i8u8;
             }
             if (type == typeof(void))
             {
@@ -50,7 +44,7 @@ namespace Huatuo.Generators
             }
             if (!type.IsValueType)
             {
-                return TypeInfo.s_i4u4;
+                return TypeInfo.s_i8u8;
             }
             if (s_typeInfoCaches.TryGetValue(type, out var cache))
             {
@@ -60,95 +54,29 @@ namespace Huatuo.Generators
             {
                 return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
             }
-            var ti = CreateValueType(type);
-            // s_typeInfoCaches.Add(type, ti);
-            return ti;
-        }
-
-        public IEnumerable<MethodBridgeSig> PrepareCommon1()
-        {
-            // (void + int32 + int64 + float + double) * (int32 + int64 + float + double) * (0 - 20) = 420
-            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-            TypeInfo typeInt = new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
-            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
-            TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
-            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            int maxParamCount = 20;
-
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
+            (int size, _) = ComputeSizeAndAligmentOfArch64(type);
+            //Debug.LogFormat("type:{0} size:{1}", type, size);
+            switch (size)
             {
-                var rt = new ReturnInfo() { Type = returnType };
-                foreach (var argType in new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble })
-                {
-                    for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
-                    {
-                        var paramInfos = new List<ParamInfo>();
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            paramInfos.Add(new ParamInfo() { Type = argType });
-                        }
-                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
-                        yield return mbs;
-                    }
-                }
-            }
-        }
-
-        public IEnumerable<MethodBridgeSig> PrepareCommon2()
-        {
-            // (void + int32 + int64 + float + double + v2f + v3f + v4f + s2) * (int32 + int64 + float + double + v2f + v3f + v4f + s2 + sr) ^ (0 - 2) = 399
-            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-            TypeInfo typeInt = new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
-            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
-            TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
-            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            //TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
-
-            int maxParamCount = 2;
-
-            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble };
-            int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
-            {
-                var rt = new ReturnInfo() { Type = returnType };
-                for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
-                {
-                    int totalCombinationNum = (int)Math.Pow(paramTypeNum, paramCount);
-
-                    for (int k = 0; k < totalCombinationNum; k++)
-                    {
-                        var paramInfos = new List<ParamInfo>();
-                        int c = k;
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            paramInfos.Add(new ParamInfo { Type = argTypes[c % paramTypeNum] });
-                            c /= paramTypeNum;
-                        }
-                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
-                        yield return mbs;
-                    }
-                }
+                case 1:
+                case 2:
+                case 4:
+                case 8: return new TypeInfo(type, ParamOrReturnType.I8_U8);
+                default:
+                    return returnValue ? CreateValueType(type) :
+                        new TypeInfo(type, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
             }
         }
 
         public override IEnumerable<MethodBridgeSig> GetPreserveMethods()
         {
-            foreach (var method in PrepareCommon1())
-            {
-                yield return method;
-            }
-            foreach (var method in PrepareCommon2())
-            {
-                yield return method;
-            }
+            yield break;
         }
 
         protected override void GenMethod(MethodBridgeSig method, List<string> lines)
         {
             //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
             int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
-
-
 
             string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
             string paramTypeListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()}").Concat(new string[] { "const MethodInfo*" })); ;
@@ -233,5 +161,7 @@ static void* __Invoke_static_{method.CreateCallSigName()}(Il2CppMethodPointer __
 #endif
 ");
         }
+
+
     }
 }

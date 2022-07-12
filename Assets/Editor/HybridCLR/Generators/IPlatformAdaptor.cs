@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Huatuo.Generators
+namespace HybridCLR.Generators
 {
     public interface IPlatformAdaptor
     {

@@ -12,12 +12,12 @@ using System;
 using UnityEditor.UnityLinker;
 using System.Reflection;
 using UnityEditor.Il2Cpp;
-using Huatuo.Editor.GlobalManagers;
+using HybridCLR.Editor.GlobalManagers;
 #if UNITY_ANDROID
 using UnityEditor.Android;
 #endif
 
-namespace Huatuo
+namespace HybridCLR
 {
     public class BuildProcessor_2019 : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 #if UNITY_ANDROID
@@ -37,7 +37,7 @@ namespace Huatuo
 
         int IOrderedCallback.callbackOrder => 0;
 
-        static Huatuo_BuildProcessor_2019()
+        static BuildProcessor_2019()
         {
             s_BuildReport_AddMessage = typeof(BuildReport).GetMethod("AddMessage", BindingFlags.Instance | BindingFlags.NonPublic);
         }
