@@ -44,19 +44,19 @@ namespace HybridCLR
         [MenuItem("HybridCLR/MethodBridge/Generate_X64")]
         public static void MethodBridge_X86()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.X64, "MethodBridge_x64.cpp");
+            GenerateMethodBridgeCppFile(CallConventionType.X64, "MethodBridge_x64");
         }
 
         [MenuItem("HybridCLR/MethodBridge/Generate_Arm64")]
         public static void MethodBridge_Arm64()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.Arm64, "MethodBridge_arm64.cpp");
+            GenerateMethodBridgeCppFile(CallConventionType.Arm64, "MethodBridge_arm64");
         }
 
         [MenuItem("HybridCLR/MethodBridge/Generate_Armv7")]
         public static void MethodBridge_Armv7()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.Armv7, "MethodBridge_armv7.cpp");
+            GenerateMethodBridgeCppFile(CallConventionType.Armv7, "MethodBridge_armv7");
         }
     }
 }
