@@ -29,78 +29,17 @@ namespace HybridCLR
     , IIl2CppProcessor
 #endif
     {
-
-#if !UNITY_IOS
-        [InitializeOnLoadMethod]
-        private static void Setup()
-        {
-            ///
-            /// unity允许使用UNITY_IL2CPP_PATH环境变量指定il2cpp的位置，因此我们不再直接修改安装位置的il2cpp，
-            /// 而是在本地目录
-            ///
-            var projDir = Path.GetDirectoryName(Application.dataPath);
-            var localIl2cppDir = $"{projDir}/HybridCLRData/LocalIl2CppData/il2cpp";
-            if (!Directory.Exists(localIl2cppDir))
-            {
-                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请手动执行一次 {projDir}/HybridCLRData 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
-            }
-            Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
-        }
-#endif
-
-        /// <summary>
-        /// 需要在Prefab上挂脚本的热更dll名称列表，不需要挂到Prefab上的脚本可以不放在这里
-        /// 但放在这里的dll即使勾选了 AnyPlatform 也会在打包过程中被排除
-        /// 
-        /// 另外请务必注意： 需要挂脚本的dll的名字最好别改，因为这个列表无法热更（上线后删除或添加某些非挂脚本dll没问题）。
-        /// 
-        /// 注意：多热更新dll不是必须的！大多数项目完全可以只有HotFix.dll这一个热更新模块,纯粹出于演示才故意设计了两个热更新模块。
-        /// 另外，是否热更新跟dll名毫无关系，凡是不打包到主工程的，都可以是热更新dll。
-        /// </summary>
-        public static List<string> s_monoHotUpdateDllNames = new List<string>()
-        {
-            "HotFix.dll",
-        };
-
-        /// <summary>
-        /// 所有热更新dll列表。放到此列表中的dll在打包时OnFilterAssemblies回调中被过滤。
-        /// </summary>
-        public static List<string> s_allHotUpdateDllNames = s_monoHotUpdateDllNames.Concat(new List<string>
-        {
-            // 这里放除了s_monoHotUpdateDllNames以外的脚本不需要挂到资源上的dll列表
-            "HotFix2.dll",
-        }).ToList();
-
-        ///// <summary>
-        ///// 需要拷贝的裁剪dll，在裁剪完成后自动拷贝到 Assets/StreamingAssets 目录，这样在打包时即会包含这些dll
-        ///// </summary>
-        //static List<string> s_copyDllName = new List<string>
-        //{
-        //    "mscorlib.dll",
-        //};
-
-
         public int callbackOrder => 0;
-
-        private static void BuildExceptionEventHandler(object sender, UnhandledExceptionEventArgs e)
-        {
-
-        }
-
-        public void OnPreprocessBuild(BuildReport report)
-        {
-
-        }
 
         public string[] OnFilterAssemblies(BuildOptions buildOptions, string[] assemblies)
         {
             // 将热更dll从打包列表中移除
-            return assemblies.Where(ass => s_allHotUpdateDllNames.All(dll => !ass.EndsWith(dll, StringComparison.OrdinalIgnoreCase))).ToArray();
+            return assemblies.Where(ass => BuildConfig.AllHotUpdateDllNames.All(dll => !ass.EndsWith(dll, StringComparison.OrdinalIgnoreCase))).ToArray();
         }
 
 
         [Serializable]
-        public class ScriptingAssemblies
+        private class ScriptingAssemblies
         {
             public List<string> names;
             public List<int> types;
@@ -120,11 +59,6 @@ namespace HybridCLR
 
             AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
 #endif
-            //var projectProject = Path.GetFullPath(".");
-            //foreach(var name in s_copyDllName)
-            //{
-            //    File.Delete(Path.Combine(projectProject, "Assets", "StreamingAssets", name));
-            //}
         }
         
         private void AddBackHotFixAssembliesToJson(BuildReport report, string path)
@@ -134,11 +68,11 @@ namespace HybridCLR
              * 不在此列表中的dll在资源反序列化时无法被找到其类型
              * 因此 OnFilterAssemblies 中移除的条目需要再加回来
              */
-            string[] jsonFiles = Directory.GetFiles(Path.GetDirectoryName(path), "ScriptingAssemblies.json", SearchOption.AllDirectories);
+            string[] jsonFiles = Directory.GetFiles(Path.GetDirectoryName(path), BuildConfig.ScriptingAssembliesJsonFile, SearchOption.AllDirectories);
 
             if (jsonFiles.Length == 0)
             {
-                Debug.LogError("can not find file ScriptingAssemblies.json");
+                Debug.LogError($"can not find file {BuildConfig.ScriptingAssembliesJsonFile}");
                 return;
             }
 
@@ -146,7 +80,7 @@ namespace HybridCLR
             {
                 string content = File.ReadAllText(file);
                 ScriptingAssemblies scriptingAssemblies = JsonUtility.FromJson<ScriptingAssemblies>(content);
-                foreach (string name in s_monoHotUpdateDllNames)
+                foreach (string name in BuildConfig.MonoHotUpdateDllNames)
                 {
                     if(!scriptingAssemblies.names.Contains(name))
                     {
@@ -160,26 +94,47 @@ namespace HybridCLR
             }
         }
 
-
         public void OnPostBuildPlayerScriptDLLs(BuildReport report)
         {
-            // var projectProject = Path.GetFullPath(".");
-            //foreach (var name in s_copyDllName)
-            //{
-            //    var dllPath = Path.Combine(projectProject, "Temp", "StagingArea", "Data", "Managed", name);
-            //    if (File.Exists(dllPath))
-            //    {
-            //        File.Copy(dllPath, Path.Combine(projectProject, "Assets", "StreamingAssets", name), true);
-            //    }
-            //    else
-            //    {
-            //        Debug.LogWarning($"can not find the strip dll, path = {dllPath}");
-            //    }
-            //}
 #if UNITY_2021_1_OR_NEWER
             BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
             CopyStripDlls(target);
 #endif
+        }
+
+        public void OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
+        {
+#if !UNITY_2021_1_OR_NEWER
+            CopyStripDlls(data.target);
+#endif
+        }
+
+        private void CopyStripDlls(BuildTarget target)
+        {
+            var dstPath = BuildConfig.GetAssembliesPostIl2CppStripDir(target);
+
+            Directory.CreateDirectory(dstPath);
+
+            string srcStripDllPath = BuildConfig.GetOriginBuildStripAssembliesDir(target);
+
+            foreach (var fileFullPath in Directory.GetFiles(srcStripDllPath, "*.dll"))
+            {
+                var file = Path.GetFileName(fileFullPath);
+                Debug.Log($"copy strip dll {fileFullPath} ==> {dstPath}/{file}");
+                File.Copy($"{fileFullPath}", $"{dstPath}/{file}", true);
+            }
+        }
+
+        #region useless
+
+        private static void BuildExceptionEventHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+
+        }
+
+        public void OnPreprocessBuild(BuildReport report)
+        {
+
         }
 
         public string GenerateAdditionalLinkXmlFile(BuildReport report, UnityLinkerBuildPipelineData data)
@@ -196,34 +151,11 @@ namespace HybridCLR
         {
         }
 
-        public void OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
-        {
-#if !UNITY_2021_1_OR_NEWER
-            CopyStripDlls(data.target);
-#endif
-        }
-
-        private void CopyStripDlls(BuildTarget target)
-        {
-            var projDir = Path.GetDirectoryName(Application.dataPath);
-            var dstPath = $"{projDir}/HybridCLRData/AssembliesPostIl2CppStrip/{target}";
-
-            Directory.CreateDirectory(dstPath);
-
-            string srcStripDllPath = projDir + "/" + (target == BuildTarget.Android ? "Temp/StagingArea/assets/bin/Data/Managed" : "Temp/StagingArea/Data/Managed/");
-
-            foreach (var fileFullPath in Directory.GetFiles(srcStripDllPath, "*.dll"))
-            {
-                var file = Path.GetFileName(fileFullPath);
-                Debug.Log($"copy strip dll {fileFullPath} ==> {dstPath}/{file}");
-                File.Copy($"{fileFullPath}", $"{dstPath}/{file}", true);
-            }
-        }
-
 
 #if UNITY_IOS
     // hook UnityEditor.BuildCompletionEventsHandler.ReportPostBuildCompletionInfo() ? 因为没有 mac 打包平台因此不清楚
 #endif
+        #endregion
     }
 
 }

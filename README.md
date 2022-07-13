@@ -59,13 +59,12 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
   - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**
   - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**
   - 重复三遍是因为太多新连il2cpp模块都没安装，也不了解打包，就想尝试热更新，结果遇到各种低级的错误来群里问。请自行找其他人或者群解决！！！
-  - **先build一次App**。由于示例项目的common ab包时包含了补充元数据dll，而补充元数据必须是打包过程中生成的裁剪后的AOT dll。
-  - build ab包。点击菜单`huatuo/BuildBundles/Win64`，生成Win64目标的AssetBundle，生成的AssetBundle文件会自动复制到StreamingAssets目录下
-  - 运行，会看到打出 hello, HybridCLR.prefab
+  - 菜单 HybridCLR/Build/Win64 ，运行完成后，会在Release_Win64目录下生成程序
+  - 运行Release_Win64/HybridCLRTrial.exe，会看到打出 hello, HybridCLR.prefab
 - 更新ab包
   - 修改HotFix项目的PrintHello代码，比如改成打印 "hello,world"。
-  - 运行菜单 Huatuo/BuildBundles/Win64，重新生成ab
-  - 将StreamingAssets下的ab包同步到打包主工程时Build目标的StreamingAsset目录，在{BuildDir}\build\bin\Huatuo_Data\StreamingAssets
-- 再将运行，屏幕上会打印"hello,world"。
+  - 运行菜单 HybridCLR/BuildBundles/Win64，重新生成ab
+  - 将StreamingAssets下的ab包复制到Release_Win64\HybridCLRTrial_Data\StreamingAssets。
+  - 再将运行，屏幕上会打印"hello,world"。
 
 剩下的体验之旅，比如各种c#特性，自己体验吧。
