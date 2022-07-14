@@ -100,6 +100,13 @@ namespace HybridCLR
             BuildAssetBundleByTarget(target);
         }
 
+        [MenuItem("HybridCLR/BuildBundles/Win32")]
+        public static void BuildSeneAssetBundleWin32()
+        {
+            var target = BuildTarget.StandaloneWindows;
+            BuildAssetBundleByTarget(target);
+        }
+
         [MenuItem("HybridCLR/BuildBundles/Android")]
         public static void BuildSeneAssetBundleAndroid()
         {

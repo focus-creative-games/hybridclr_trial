@@ -38,6 +38,12 @@ namespace HybridCLR
             CompileDll(EditorUserBuildSettings.activeBuildTarget);
         }
 
+        [MenuItem("HybridCLR/CompileDll/Win32")]
+        public static void CompileDllWin32()
+        {
+            CompileDll(BuildTarget.StandaloneWindows);
+        }
+
         [MenuItem("HybridCLR/CompileDll/Win64")]
         public static void CompileDllWin64()
         {

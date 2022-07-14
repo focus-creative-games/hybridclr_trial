@@ -42,9 +42,15 @@ namespace HybridCLR
         }
 
         [MenuItem("HybridCLR/MethodBridge/Generate_X64")]
-        public static void MethodBridge_X86()
+        public static void MethodBridge_X64()
         {
             GenerateMethodBridgeCppFile(CallConventionType.X64, "MethodBridge_x64");
+        }
+
+        [MenuItem("HybridCLR/MethodBridge/Generate_X86")]
+        public static void MethodBridge_X86()
+        {
+            GenerateMethodBridgeCppFile(CallConventionType.X64, "MethodBridge_x86");
         }
 
         [MenuItem("HybridCLR/MethodBridge/Generate_Arm64")]

@@ -12,6 +12,7 @@ namespace HybridCLR.Generators
 {
     public enum CallConventionType
     {
+        X86,
         X64,
         Armv7,
         Arm64,
@@ -59,9 +60,10 @@ namespace HybridCLR.Generators
         {
             return type switch
             {
+                CallConventionType.X86 => new PlatformAdaptor_X86(),
+                CallConventionType.X64 => new PlatformAdaptor_X64(),
                 CallConventionType.Armv7 => new PlatformAdaptor_Armv7(),
                 CallConventionType.Arm64 => new PlatformAdaptor_Arm64(),
-                CallConventionType.X64 => new PlatformAdaptor_X64(),
                 _ => throw new NotSupportedException(),
             };
         }
@@ -70,12 +72,13 @@ namespace HybridCLR.Generators
         {
             string tplFile = _callConvention switch
             {
+                CallConventionType.X86 => "x86",
                 CallConventionType.X64 => "x64",
                 CallConventionType.Armv7 => "armv7",
                 CallConventionType.Arm64 => "arm64",
                 _ => throw new NotSupportedException(),
             };
-            return $"{Application.dataPath}/Editor/HybridCLR/Templates/MethodBridge_{tplFile}.cpp";
+            return $"{Application.dataPath}/Editor/HybridCLR/Generators/Templates/MethodBridge_{tplFile}.cpp";
         }
 
         public IEnumerable<TypeGenInfo> GetGenerateTypes()

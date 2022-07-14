@@ -29,7 +29,7 @@ namespace HybridCLR
 
             var buildOptions = BuildOptions.None;
 
-            string location = $"{outputPath}/HybridCLRTest.exe";
+            string location = $"{outputPath}/HybridCLRTrial.exe";
 
             Debug.Log("====> Build App");
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
@@ -37,7 +37,45 @@ namespace HybridCLR
                 scenes = new string[] { "Assets/Scenes/main.unity" },
                 locationPathName = location,
                 options = buildOptions,
-                target = BuildTarget.StandaloneWindows64,
+                target = target,
+                targetGroup = BuildTargetGroup.Standalone,
+            };
+
+            var report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            {
+                Debug.LogError("´ò°üÊ§°Ü");
+                return;
+            }
+
+            Debug.Log("====> Build AssetBundle");
+            AssetBundleBuildHelper.BuildAssetBundleByTarget(target);
+            Debug.Log("====> ¸´ÖÆ AssetBundle");
+            CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
+
+#if UNITY_EDITOR
+            Application.OpenURL($"file:///{outputPath}");
+#endif
+        }
+
+        [MenuItem("HybridCLR/Build/Win32")]
+        public static void Build_Win32()
+        {
+            BuildTarget target = BuildTarget.StandaloneWindows;
+            // Get filename.
+            string outputPath = $"{BuildConfig.ProjectDir}/Release-Win32";
+
+            var buildOptions = BuildOptions.None;
+
+            string location = $"{outputPath}/HybridCLRTrial.exe";
+
+            Debug.Log("====> Build App");
+            BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
+            {
+                scenes = new string[] { "Assets/Scenes/main.unity" },
+                locationPathName = location,
+                options = buildOptions,
+                target = target,
                 targetGroup = BuildTargetGroup.Standalone,
             };
 
