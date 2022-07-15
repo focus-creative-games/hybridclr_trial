@@ -10,6 +10,11 @@ using UnityEngine;
 
 namespace HybridCLR.Generators
 {
+    public interface ICustomSignature
+    {
+        List<string> GetSignatureList();
+    }
+
     public enum CallConventionType
     {
         X86,
@@ -251,15 +256,27 @@ namespace HybridCLR.Generators
         }
 
         /// <summary>
-        /// 如果提示缺失桥接函数，将提示缺失的签名加入到下列列表是简单的做法
+        /// 如果提示缺失桥接函数，将提示缺失的签名加入到下列列表是简单的做法，或者在Editor下添加实现ICustomSignature接口的类
         /// </summary>
         /// <returns></returns>
         private List<string> PrepareCustomMethodSignatures()
         {
-            return new List<string>
+            TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom(typeof(ICustomSignature));
+            var signatureMethods = collection.ToList();
+
+            var SignatureList = new List<string>
             {
                 "S108i8i8",
             };
+
+            foreach (var item in signatureMethods)
+            {
+                var signatureMethod = (ICustomSignature)Activator.CreateInstance(item);
+                var customSignature = signatureMethod.GetSignatureList();
+                SignatureList.AddRange(customSignature);
+            }
+
+            return SignatureList;
         }
 
         public void PrepareMethods()
