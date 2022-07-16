@@ -1,18 +1,14 @@
 @echo off
-rem git clone https://github.com/focus-creative-games/hybridclr
-git clone -- https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
-
-rem git clone https://github.com/focus-creative-games/il2cpp_huatuo
-git clone https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
-
 
 rem set default branch
 set IL2CPP_BRANCH=2020.3.33
-cd il2cpp_plus_repo
 
-git switch %IL2CPP_BRANCH%
+rem git clone https://github.com/focus-creative-games/hybridclr
+git clone --depth=1 https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
-cd ..
+rem git clone https://github.com/focus-creative-games/il2cpp_huatuo
+git clone --depth=1 -b %IL2CPP_BRANCH% https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
+
 
 rem replace with right Unity Editor Install path
 set IL2CPP_PATH=C:\Program Files\Unity\Hub\Editor\2020.3.33f1\Editor\Data\il2cpp

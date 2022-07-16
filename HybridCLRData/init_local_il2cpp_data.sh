@@ -1,21 +1,15 @@
 #!/bin/bash
 
-# clone huatuo仓库,国内推荐用 gitee
-# git clone https://github.com/focus-creative-games/hybridclr
-git clone https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
-
-# git clone https://github.com/focus-creative-games/il2cpp_plus
-git clone https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
-
-
 # 设置默认分支为2020.3.33，避免很多人忘了切分支
 IL2CPP_BRANCH=2020.3.33
 
-cd il2cpp_plus_repo
+# clone huatuo仓库,国内推荐用 gitee
+# git clone https://github.com/focus-creative-games/hybridclr
+git clone --depth=1 https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
-git switch $IL2CPP_BRANCH
+# git clone https://github.com/focus-creative-games/il2cpp_plus
+git clone --depth=1 -b $IL2CPP_BRANCH https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
 
-cd ..
 
 # 请修改为你所用Unity的il2cpp目录
 # 一般像这样 C:\Program Files\Unity\Hub\Editor\2020.3.33f1c2\Editor\Data\il2cpp
