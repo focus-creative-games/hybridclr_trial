@@ -134,7 +134,8 @@ namespace HybridCLR.Generators
             }
             else
             {
-                return CreateGeneralValueType(type, typeSize, typeAligment);
+                // 64位下结构体内存对齐规则是一样的
+                return CreateGeneralValueType(type, typeSize, 1 /*typeAligment*/);
             }
 
         }

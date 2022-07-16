@@ -42,7 +42,8 @@ namespace HybridCLR.Generators
         protected override TypeInfo CreateValueType(Type type)
         {
             (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch32(type);
-            return CreateGeneralValueType(type, typeSize, typeAligment);
+            int actualAliment = typeAligment <= 4 ? 1 : 8;
+            return CreateGeneralValueType(type, typeSize, actualAliment);
         }
 
         public IEnumerable<MethodBridgeSig> PrepareCommon1()
