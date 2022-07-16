@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace HybridCLR.Generators
 {
-    internal class PlatformAdaptor_Arm64 : PlatformAdaptorBase
+    internal class PlatformAdaptor_General64 : PlatformAdaptorBase
     {
 
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
@@ -36,57 +36,13 @@ namespace HybridCLR.Generators
             { typeof(System.Numerics.Vector4), new TypeInfo(typeof(System.Numerics.Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4) },
         };
 
-        public CallConventionType CallConventionType { get; } = CallConventionType.Arm64;
+        public CallConventionType CallConventionType { get; } = CallConventionType.General64;
 
         public override bool IsArch32 => false;
 
-        public override TypeInfo CreateTypeInfo(Type type, bool returnValue)
-        {
-            if (type.IsByRef)
-            {
-                return TypeInfo.s_i8u8;
-            }
-            if (type == typeof(void))
-            {
-                return TypeInfo.s_void;
-            }
-            if (!type.IsValueType)
-            {
-                return TypeInfo.s_i8u8;
-            }
-            if (s_typeInfoCaches.TryGetValue(type, out var cache))
-            {
-                return cache;
-            }
-            if (type.IsEnum)
-            {
-                return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
-            }
-            var ti = CreateValueType(type, returnValue);
-            // s_typeInfoCaches.Add(type, ti);
-            return ti;
-        }
+        public override TypeInfo PointerType => TypeInfo.s_i8u8;
 
-        private static TypeInfo CreateNormalValueTypeBySize(Type type, int typeSize, bool returnValue)
-        {
-            if (typeSize <= 8)
-            {
-                return new TypeInfo(type, ParamOrReturnType.I8_U8);
-            }
-            if (typeSize <= 16)
-            {
-                return new TypeInfo(type, ParamOrReturnType.STRUCTURE_SIZE_LE_16);
-            }
-            else if(returnValue)
-            {
-                //return new TypeInfo(type, ParamOrReturnType.STRUCTURE_ALIGN1, typeSize);
-                return CreateValueType(type);
-            }
-            else
-            {
-                return TypeInfo.s_valueTypeAsParam;
-            }
-        }
+        protected override Dictionary<Type, TypeInfo> CacheTypes => s_typeInfoCaches;
 
         public class HFATypeInfo
         {
@@ -149,7 +105,7 @@ namespace HybridCLR.Generators
             return false;
         }
 
-        private static TypeInfo CreateValueType(Type type, bool returnValue)
+        protected override TypeInfo CreateValueType(Type type)
         {
             (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch64(type);
             if (ComputHFATypeInfo(type, typeSize, out HFATypeInfo hfaTypeInfo))
@@ -178,10 +134,11 @@ namespace HybridCLR.Generators
             }
             else
             {
-                return CreateNormalValueTypeBySize(type, typeSize, returnValue);
+                return CreateGeneralValueType(type, typeSize, typeAligment);
             }
 
         }
+
         public IEnumerable<MethodBridgeSig> PrepareCommon1()
         {
             // (void + int32 + int64 + float + double) * (int32 + int64 + float + double) * (0 - 20) = 420
@@ -222,14 +179,12 @@ namespace HybridCLR.Generators
             TypeInfo typeV2f = new TypeInfo(typeof(Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2);
             TypeInfo typeV3f = new TypeInfo(typeof(Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3);
             TypeInfo typeV4f = new TypeInfo(typeof(Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4);
-            TypeInfo typeStructLe16 = new TypeInfo(null, ParamOrReturnType.STRUCTURE_SIZE_LE_16);
-            TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
             int maxParamCount = 2;
 
-            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f, typeStructLe16, typeStructRef };
+            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f };
             int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f, typeStructRef })
+            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f })
             {
                 var rt = new ReturnInfo() { Type = returnType };
                 for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)

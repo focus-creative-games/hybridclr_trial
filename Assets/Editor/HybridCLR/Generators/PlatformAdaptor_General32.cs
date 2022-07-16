@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace HybridCLR.Generators
 {
-    internal class PlatformAdaptor_Armv7 : PlatformAdaptorBase
+    internal class PlatformAdaptor_General32 : PlatformAdaptorBase
     {
 
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
@@ -31,38 +31,18 @@ namespace HybridCLR.Generators
         };
 
 
-
-
-
-        public CallConventionType CallConventionType { get; } = CallConventionType.Armv7;
+        public CallConventionType CallConventionType { get; } = CallConventionType.General32;
 
         public override bool IsArch32 => true;
 
-        public override TypeInfo CreateTypeInfo(Type type, bool returnValue)
+        public override TypeInfo PointerType => TypeInfo.s_i4u4;
+
+        protected override Dictionary<Type, TypeInfo> CacheTypes => s_typeInfoCaches;
+
+        protected override TypeInfo CreateValueType(Type type)
         {
-            if (type.IsByRef)
-            {
-                return TypeInfo.s_i4u4;
-            }
-            if (type == typeof(void))
-            {
-                return TypeInfo.s_void;
-            }
-            if (!type.IsValueType)
-            {
-                return TypeInfo.s_i4u4;
-            }
-            if (s_typeInfoCaches.TryGetValue(type, out var cache))
-            {
-                return cache;
-            }
-            if (type.IsEnum)
-            {
-                return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
-            }
-            var ti = CreateValueType(type);
-            // s_typeInfoCaches.Add(type, ti);
-            return ti;
+            (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch32(type);
+            return CreateGeneralValueType(type, typeSize, typeAligment);
         }
 
         public IEnumerable<MethodBridgeSig> PrepareCommon1()

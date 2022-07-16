@@ -11,7 +11,7 @@ namespace HybridCLR.Generators
     public class MethodBridgeSig : IEquatable<MethodBridgeSig>
     {
 
-        private readonly static Regex s_sigPattern = new Regex(@"^(v|i1|i2|i4|i8|r4|r8|sr|vf2|vf3|vf4|vd2|vd3|vd4|s2|S\d+|A\d+|B\d+|C\d+)+$");
+        private readonly static Regex s_sigPattern = new Regex(@"^(v|i1|i2|i4|i8|r4|r8|vf2|vf3|vf4|vd2|vd3|vd4|S\d+|A\d+|B\d+|C\d+)+$");
 
         public static MethodBridgeSig CreateBySignatuer(string sigName)
         {
@@ -43,14 +43,12 @@ namespace HybridCLR.Generators
                 case "i8": return new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
                 case "r4": return new TypeInfo(typeof(float), ParamOrReturnType.R4);
                 case "r8": return new TypeInfo(typeof(double), ParamOrReturnType.R8);
-                case "sr": return new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
                 case "vf2": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_FLOAT_2);
                 case "vf3": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_FLOAT_3);
                 case "vf4": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_FLOAT_4);
                 case "vd2": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_DOUBLE_2);
                 case "vd3": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_DOUBLE_3);
                 case "vd4": return new TypeInfo(null, ParamOrReturnType.ARM64_HFA_DOUBLE_4);
-                case "s2": return new TypeInfo(null, ParamOrReturnType.STRUCTURE_SIZE_LE_16);
                 default:
                     {
                         if (sigName.StartsWith("S"))

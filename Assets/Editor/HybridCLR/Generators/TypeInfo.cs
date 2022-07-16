@@ -11,7 +11,6 @@ namespace HybridCLR.Generators
         public static readonly TypeInfo s_void = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
         public static readonly TypeInfo s_i4u4 = new TypeInfo(null, ParamOrReturnType.I4_U4);
         public static readonly TypeInfo s_i8u8 = new TypeInfo(null, ParamOrReturnType.I8_U8);
-        public static readonly TypeInfo s_valueTypeAsParam = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
         public TypeInfo(Type type, ParamOrReturnType portype)
         {
@@ -48,31 +47,6 @@ namespace HybridCLR.Generators
             return (int)PorType * 23 + Size;
         }
 
-
-        public int QuadWordNum => PorType switch
-        {
-            ParamOrReturnType.VOID => 0,
-            ParamOrReturnType.I1_U1 => 1,
-            ParamOrReturnType.I2_U2 => 1,
-            ParamOrReturnType.I4_U4 => 1,
-            ParamOrReturnType.I8_U8 => 1,
-            ParamOrReturnType.R4 => 1,
-            ParamOrReturnType.R8 => 1,
-            ParamOrReturnType.STRUCTURE_AS_REF_PARAM => 1,
-            ParamOrReturnType.ARM64_HFA_FLOAT_2 => 1,
-            ParamOrReturnType.ARM64_HFA_FLOAT_3 => 1,
-            ParamOrReturnType.ARM64_HFA_FLOAT_4 => 1,
-            ParamOrReturnType.ARM64_HFA_DOUBLE_2 => 1,
-            ParamOrReturnType.ARM64_HFA_DOUBLE_3 => 1,
-            ParamOrReturnType.ARM64_HFA_DOUBLE_4 => 1,
-            ParamOrReturnType.STRUCTURE_SIZE_LE_16 => 1,
-            ParamOrReturnType.STRUCTURE_ALIGN1 => 1,
-            ParamOrReturnType.STRUCTURE_ALIGN2 => 1,
-            ParamOrReturnType.STRUCTURE_ALIGN4 => 1,
-            ParamOrReturnType.STRUCTURE_ALIGN8 => 1,
-            _ => throw new NotSupportedException(),
-        };
-
         public string CreateSigName()
         {
             return PorType switch
@@ -84,14 +58,12 @@ namespace HybridCLR.Generators
                 ParamOrReturnType.I8_U8 => "i8",
                 ParamOrReturnType.R4 => "r4",
                 ParamOrReturnType.R8 => "r8",
-                ParamOrReturnType.STRUCTURE_AS_REF_PARAM => "sr",
                 ParamOrReturnType.ARM64_HFA_FLOAT_2 => "vf2",
                 ParamOrReturnType.ARM64_HFA_FLOAT_3 => "vf3",
                 ParamOrReturnType.ARM64_HFA_FLOAT_4 => "vf4",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_2 => "vd2",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_3 => "vd3",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_4 => "vd4",
-                ParamOrReturnType.STRUCTURE_SIZE_LE_16 => "s2",
                 ParamOrReturnType.STRUCTURE_ALIGN1 => "S" + Size,
                 ParamOrReturnType.STRUCTURE_ALIGN2 => "A" + Size,
                 ParamOrReturnType.STRUCTURE_ALIGN4 => "B" + Size,
@@ -111,20 +83,42 @@ namespace HybridCLR.Generators
                 ParamOrReturnType.I8_U8 => "int64_t",
                 ParamOrReturnType.R4 => "float",
                 ParamOrReturnType.R8 => "double",
-                ParamOrReturnType.STRUCTURE_AS_REF_PARAM => "void*",
                 ParamOrReturnType.ARM64_HFA_FLOAT_2 => "HtVector2f",
                 ParamOrReturnType.ARM64_HFA_FLOAT_3 => "HtVector3f",
                 ParamOrReturnType.ARM64_HFA_FLOAT_4 => "HtVector4f",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_2 => "HtVector2d",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_3 => "HtVector3d",
                 ParamOrReturnType.ARM64_HFA_DOUBLE_4 => "HtVector4d",
-                ParamOrReturnType.STRUCTURE_SIZE_LE_16 => "ValueTypeSize16",
                 ParamOrReturnType.STRUCTURE_ALIGN1 => $"ValueTypeSize<{Size}>",
                 ParamOrReturnType.STRUCTURE_ALIGN2 => $"ValueTypeSizeAlign2<{Size}>",
                 ParamOrReturnType.STRUCTURE_ALIGN4 => $"ValueTypeSizeAlign4<{Size}>",
                 ParamOrReturnType.STRUCTURE_ALIGN8 => $"ValueTypeSizeAlign8<{Size}>",
                 _ => throw new NotImplementedException(PorType.ToString()),
             };
+        }
+        public int GetParamSlotNum()
+        {
+            switch (PorType)
+            {
+                case ParamOrReturnType.VOID: return 0;
+                case ParamOrReturnType.ARM64_HFA_FLOAT_3: return 2;
+                case ParamOrReturnType.ARM64_HFA_FLOAT_4: return 2;
+                case ParamOrReturnType.ARM64_HFA_DOUBLE_2: return 2;
+                case ParamOrReturnType.ARM64_HFA_DOUBLE_3: return 3;
+                case ParamOrReturnType.ARM64_HFA_DOUBLE_4: return 4;
+                case ParamOrReturnType.ARM64_HVA_8:
+                case ParamOrReturnType.ARM64_HVA_16: throw new NotSupportedException();
+                case ParamOrReturnType.STRUCTURE_ALIGN1:
+                case ParamOrReturnType.STRUCTURE_ALIGN2:
+                case ParamOrReturnType.STRUCTURE_ALIGN4:
+                case ParamOrReturnType.STRUCTURE_ALIGN8: return (Size + 7) / 8;
+                default:
+                    {
+                        Debug.Assert(PorType < ParamOrReturnType.STRUCT_NOT_PASS_AS_VALUE);
+                        Debug.Assert(Size <= 8);
+                        return 1;
+                    }
+            }
         }
     }
 }

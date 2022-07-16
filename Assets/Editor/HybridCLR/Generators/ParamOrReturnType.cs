@@ -18,9 +18,9 @@ namespace HybridCLR.Generators
         //I_U,
         R4,
         R8,
-        OBJECT_PTR_REF,
         ARM64_HFA_FLOAT_2,
-        STRUCTURE_AS_REF_PARAM, // size > 16
+        VALUE_TYPE_SIZE_LESS_EQUAL_8,
+        //STRUCTURE_AS_REF_PARAM, // size > 16
         STRUCT_NOT_PASS_AS_VALUE, // struct  pass not as value
         ARM64_HFA_FLOAT_3,
         ARM64_HFA_FLOAT_4,
@@ -29,7 +29,6 @@ namespace HybridCLR.Generators
         ARM64_HFA_DOUBLE_4,
         ARM64_HVA_8,
         ARM64_HVA_16,
-        STRUCTURE_SIZE_LE_16, // size <= 16
         STRUCTURE_ALIGN1, // size > 16
         STRUCTURE_ALIGN2,
         STRUCTURE_ALIGN4,

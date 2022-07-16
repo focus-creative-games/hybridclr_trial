@@ -14,8 +14,8 @@ namespace HybridCLR.Generators
 
         public int Index { get; set; }
 
-        public bool IsNative2ManagedByAddress => Type.PorType >= ParamOrReturnType.STRUCT_NOT_PASS_AS_VALUE;
-        public bool IsManaged2NativeDereference => Type.PorType != ParamOrReturnType.STRUCTURE_AS_REF_PARAM;
+        //public bool IsNative2ManagedByAddress => Type.PorType >= ParamOrReturnType.STRUCT_NOT_PASS_AS_VALUE;
+        public bool IsPassByAddress => Type.GetParamSlotNum() > 1;
 
         public int GetParamSlotNum(CallConventionType canv)
         {
@@ -24,28 +24,12 @@ namespace HybridCLR.Generators
 
         public string Native2ManagedParamValue(CallConventionType canv)
         {
-            switch(canv)
-            {
-                case CallConventionType.X64:
-                    {
-                        return IsNative2ManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
-                    }
-                case CallConventionType.Arm64:
-                    {
-                        return IsNative2ManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
-                    }
-                case CallConventionType.Armv7:
-                    {
-                        return IsNative2ManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
-                    }
-                default:
-                    throw new NotSupportedException();
-            }
+            return IsPassByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
         }
 
         public string Managed2NativeParamValue(CallConventionType canv)
         {
-            return IsManaged2NativeDereference ?  $"*({Type.GetTypeName()}*)(localVarBase+argVarIndexs[{Index}])" : $"({Type.GetTypeName()})(localVarBase+argVarIndexs[{Index}])";
+            return $"*({Type.GetTypeName()}*)(localVarBase+argVarIndexs[{Index}])";
         }
     }
 
@@ -55,31 +39,9 @@ namespace HybridCLR.Generators
 
         public bool IsVoid => Type.PorType == ParamOrReturnType.VOID;
 
-        public bool PassReturnAsParam => Type.PorType == ParamOrReturnType.STRUCTURE_AS_REF_PARAM;
-
         public int GetParamSlotNum(CallConventionType canv)
         {
-            switch(Type.PorType)
-            {
-                case ParamOrReturnType.VOID: return 0;
-                case ParamOrReturnType.ARM64_HFA_FLOAT_3: return 2;
-                case ParamOrReturnType.ARM64_HFA_FLOAT_4: return 2;
-                case ParamOrReturnType.ARM64_HFA_DOUBLE_2: return 2;
-                case ParamOrReturnType.ARM64_HFA_DOUBLE_3: return 3;
-                case ParamOrReturnType.ARM64_HFA_DOUBLE_4: return 4;
-                case ParamOrReturnType.ARM64_HVA_8:
-                case ParamOrReturnType.ARM64_HVA_16: throw new NotSupportedException();
-                case ParamOrReturnType.STRUCTURE_SIZE_LE_16: return 2; // size <= 16
-                case ParamOrReturnType.STRUCTURE_ALIGN1:
-                case ParamOrReturnType.STRUCTURE_ALIGN2:
-                case ParamOrReturnType.STRUCTURE_ALIGN4:
-                case ParamOrReturnType.STRUCTURE_ALIGN8: return (Type.Size + 7) / 8;
-                default:
-                    {
-                        Debug.Assert(Type.PorType < ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
-                        return 1;
-                    }
-            }
+            return Type.GetParamSlotNum();
         }
     }
 }

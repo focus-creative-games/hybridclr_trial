@@ -13,7 +13,11 @@ namespace HybridCLR.Generators
     {
         public abstract bool IsArch32 { get; }
 
-        public abstract TypeInfo CreateTypeInfo(Type type, bool returnValue);
+        public abstract TypeInfo PointerType { get; }
+
+        protected abstract Dictionary<Type, TypeInfo> CacheTypes { get; }
+
+        protected abstract TypeInfo CreateValueType(Type type);
 
         protected abstract void GenMethod(MethodBridgeSig method, List<string> lines);
 
@@ -63,9 +67,35 @@ namespace HybridCLR.Generators
             return sa;
         }
 
-        protected static TypeInfo CreateValueType(Type type)
+        public TypeInfo CreateTypeInfo(Type type, bool returnValue)
         {
-            var (size, aligment) = ComputeSizeAndAligmentOfArch32(type);
+            if (type.IsByRef)
+            {
+                return PointerType;
+            }
+            if (type == typeof(void))
+            {
+                return TypeInfo.s_void;
+            }
+            if (!type.IsValueType)
+            {
+                return PointerType;
+            }
+            if (CacheTypes.TryGetValue(type, out var cache))
+            {
+                return cache;
+            }
+            if (type.IsEnum)
+            {
+                return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
+            }
+            var ti = CreateValueType(type);
+            // s_typeInfoCaches.Add(type, ti);
+            return ti;
+        }
+
+        protected static TypeInfo CreateGeneralValueType(Type type, int size, int aligment)
+        {
             Debug.Assert(size % aligment == 0);
             switch (aligment)
             {

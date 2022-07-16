@@ -14,7 +14,7 @@
 
 using namespace huatuo::interpreter;
 
-#if HUATUO_TARGET_X86
+#if GENERAL_ABI_64
 //!!!{{INVOKE_STUB
 
 //!!!}}INVOKE_STUB

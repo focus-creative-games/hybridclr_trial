@@ -41,28 +41,16 @@ namespace HybridCLR
             CleanIl2CppBuildCache();
         }
 
-        [MenuItem("HybridCLR/MethodBridge/Generate_X64")]
-        public static void MethodBridge_X64()
+        [MenuItem("HybridCLR/MethodBridge/General64")]
+        public static void MethodBridge_General64()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.X64, "MethodBridge_x64");
+            GenerateMethodBridgeCppFile(CallConventionType.General64, "MethodBridge_General64");
         }
 
-        [MenuItem("HybridCLR/MethodBridge/Generate_X86")]
-        public static void MethodBridge_X86()
+        [MenuItem("HybridCLR/MethodBridge/General32")]
+        public static void MethodBridge_General32()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.X64, "MethodBridge_x86");
-        }
-
-        [MenuItem("HybridCLR/MethodBridge/Generate_Arm64")]
-        public static void MethodBridge_Arm64()
-        {
-            GenerateMethodBridgeCppFile(CallConventionType.Arm64, "MethodBridge_arm64");
-        }
-
-        [MenuItem("HybridCLR/MethodBridge/Generate_Armv7")]
-        public static void MethodBridge_Armv7()
-        {
-            GenerateMethodBridgeCppFile(CallConventionType.Armv7, "MethodBridge_armv7");
+            GenerateMethodBridgeCppFile(CallConventionType.General32, "MethodBridge_General32");
         }
     }
 }

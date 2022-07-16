@@ -12,10 +12,8 @@ namespace HybridCLR.Generators
 {
     public enum CallConventionType
     {
-        X86,
-        X64,
-        Armv7,
-        Arm64,
+        General32,
+        General64,
     }
 
     public class TypeGenInfo
@@ -60,10 +58,8 @@ namespace HybridCLR.Generators
         {
             return type switch
             {
-                CallConventionType.X86 => new PlatformAdaptor_X86(),
-                CallConventionType.X64 => new PlatformAdaptor_X64(),
-                CallConventionType.Armv7 => new PlatformAdaptor_Armv7(),
-                CallConventionType.Arm64 => new PlatformAdaptor_Arm64(),
+                CallConventionType.General32 => new PlatformAdaptor_General32(),
+                CallConventionType.General64 => new PlatformAdaptor_General64(),
                 _ => throw new NotSupportedException(),
             };
         }
@@ -72,10 +68,8 @@ namespace HybridCLR.Generators
         {
             string tplFile = _callConvention switch
             {
-                CallConventionType.X86 => "x86",
-                CallConventionType.X64 => "x64",
-                CallConventionType.Armv7 => "armv7",
-                CallConventionType.Arm64 => "arm64",
+                CallConventionType.General32 => "general32",
+                CallConventionType.General64 => "general64",
                 _ => throw new NotSupportedException(),
             };
             return $"{Application.dataPath}/Editor/HybridCLR/Generators/Templates/MethodBridge_{tplFile}.cpp";
@@ -201,11 +195,10 @@ namespace HybridCLR.Generators
             TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
             TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
             TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
             int maxParamCount = 4;
 
-            var argTypes = new TypeInfo[] { typeLong, typeDouble, typeStructRef };
+            var argTypes = new TypeInfo[] { typeLong, typeDouble };
             int paramTypeNum = argTypes.Length;
             foreach (var returnType in new TypeInfo[] { typeVoid, typeLong, typeDouble })
             {
