@@ -91,6 +91,7 @@ namespace HybridCLR
                 content = JsonUtility.ToJson(scriptingAssemblies);
 
                 File.WriteAllText(file, content);
+                Debug.Log($"============= Update ScriptingAssemblies.json:{file}");
             }
         }
 

@@ -24,6 +24,12 @@ namespace HybridCLR
         public static void Build_Win64()
         {
             BuildTarget target = BuildTarget.StandaloneWindows64;
+            BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
+            if (activeTarget != BuildTarget.StandaloneWindows64 && activeTarget != BuildTarget.StandaloneWindows)
+            {
+                Debug.LogError("请先切到Win平台再打包");
+                return;
+            }
             // Get filename.
             string outputPath = $"{BuildConfig.ProjectDir}/Release-Win64";
 
@@ -62,6 +68,12 @@ namespace HybridCLR
         public static void Build_Win32()
         {
             BuildTarget target = BuildTarget.StandaloneWindows;
+            BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
+            if (activeTarget != BuildTarget.StandaloneWindows64 && activeTarget != BuildTarget.StandaloneWindows)
+            {
+                Debug.LogError("请先切到Win平台再打包");
+                return;
+            }
             // Get filename.
             string outputPath = $"{BuildConfig.ProjectDir}/Release-Win32";
 
@@ -100,6 +112,12 @@ namespace HybridCLR
         public static void Build_Android64()
         {
             BuildTarget target = BuildTarget.Android;
+            BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
+            if (activeTarget != BuildTarget.Android)
+            {
+                Debug.LogError("请先切到Win平台再打包");
+                return;
+            }
             // Get filename.
             string outputPath = $"{BuildConfig.ProjectDir}/Release-Android";
 
