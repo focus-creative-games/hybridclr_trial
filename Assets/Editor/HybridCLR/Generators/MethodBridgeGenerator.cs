@@ -42,9 +42,13 @@ namespace HybridCLR.Generators
 
         private readonly IPlatformAdaptor _platformAdaptor;
 
-        private readonly HashSet<MethodBridgeSig> _methodSet = new HashSet<MethodBridgeSig>();
+        private readonly HashSet<MethodBridgeSig> _callMethodSet = new HashSet<MethodBridgeSig>();
 
-        private List<MethodBridgeSig> _methodList;
+        private List<MethodBridgeSig> _callMethodList;
+
+        private readonly HashSet<MethodBridgeSig> _invokeMethodSet = new HashSet<MethodBridgeSig>();
+
+        private List<MethodBridgeSig> _invokeMethodList;
 
         public MethodBridgeGenerator(MethodBridgeGeneratorOptions options)
         {
@@ -80,11 +84,6 @@ namespace HybridCLR.Generators
             return new List<TypeGenInfo>();
         }
 
-        public List<MethodBridgeSig> GetGenerateMethods()
-        {
-            return _methodList;
-        }
-
         private MethodBridgeSig CreateMethodBridgeSig(bool isStatic, ParameterInfo returnType, ParameterInfo[] parameters)
         {
             var paramInfos = new List<ParamInfo>();
@@ -105,9 +104,17 @@ namespace HybridCLR.Generators
             return mbs;
         }
 
-        private void AddMethod(MethodBridgeSig method)
+        private void AddCallMethod(MethodBridgeSig method)
         {
-            if (_methodSet.Add(method))
+            if (_callMethodSet.Add(method))
+            {
+                method.Init();
+            }
+        }
+
+        private void AddInvokeMethod(MethodBridgeSig method)
+        {
+            if (_invokeMethodSet.Add(method))
             {
                 method.Init();
             }
@@ -127,24 +134,24 @@ namespace HybridCLR.Generators
                 {
                     continue;
                 }
-                var mbs = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
-                AddMethod(mbs);
-                if (typeDel.IsAssignableFrom(type) && method.Name == "Invoke")
-                {
+                var callMethod = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
+                AddCallMethod(callMethod);
 
-                    var mbs2 = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
-                    AddMethod(mbs2);
-                }
+                var invokeMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                AddInvokeMethod(invokeMethod);
             }
 
             foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
 | BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
             {
-                var mbs = CreateMethodBridgeSig(false, null, method.GetParameters());
-                AddMethod(mbs);
+                var callMethod = CreateMethodBridgeSig(false, null, method.GetParameters());
+                AddCallMethod(callMethod);
+
+                var invokeMethod = CreateMethodBridgeSig(true, null, method.GetParameters());
+                AddInvokeMethod(invokeMethod);
             }
 
-            foreach(var subType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
+            foreach (var subType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
             {
                 ScanType(subType);
             }
@@ -183,7 +190,7 @@ namespace HybridCLR.Generators
                             paramInfos.Add(new ParamInfo() { Type = argType });
                         }
                         var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos =  paramInfos};
-                        AddMethod(mbs);
+                        AddCallMethod(mbs);
                     }
                 }
             }
@@ -217,7 +224,7 @@ namespace HybridCLR.Generators
                             c /= paramTypeNum;
                         }
                         var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
-                        AddMethod(mbs);
+                        AddCallMethod(mbs);
                     }
                 }
             }
@@ -225,34 +232,10 @@ namespace HybridCLR.Generators
 
         private void PrepareMethodsFromCustomeGenericTypes()
         {
-            foreach(var type in PrepareCustomGenericTypes())
+            foreach (var type in GeneratorConfig.PrepareCustomGenericTypes())
             {
                 ScanType(type);
             }
-        }
-
-        /// <summary>
-        /// 暂时没有仔细扫描泛型，如果运行时发现有生成缺失，先手动在此添加类
-        /// </summary>
-        /// <returns></returns>
-        private List<Type> PrepareCustomGenericTypes()
-        {
-            return new List<Type>
-            {
-                typeof(Action<int, string, Vector3>),
-            };
-        }
-
-        /// <summary>
-        /// 如果提示缺失桥接函数，将提示缺失的签名加入到下列列表是简单的做法
-        /// </summary>
-        /// <returns></returns>
-        private List<string> PrepareCustomMethodSignatures()
-        {
-            return new List<string>
-            {
-                "S108i8i8",
-            };
         }
 
         public void PrepareMethods()
@@ -260,22 +243,37 @@ namespace HybridCLR.Generators
             PrepareCommon1();
             PrepareCommon2();
             PrepareMethodsFromCustomeGenericTypes();
-            foreach(var methodSig in PrepareCustomMethodSignatures())
+
+
+            foreach(var methodSig in _platformAdaptor.IsArch32 ? GeneratorConfig.PrepareCustomMethodSignatures32() : GeneratorConfig.PrepareCustomMethodSignatures64())
             {
-                AddMethod(MethodBridgeSig.CreateBySignatuer(methodSig));
+                var method = MethodBridgeSig.CreateBySignatuer(methodSig);
+                AddCallMethod(method);
+                AddInvokeMethod(method);
             }
             foreach(var method in _platformAdaptor.GetPreserveMethods())
             {
-                AddMethod(method);
+                AddCallMethod(method);
+                AddInvokeMethod(method);
             }
             PrepareFromAssemblies();
 
-            var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
-            foreach(var method in _methodSet)
             {
-                sortedMethods.Add(method.CreateCallSigName(), method);
+                var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
+                foreach (var method in _callMethodSet)
+                {
+                    sortedMethods.Add(method.CreateCallSigName(), method);
+                }
+                _callMethodList = sortedMethods.Values.ToList();
             }
-            _methodList = sortedMethods.Values.ToList();
+            {
+                var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
+                foreach (var method in _invokeMethodSet)
+                {
+                    sortedMethods.Add(method.CreateCallSigName(), method);
+                }
+                _invokeMethodList = sortedMethods.Values.ToList();
+            }
         }
 
         public void Generate()
@@ -284,9 +282,21 @@ namespace HybridCLR.Generators
 
             List<string> lines = new List<string>(20_0000);
 
-            Debug.LogFormat("== method count:{0}", GetGenerateMethods().Count);
+            Debug.LogFormat("== call method count:{0}", _callMethodList.Count);
 
-            _platformAdaptor.Generate(GetGenerateMethods(), lines);
+            foreach(var method in _callMethodList)
+            {
+                _platformAdaptor.GenerateCall(method, lines);
+            }
+
+            Debug.LogFormat("== invoke method count:{0}", _invokeMethodList.Count);
+            foreach (var method in _invokeMethodList)
+            {
+                _platformAdaptor.GenerateInvoke(method, lines);
+            }
+
+            _platformAdaptor.GenCallStub(_callMethodList, lines);
+            _platformAdaptor.GenInvokeStub(_invokeMethodList, lines);
 
             frr.Replace("INVOKE_STUB", string.Join("\n", lines));
 

@@ -19,7 +19,9 @@ namespace HybridCLR.Generators
 
         protected abstract TypeInfo CreateValueType(Type type);
 
-        protected abstract void GenMethod(MethodBridgeSig method, List<string> lines);
+        public abstract void GenerateCall(MethodBridgeSig method, List<string> lines);
+
+        public abstract void GenerateInvoke(MethodBridgeSig method, List<string> lines);
 
         public abstract IEnumerable<MethodBridgeSig> GetPreserveMethods();
 
@@ -107,7 +109,7 @@ namespace HybridCLR.Generators
             }
         }
 
-        protected void GenCallStub(List<MethodBridgeSig> methods, List<string> lines)
+        public void GenCallStub(List<MethodBridgeSig> methods, List<string> lines)
         {
             lines.Add($@"
 NativeCallMethod huatuo::interpreter::g_callStub[] = 
@@ -123,7 +125,7 @@ NativeCallMethod huatuo::interpreter::g_callStub[] =
             lines.Add("};");
         }
 
-        protected void GenInvokeStub(List<MethodBridgeSig> methods, List<string> lines)
+        public void GenInvokeStub(List<MethodBridgeSig> methods, List<string> lines)
         {
             lines.Add($@"
 NativeInvokeMethod huatuo::interpreter::g_invokeStub[] = 
@@ -137,16 +139,6 @@ NativeInvokeMethod huatuo::interpreter::g_invokeStub[] =
 
             lines.Add($"\t{{nullptr, nullptr, nullptr}},");
             lines.Add("};");
-        }
-
-        public void Generate(List<MethodBridgeSig> methods, List<string> outputLines)
-        {
-            foreach (var method in methods)
-            {
-                GenMethod(method, outputLines);
-            }
-            GenCallStub(methods, outputLines);
-            GenInvokeStub(methods, outputLines);
         }
     }
 }

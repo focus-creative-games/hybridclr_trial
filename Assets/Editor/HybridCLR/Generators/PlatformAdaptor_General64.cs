@@ -112,7 +112,7 @@ namespace HybridCLR.Generators
             {
                 if (hfaTypeInfo.Type == typeof(float))
                 {
-                    switch(hfaTypeInfo.Count)
+                    switch (hfaTypeInfo.Count)
                     {
                         case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_2);
                         case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_3);
@@ -220,7 +220,7 @@ namespace HybridCLR.Generators
             }
         }
 
-        protected override void GenMethod(MethodBridgeSig method, List<string> lines)
+        public override void GenerateCall(MethodBridgeSig method, List<string> lines)
         {
             //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
             int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
@@ -243,8 +243,7 @@ namespace HybridCLR.Generators
     }}
 ";
 
-            {
-                lines.Add($@"
+            lines.Add($@"
 static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_{method.CreateCallSigName()}({paramListStr})
 {{
     StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => p.Native2ManagedParamValue(this.CallConventionType)))} }};
@@ -272,7 +271,31 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
     {(!method.ReturnInfo.IsVoid ? $"*({method.ReturnInfo.Type.GetTypeName()}*)ret = " : "")}((NativeMethod)(method->methodPointer))({paramNameListStr});
 }}
 ");
-            }
+        }
+
+        public override void GenerateInvoke(MethodBridgeSig method, List<string> lines)
+        {
+            //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
+            int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
+
+
+
+            string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
+            string paramTypeListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()}").Concat(new string[] { "const MethodInfo*" })); ;
+            string paramNameListStr = string.Join(", ", method.ParamInfos.Select(p => p.Managed2NativeParamValue(this.CallConventionType)).Concat(new string[] { "method" }));
+
+            string invokeAssignArgs = @$"
+	if (huatuo::IsInstanceMethod(method))
+	{{
+        args[0].ptr = __this;
+{string.Join("\n", method.ParamInfos.Skip(1).Select(p => $"\t\targs[{p.Index}].u64 = *(uint64_t*)__args[{p.Index - 1}];"))}
+    }}
+	else
+	{{
+{string.Join("\n", method.ParamInfos.Select(p => $"\t\targs[{p.Index}].u64 = *(uint64_t*)__args[{p.Index}];"))}
+    }}
+";
+
 
             lines.Add($@"
 #ifdef HUATUO_UNITY_2021_OR_NEW
