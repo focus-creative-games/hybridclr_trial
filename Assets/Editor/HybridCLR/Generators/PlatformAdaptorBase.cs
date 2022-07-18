@@ -17,7 +17,7 @@ namespace HybridCLR.Generators
 
         protected abstract Dictionary<Type, TypeInfo> CacheTypes { get; }
 
-        protected abstract TypeInfo CreateValueType(Type type);
+        protected abstract TypeInfo CreateValueType(Type type, bool returnValue);
 
         public abstract void GenerateCall(MethodBridgeSig method, List<string> lines);
 
@@ -91,7 +91,7 @@ namespace HybridCLR.Generators
             {
                 return CreateTypeInfo(type.GetEnumUnderlyingType(), returnValue);
             }
-            var ti = CreateValueType(type);
+            var ti = CreateValueType(type, returnValue);
             // s_typeInfoCaches.Add(type, ti);
             return ti;
         }

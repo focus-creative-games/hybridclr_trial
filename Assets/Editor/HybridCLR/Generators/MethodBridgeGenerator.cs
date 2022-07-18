@@ -14,6 +14,7 @@ namespace HybridCLR.Generators
     {
         General32,
         General64,
+        Arm64,
     }
 
     public class TypeGenInfo
@@ -64,6 +65,7 @@ namespace HybridCLR.Generators
             {
                 CallConventionType.General32 => new PlatformAdaptor_General32(),
                 CallConventionType.General64 => new PlatformAdaptor_General64(),
+                CallConventionType.Arm64 => new PlatformAdaptor_Arm64(),
                 _ => throw new NotSupportedException(),
             };
         }
@@ -72,8 +74,9 @@ namespace HybridCLR.Generators
         {
             string tplFile = _callConvention switch
             {
-                CallConventionType.General32 => "general32",
-                CallConventionType.General64 => "general64",
+                CallConventionType.General32 => "General32",
+                CallConventionType.General64 => "General64",
+                CallConventionType.Arm64 => "Arm64",
                 _ => throw new NotSupportedException(),
             };
             return $"{Application.dataPath}/Editor/HybridCLR/Generators/Templates/MethodBridge_{tplFile}.cpp";

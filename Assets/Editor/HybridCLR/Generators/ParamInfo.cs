@@ -15,21 +15,18 @@ namespace HybridCLR.Generators
         public int Index { get; set; }
 
         //public bool IsNative2ManagedByAddress => Type.PorType >= ParamOrReturnType.STRUCT_NOT_PASS_AS_VALUE;
-        public bool IsPassByAddress => Type.GetParamSlotNum() > 1;
+        public bool IsPassToManagedByAddress => Type.GetParamSlotNum() > 1;
 
-        public int GetParamSlotNum(CallConventionType canv)
-        {
-            return 1;
-        }
+        public bool IsPassToNativeByAddress => Type.PorType == ParamOrReturnType.STRUCTURE_AS_REF_PARAM;
 
         public string Native2ManagedParamValue(CallConventionType canv)
         {
-            return IsPassByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
+            return IsPassToManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
         }
 
         public string Managed2NativeParamValue(CallConventionType canv)
         {
-            return $"*({Type.GetTypeName()}*)(localVarBase+argVarIndexs[{Index}])";
+            return IsPassToNativeByAddress ? $"(uint64_t)(localVarBase+argVarIndexs[{Index}])" : $"*({Type.GetTypeName()}*)(localVarBase+argVarIndexs[{Index}])";
         }
     }
 

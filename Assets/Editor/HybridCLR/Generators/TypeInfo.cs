@@ -11,6 +11,8 @@ namespace HybridCLR.Generators
         public static readonly TypeInfo s_void = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
         public static readonly TypeInfo s_i4u4 = new TypeInfo(null, ParamOrReturnType.I4_U4);
         public static readonly TypeInfo s_i8u8 = new TypeInfo(null, ParamOrReturnType.I8_U8);
+        public static readonly TypeInfo s_i16 = new TypeInfo(null, ParamOrReturnType.I16);
+        public static readonly TypeInfo s_ref = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
 
         public TypeInfo(Type type, ParamOrReturnType portype)
         {
@@ -58,6 +60,8 @@ namespace HybridCLR.Generators
                 ParamOrReturnType.I8_U8 => "i8",
                 ParamOrReturnType.R4 => "r4",
                 ParamOrReturnType.R8 => "r8",
+                ParamOrReturnType.I16 => "i16",
+                ParamOrReturnType.STRUCTURE_AS_REF_PARAM => "sr",
                 ParamOrReturnType.ARM64_HFA_FLOAT_2 => "vf2",
                 ParamOrReturnType.ARM64_HFA_FLOAT_3 => "vf3",
                 ParamOrReturnType.ARM64_HFA_FLOAT_4 => "vf4",
@@ -83,6 +87,8 @@ namespace HybridCLR.Generators
                 ParamOrReturnType.I8_U8 => "int64_t",
                 ParamOrReturnType.R4 => "float",
                 ParamOrReturnType.R8 => "double",
+                ParamOrReturnType.I16 => "ValueTypeSize16",
+                ParamOrReturnType.STRUCTURE_AS_REF_PARAM => "uint64_t",
                 ParamOrReturnType.ARM64_HFA_FLOAT_2 => "HtVector2f",
                 ParamOrReturnType.ARM64_HFA_FLOAT_3 => "HtVector3f",
                 ParamOrReturnType.ARM64_HFA_FLOAT_4 => "HtVector4f",
@@ -101,6 +107,8 @@ namespace HybridCLR.Generators
             switch (PorType)
             {
                 case ParamOrReturnType.VOID: return 0;
+                case ParamOrReturnType.I16: return 2;
+                case ParamOrReturnType.STRUCTURE_AS_REF_PARAM: return 1;
                 case ParamOrReturnType.ARM64_HFA_FLOAT_3: return 2;
                 case ParamOrReturnType.ARM64_HFA_FLOAT_4: return 2;
                 case ParamOrReturnType.ARM64_HFA_DOUBLE_2: return 2;

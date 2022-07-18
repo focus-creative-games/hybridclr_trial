@@ -105,7 +105,7 @@ namespace HybridCLR.Generators
             return false;
         }
 
-        protected override TypeInfo CreateValueType(Type type)
+        protected override TypeInfo CreateValueType(Type type, bool returnValue)
         {
             (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch64(type);
             if (ComputHFATypeInfo(type, typeSize, out HFATypeInfo hfaTypeInfo))

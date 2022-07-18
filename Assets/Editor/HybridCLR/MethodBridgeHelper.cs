@@ -41,6 +41,12 @@ namespace HybridCLR
             CleanIl2CppBuildCache();
         }
 
+        [MenuItem("HybridCLR/MethodBridge/Arm64")]
+        public static void MethodBridge_Arm64()
+        {
+            GenerateMethodBridgeCppFile(CallConventionType.Arm64, "MethodBridge_Arm64");
+        }
+
         [MenuItem("HybridCLR/MethodBridge/General64")]
         public static void MethodBridge_General64()
         {
