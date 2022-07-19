@@ -49,7 +49,11 @@ namespace HybridCLR
 
         private static List<Assembly> GetScanAssembiles()
         {
-            var allAssByName = AppDomain.CurrentDomain.GetAssemblies().ToDictionary(a => a.GetName().Name);
+            var allAssByName = new Dictionary<string, Assembly>();
+            foreach(var ass in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                allAssByName[ass.GetName().Name] = ass;
+            }
             CompileDllHelper.CompileDllActiveBuildTarget();
 
             var rootAssemblies = Directory.GetFiles(BuildConfig.GetHotFixDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget), "*.dll")
