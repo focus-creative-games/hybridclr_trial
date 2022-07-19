@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -9,7 +10,18 @@ namespace HybridCLR.Generators
 {
     internal class GeneratorConfig
     {
-
+        /// <summary>
+        /// 目前已经根据热更新dll的依赖自动计算需要扫描哪些dll来收集桥接函数。
+        /// 只要你的热更新以assembly def形式放到项目中，是不需要改这个的
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetExtraAssembiles()
+        {
+            return new List<string>
+            {
+                // "mscorlib",
+            };
+        }
 
         /// <summary>
         /// 暂时没有仔细扫描泛型，如果运行时发现有生成缺失，先手动在此添加类
