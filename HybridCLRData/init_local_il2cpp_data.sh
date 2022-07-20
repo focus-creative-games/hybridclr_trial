@@ -3,10 +3,12 @@
 # 设置默认分支为2020.3.33，避免很多人忘了切分支
 IL2CPP_BRANCH=2020.3.33
 
+rm -rf hybridclr_repo
 # clone huatuo仓库,国内推荐用 gitee
 # git clone https://github.com/focus-creative-games/hybridclr
 git clone --depth=1 https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
+rm -rf il2cpp_plus_repo
 # git clone https://github.com/focus-creative-games/il2cpp_plus
 git clone --depth=1 -b $IL2CPP_BRANCH https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
 

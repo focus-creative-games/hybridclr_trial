@@ -3,9 +3,11 @@
 rem set default branch
 set IL2CPP_BRANCH=2020.3.33
 
+rd /s /q hybridclr_repo
 rem git clone https://github.com/focus-creative-games/hybridclr
 git clone --depth=1 https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
+rd /s /q il2cpp_plus_repo
 rem git clone https://github.com/focus-creative-games/il2cpp_huatuo
 git clone --depth=1 -b %IL2CPP_BRANCH% https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
 
