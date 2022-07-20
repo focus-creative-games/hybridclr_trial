@@ -10,7 +10,8 @@ cd build
 cmake ..
 make -j4
 
-if [ -f "$libil2cpp.a" ] ; then
+if [ -f "libil2cpp.a" ]
+then
 	echo 'build succ'
 else
     echo "build fail"
