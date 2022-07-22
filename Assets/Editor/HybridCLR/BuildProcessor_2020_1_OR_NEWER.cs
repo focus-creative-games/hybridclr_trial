@@ -58,6 +58,8 @@ namespace HybridCLR
 #if !UNITY_ANDROID
 
             AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            CopyStripDlls(target);
 #endif
         }
         
