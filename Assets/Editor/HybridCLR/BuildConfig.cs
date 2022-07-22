@@ -104,6 +104,8 @@ namespace HybridCLR
             return $"{ProjectDir}/Library/Bee/artifacts/Android/ManagedStripped";
 #elif UNITY_IOS
             return $"{ProjectDir}/Library/PlayerDataCache/iOS/Data/Managed";
+#elif UNITY_WEBGL
+            return $"{ProjectDir}/Library/Bee/artifacts/WebGL/ManagedStripped";
 #else
             throw new NotSupportedException("GetOriginBuildStripAssembliesDir");
 #endif
