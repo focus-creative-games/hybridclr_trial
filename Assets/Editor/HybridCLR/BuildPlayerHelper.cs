@@ -27,7 +27,7 @@ namespace HybridCLR
             BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
             if (activeTarget != BuildTarget.StandaloneWindows64 && activeTarget != BuildTarget.StandaloneWindows)
             {
-                Debug.LogError("ÇëÏÈÇÐµ½WinÆ½Ì¨ÔÙ´ò°ü");
+                Debug.LogError("è¯·å…ˆåˆ‡åˆ°Winå¹³å°å†æ‰“åŒ…");
                 return;
             }
             // Get filename.
@@ -50,13 +50,13 @@ namespace HybridCLR
             var report = BuildPipeline.BuildPlayer(buildPlayerOptions);
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
-                Debug.LogError("´ò°üÊ§°Ü");
+                Debug.LogError("æ‰“åŒ…å¤±è´¥");
                 return;
             }
 
             Debug.Log("====> Build AssetBundle");
             AssetBundleBuildHelper.BuildAssetBundleByTarget(target);
-            Debug.Log("====> ¸´ÖÆ AssetBundle");
+            Debug.Log("====> å¤åˆ¶ AssetBundle");
             CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
 
 #if UNITY_EDITOR
@@ -71,7 +71,7 @@ namespace HybridCLR
             BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
             if (activeTarget != BuildTarget.StandaloneWindows64 && activeTarget != BuildTarget.StandaloneWindows)
             {
-                Debug.LogError("ÇëÏÈÇÐµ½WinÆ½Ì¨ÔÙ´ò°ü");
+                Debug.LogError("è¯·å…ˆåˆ‡åˆ°Winå¹³å°å†æ‰“åŒ…");
                 return;
             }
             // Get filename.
@@ -94,13 +94,13 @@ namespace HybridCLR
             var report = BuildPipeline.BuildPlayer(buildPlayerOptions);
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
-                Debug.LogError("´ò°üÊ§°Ü");
+                Debug.LogError("æ‰“åŒ…å¤±è´¥");
                 return;
             }
 
             Debug.Log("====> Build AssetBundle");
             AssetBundleBuildHelper.BuildAssetBundleByTarget(target);
-            Debug.Log("====> ¸´ÖÆ AssetBundle");
+            Debug.Log("====> å¤åˆ¶ AssetBundle");
             CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
 
 #if UNITY_EDITOR
@@ -115,7 +115,7 @@ namespace HybridCLR
             BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
             if (activeTarget != BuildTarget.Android)
             {
-                Debug.LogError("ÇëÏÈÇÐµ½WinÆ½Ì¨ÔÙ´ò°ü");
+                Debug.LogError("è¯·å…ˆåˆ‡åˆ°Winå¹³å°å†æ‰“åŒ…");
                 return;
             }
             // Get filename.
@@ -133,12 +133,12 @@ namespace HybridCLR
                 targetGroup = BuildTargetGroup.Android,
             };
 
-            Debug.Log("====> µÚ1´Î Build App(ÎªÁËÉú³É²¹³äAOTÔªÊý¾Ýdll)");
+            Debug.Log("====> ç¬¬1æ¬¡ Build App(ä¸ºäº†ç”Ÿæˆè¡¥å……AOTå…ƒæ•°æ®dll)");
             BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("====> Build AssetBundle");
             AssetBundleBuildHelper.BuildAssetBundleByTarget(target);
 
-            Debug.Log("====> µÚ2´Î´ò°ü");
+            Debug.Log("====> ç¬¬2æ¬¡æ‰“åŒ…");
             BuildPipeline.BuildPlayer(buildPlayerOptions);
 #if UNITY_EDITOR
             Application.OpenURL($"file:///{outputPath}");
