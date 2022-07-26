@@ -13,6 +13,7 @@
 #include "InstrinctDef.h"
 
 using namespace huatuo::interpreter;
+using huatuo::GetInterpreterDirectlyCallMethodPointer;
 
 #if GENERAL_ABI_32
 //!!!{{INVOKE_STUB

@@ -268,7 +268,7 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
     }}
     Interpreter::RuntimeClassCCtorInit(method);
     typedef {method.ReturnInfo.Type.GetTypeName()} (*NativeMethod)({paramListStr});
-    {(!method.ReturnInfo.IsVoid ? $"*({method.ReturnInfo.Type.GetTypeName()}*)ret = " : "")}((NativeMethod)(method->methodPointer))({paramNameListStr});
+    {(!method.ReturnInfo.IsVoid ? $"*({method.ReturnInfo.Type.GetTypeName()}*)ret = " : "")}((NativeMethod)(GetInterpreterDirectlyCallMethodPointer(method)))({paramNameListStr});
 }}
 ");
         }
@@ -301,7 +301,7 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
 #ifdef HUATUO_UNITY_2021_OR_NEW
 static void __Invoke_instance_{method.CreateCallSigName()}(Il2CppMethodPointer __methodPtr, const MethodInfo* __method, void* __this, void** __args, void* __ret)
 {{
-    StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)AdjustValueTypeSelfPointer(({ConstStrings.typeObjectPtr})__this, __method)}};
+    StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)__this }};
     ConvertInvokeArgs(args+1, __method, __args);
     Interpreter::Execute(__method, args, __ret);
 }}
