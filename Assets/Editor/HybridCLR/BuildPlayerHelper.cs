@@ -108,7 +108,7 @@ namespace HybridCLR
 #endif
         }
 
-        [MenuItem("HybridCLR/Build/Andriod64")]
+        [MenuItem("HybridCLR/Build/Android64")]
         public static void Build_Android64()
         {
             BuildTarget target = BuildTarget.Android;

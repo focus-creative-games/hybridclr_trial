@@ -12,7 +12,7 @@ namespace HybridCLR
     public static class AssetBundleBuildHelper
     {
 
-        public static string ToReleateAssetPath(string s)
+        public static string ToRelativeAssetPath(string s)
         {
             return s.Substring(s.IndexOf("Assets/"));
         }
@@ -64,7 +64,7 @@ namespace HybridCLR
             AssetBundleBuild notSceneAb = new AssetBundleBuild
             {
                 assetBundleName = "common",
-                assetNames = notSceneAssets.Select(s => ToReleateAssetPath(s)).ToArray(),
+                assetNames = notSceneAssets.Select(s => ToRelativeAssetPath(s)).ToArray(),
             };
             abs.Add(notSceneAb);
 
@@ -77,8 +77,8 @@ namespace HybridCLR
 
             foreach (var ab in abs)
             {
-                AssetDatabase.CopyAsset(ToReleateAssetPath($"{outputDir}/{ab.assetBundleName}"),
-                    ToReleateAssetPath($"{streamingAssetPathDst}/{ab.assetBundleName}"));
+                AssetDatabase.CopyAsset(ToRelativeAssetPath($"{outputDir}/{ab.assetBundleName}"),
+                    ToRelativeAssetPath($"{streamingAssetPathDst}/{ab.assetBundleName}"));
             }
         }
 
@@ -88,34 +88,34 @@ namespace HybridCLR
         }
 
         [MenuItem("HybridCLR/BuildBundles/ActiveBuildTarget")]
-        public static void BuildSeneAssetBundleActiveBuildTarget()
+        public static void BuildSceneAssetBundleActiveBuildTarget()
         {
             BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget);
         }
 
         [MenuItem("HybridCLR/BuildBundles/Win64")]
-        public static void BuildSeneAssetBundleWin64()
+        public static void BuildSceneAssetBundleWin64()
         {
             var target = BuildTarget.StandaloneWindows64;
             BuildAssetBundleByTarget(target);
         }
 
         [MenuItem("HybridCLR/BuildBundles/Win32")]
-        public static void BuildSeneAssetBundleWin32()
+        public static void BuildSceneAssetBundleWin32()
         {
             var target = BuildTarget.StandaloneWindows;
             BuildAssetBundleByTarget(target);
         }
 
         [MenuItem("HybridCLR/BuildBundles/Android")]
-        public static void BuildSeneAssetBundleAndroid()
+        public static void BuildSceneAssetBundleAndroid()
         {
             var target = BuildTarget.Android;
             BuildAssetBundleByTarget(target);
         }
 
         [MenuItem("HybridCLR/BuildBundles/IOS")]
-        public static void BuildSeneAssetBundleIOS()
+        public static void BuildSceneAssetBundleIOS()
         {
             var target = BuildTarget.iOS;
             BuildAssetBundleByTarget(target);
