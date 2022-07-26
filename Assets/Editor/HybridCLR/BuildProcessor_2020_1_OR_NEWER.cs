@@ -18,13 +18,13 @@ using UnityEditor.Android;
 
 namespace HybridCLR
 {
-    public class BuildProcessor_2020_1_OR_NEWER : IPreprocessBuildWithReport
+    public class BuildProcessor_2020_1_OR_NEWER : IPreprocessBuildWithReport,
 #if UNITY_ANDROID
-        , IPostGenerateGradleAndroidProject
-#else
-        , IPostprocessBuildWithReport
+        IPostGenerateGradleAndroidProject,
 #endif
-        , IFilterBuildAssemblies, IPostBuildPlayerScriptDLLs, IUnityLinkerProcessor
+        IPostprocessBuildWithReport,
+        IFilterBuildAssemblies,
+        IUnityLinkerProcessor
 #if !UNITY_2021_1_OR_NEWER
     , IIl2CppProcessor
 #endif
@@ -45,16 +45,29 @@ namespace HybridCLR
             public List<int> types;
         }
 
-#if UNITY_ANDROID
+        public void OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
+        {
+            Debug.Log("==== OnBeforeConvertRun");
+            // 此回调只在 2020中调用
+            CopyStripDlls(data.target);
+        }
+
         public void OnPostGenerateGradleAndroidProject(string path)
         {
+            Debug.Log("==== OnPostGenerateGradleAndroidProject");
             // 由于 Android 平台在 OnPostprocessBuild 调用时已经生成完 apk 文件，因此需要提前调用
             AddBackHotFixAssembliesToJson(null, path);
+
+            // 对于 2020, 已经在OnBeforeConvertRun中复制了，因此这儿不再复制
+//#if UNITY_2021_1_OR_NEWER
+//            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+//            CopyStripDlls(target);
+//#endif
         }
-#endif
 
         public void OnPostprocessBuild(BuildReport report)
         {
+            Debug.Log("==== OnPostprocessBuild");
 #if !UNITY_ANDROID
 
             AddBackHotFixAssembliesToJson(report, report.summary.outputPath);
@@ -97,21 +110,6 @@ namespace HybridCLR
 
                 File.WriteAllText(file, content);
             }
-        }
-
-        public void OnPostBuildPlayerScriptDLLs(BuildReport report)
-        {
-//#if UNITY_2021_1_OR_NEWER
-//            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
-//            CopyStripDlls(target);
-//#endif
-        }
-
-        public void OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
-        {
-#if !UNITY_2021_1_OR_NEWER
-            CopyStripDlls(data.target);
-#endif
         }
 
         private void CopyStripDlls(BuildTarget target)
