@@ -115,7 +115,7 @@ namespace HybridCLR
             BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
             if (activeTarget != BuildTarget.Android)
             {
-                Debug.LogError("请先切到Win平台再打包");
+                Debug.LogError("请先切到Android平台再打包");
                 return;
             }
             // Get filename.
