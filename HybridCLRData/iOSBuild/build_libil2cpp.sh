@@ -13,8 +13,7 @@ cd build
 # 不设置CMAKE_TOOLCHAIN_FILE 导出的mac版本 不过CMakeLists.txt没有兼容mac版本
 
 cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=../CMake/ios.toolchain.cmake -DPLATFORM=OS64 -DHUATUO_IL2CPP_SOURCE_DIR=${HUATUO_IL2CPP_SOURCE_DIR} -DOUTPUT_BIN_DIR=lib
-
-xcodebuild -project il2cpp.xcodeproj -alltargets -configuration Release
+cmake --build . --config Release
 
 if [ -f "lib/libil2cpp.a" ]
 then
