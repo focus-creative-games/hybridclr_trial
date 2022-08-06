@@ -8,7 +8,7 @@ rem git clone https://github.com/focus-creative-games/hybridclr
 git clone --depth=1 https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
 if exist il2cpp_plus_repo rd /s /q il2cpp_plus_repo
-rem git clone https://github.com/focus-creative-games/il2cpp_huatuo
+rem git clone https://github.com/focus-creative-games/il2cpp_hybridclr
 git clone --depth=1 -b %IL2CPP_BRANCH% https://gitee.com/focus-creative-games/il2cpp_plus il2cpp_plus_repo
 
 
@@ -47,7 +47,7 @@ set LIBIL2CPP_PATH=%LOCAL_IL2CPP_DATA%\il2cpp\libil2cpp
 rd /s /q %LIBIL2CPP_PATH%
 
 xcopy /q /i /e %IL2CPP_PLUS_REPO_DIR%\libil2cpp %LIBIL2CPP_PATH%
-xcopy /q /i /e %HYBRIDCLR_REPO_DIR%\huatuo %LIBIL2CPP_PATH%\huatuo
+xcopy /q /i /e %HYBRIDCLR_REPO_DIR%\hybridclr %LIBIL2CPP_PATH%\hybridclr
 
 rem clean il2cpp build cache
 set IL2CPP_CACHE=..\Library\Il2cppBuildCache
