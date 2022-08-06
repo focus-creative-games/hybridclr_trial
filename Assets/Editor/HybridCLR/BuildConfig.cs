@@ -22,7 +22,7 @@ namespace HybridCLR
             var localIl2cppDir = LocalIl2CppDir;
             if (!Directory.Exists(localIl2cppDir))
             {
-                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请手动执行一次 {BuildConfig.HybridCLRDataDir} 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
+                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请手动执行一次 {HybridCLRDataDir} 目录下的 init_local_il2cpp_data.bat 或者 init_local_il2cpp_data.sh 文件");
             }
             Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
         }
@@ -46,7 +46,7 @@ namespace HybridCLR
 
         public static string LocalIl2CppDir => $"{HybridCLRDataDir}/LocalIl2CppData/il2cpp";
 
-        public static string MethodBridgeCppDir => $"{LocalIl2CppDir}/libil2cpp/huatuo/interpreter";
+        public static string MethodBridgeCppDir => $"{LocalIl2CppDir}/libil2cpp/hybridclr/interpreter";
 
         public static string Il2CppBuildCacheDir { get; } = $"{ProjectDir}/Library/Il2cppBuildCache";
 

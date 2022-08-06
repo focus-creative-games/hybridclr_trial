@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Generators.MethodBridge
 {
     internal abstract class PlatformAdaptorBase : IPlatformAdaptor
     {
@@ -112,7 +112,7 @@ namespace HybridCLR.Generators
         public void GenCallStub(List<MethodBridgeSig> methods, List<string> lines)
         {
             lines.Add($@"
-NativeCallMethod huatuo::interpreter::g_callStub[] = 
+NativeCallMethod hybridclr::interpreter::g_callStub[] = 
 {{
 ");
 
@@ -128,7 +128,7 @@ NativeCallMethod huatuo::interpreter::g_callStub[] =
         public void GenInvokeStub(List<MethodBridgeSig> methods, List<string> lines)
         {
             lines.Add($@"
-NativeInvokeMethod huatuo::interpreter::g_invokeStub[] = 
+NativeInvokeMethod hybridclr::interpreter::g_invokeStub[] = 
 {{
 ");
 

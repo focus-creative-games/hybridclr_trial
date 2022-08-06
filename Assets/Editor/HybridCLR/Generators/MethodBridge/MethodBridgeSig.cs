@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Generators.MethodBridge
 {
     public class MethodBridgeSig : IEquatable<MethodBridgeSig>
     {

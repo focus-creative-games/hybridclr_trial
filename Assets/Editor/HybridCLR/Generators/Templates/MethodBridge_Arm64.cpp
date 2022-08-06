@@ -12,10 +12,10 @@
 #include "MemoryUtil.h"
 #include "InstrinctDef.h"
 
-using namespace huatuo::interpreter;
-using huatuo::GetInterpreterDirectlyCallMethodPointer;
+using namespace hybridclr::interpreter;
+using hybridclr::GetInterpreterDirectlyCallMethodPointer;
 
-#if ARM64_ABI
+#if HYBRIDCLR_ABI_ARM_64
 //!!!{{INVOKE_STUB
 
 //!!!}}INVOKE_STUB

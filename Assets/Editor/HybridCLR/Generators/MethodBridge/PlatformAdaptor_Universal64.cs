@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Generators.MethodBridge
 {
-    internal class PlatformAdaptor_General32 : PlatformAdaptorBase
+    internal class PlatformAdaptor_Universal64 : PlatformAdaptorBase
     {
 
         private static readonly Dictionary<Type, TypeInfo> s_typeInfoCaches = new Dictionary<Type, TypeInfo>()
@@ -26,24 +26,118 @@ namespace HybridCLR.Generators
             { typeof(ulong), new TypeInfo(typeof(ulong), ParamOrReturnType.I8_U8)},
             { typeof(float), new TypeInfo(typeof(float), ParamOrReturnType.R4)},
             { typeof(double), new TypeInfo(typeof(double), ParamOrReturnType.R8)},
-            { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I4_U4)},
-            { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I4_U4)},
+            { typeof(IntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
+            { typeof(UIntPtr), new TypeInfo(null, ParamOrReturnType.I8_U8)},
+            { typeof(Vector2), new TypeInfo(typeof(Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2) },
+            { typeof(Vector3), new TypeInfo(typeof(Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3) },
+            { typeof(Vector4), new TypeInfo(typeof(Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4) },
+            { typeof(System.Numerics.Vector2), new TypeInfo(typeof(System.Numerics.Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2) },
+            { typeof(System.Numerics.Vector3), new TypeInfo(typeof(System.Numerics.Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3) },
+            { typeof(System.Numerics.Vector4), new TypeInfo(typeof(System.Numerics.Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4) },
         };
 
+        public PlatformABI CallConventionType { get; } = PlatformABI.Universal64;
 
-        public CallConventionType CallConventionType { get; } = CallConventionType.General32;
+        public override bool IsArch32 => false;
 
-        public override bool IsArch32 => true;
-
-        public override TypeInfo PointerType => TypeInfo.s_i4u4;
+        public override TypeInfo PointerType => TypeInfo.s_i8u8;
 
         protected override Dictionary<Type, TypeInfo> CacheTypes => s_typeInfoCaches;
 
+        public class HFATypeInfo
+        {
+            public Type Type { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        private static bool IsNotHFAFastCheck(int typeSize)
+        {
+            return typeSize != 8 && typeSize != 12 && typeSize != 16 && typeSize != 24 && typeSize != 32;
+        }
+
+        private static bool ComputHFATypeInfo0(Type type, HFATypeInfo typeInfo)
+        {
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (var field in fields)
+            {
+                Type ftype = field.FieldType;
+                if (ftype != typeof(float) && ftype != typeof(double))
+                {
+                    if (!ftype.IsPrimitive && ftype.IsValueType)
+                    {
+                        if (!ComputHFATypeInfo0(ftype, typeInfo))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (ftype == typeInfo.Type || typeInfo.Type == null)
+                {
+                    typeInfo.Type = ftype;
+                    ++typeInfo.Count;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return typeInfo.Count <= 4;
+        }
+
+        public static bool ComputHFATypeInfo(Type type, int typeSize, out HFATypeInfo typeInfo)
+        {
+            typeInfo = new HFATypeInfo();
+            if (IsNotHFAFastCheck(typeSize))
+            {
+                return false;
+            }
+            bool ok = ComputHFATypeInfo0(type, typeInfo);
+            if (ok && typeInfo.Count >= 2 && typeInfo.Count <= 4)
+            {
+                int fieldSize = typeInfo.Type == typeof(float) ? 4 : 8;
+                return typeSize == fieldSize * typeInfo.Count;
+            }
+            return false;
+        }
+
         protected override TypeInfo CreateValueType(Type type, bool returnValue)
         {
-            (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch32(type);
-            int actualAliment = typeAligment <= 4 ? 1 : 8;
-            return CreateGeneralValueType(type, typeSize, actualAliment);
+            (int typeSize, int typeAligment) = ComputeSizeAndAligmentOfArch64(type);
+            if (ComputHFATypeInfo(type, typeSize, out HFATypeInfo hfaTypeInfo))
+            {
+                if (hfaTypeInfo.Type == typeof(float))
+                {
+                    switch (hfaTypeInfo.Count)
+                    {
+                        case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_2);
+                        case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_3);
+                        case 4: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_FLOAT_4);
+                        default: throw new NotSupportedException();
+                    }
+                }
+                else
+                {
+                    Debug.Assert(hfaTypeInfo.Type == typeof(double));
+                    switch (hfaTypeInfo.Count)
+                    {
+                        case 2: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_2);
+                        case 3: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_3);
+                        case 4: return new TypeInfo(type, ParamOrReturnType.ARM64_HFA_DOUBLE_4);
+                        default: throw new NotSupportedException();
+                    }
+                }
+            }
+            else
+            {
+                // 64位下结构体内存对齐规则是一样的
+                return CreateGeneralValueType(type, typeSize, 1 /*typeAligment*/);
+            }
+
         }
 
         public IEnumerable<MethodBridgeSig> PrepareCommon1()
@@ -83,13 +177,15 @@ namespace HybridCLR.Generators
             TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
             TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
             TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            //TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
+            TypeInfo typeV2f = new TypeInfo(typeof(Vector2), ParamOrReturnType.ARM64_HFA_FLOAT_2);
+            TypeInfo typeV3f = new TypeInfo(typeof(Vector3), ParamOrReturnType.ARM64_HFA_FLOAT_3);
+            TypeInfo typeV4f = new TypeInfo(typeof(Vector4), ParamOrReturnType.ARM64_HFA_FLOAT_4);
 
             int maxParamCount = 2;
 
-            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble };
+            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f };
             int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
+            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble, typeV2f, typeV3f, typeV4f })
             {
                 var rt = new ReturnInfo() { Type = returnType };
                 for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
@@ -129,12 +225,14 @@ namespace HybridCLR.Generators
             //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
             int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
 
+
+
             string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
             string paramTypeListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()}").Concat(new string[] { "const MethodInfo*" })); ;
             string paramNameListStr = string.Join(", ", method.ParamInfos.Select(p => p.Managed2NativeParamValue(this.CallConventionType)).Concat(new string[] { "method" }));
 
             string invokeAssignArgs = @$"
-	if (huatuo::IsInstanceMethod(method))
+	if (hybridclr::IsInstanceMethod(method))
 	{{
         args[0].ptr = __this;
 {string.Join("\n", method.ParamInfos.Skip(1).Select(p => $"\t\targs[{p.Index}].u64 = *(uint64_t*)__args[{p.Index - 1}];"))}
@@ -164,7 +262,7 @@ static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_AdjustorThunk
 
 static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* method, uint16_t* argVarIndexs, StackObject* localVarBase, void* ret)
 {{
-    if (huatuo::metadata::IsInstanceMethod(method) && !localVarBase[argVarIndexs[0]].obj)
+    if (hybridclr::metadata::IsInstanceMethod(method) && !localVarBase[argVarIndexs[0]].obj)
     {{
         il2cpp::vm::Exception::RaiseNullReferenceException();
     }}
@@ -173,21 +271,21 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
     {(!method.ReturnInfo.IsVoid ? $"*({method.ReturnInfo.Type.GetTypeName()}*)ret = " : "")}((NativeMethod)(GetInterpreterDirectlyCallMethodPointer(method)))({paramNameListStr});
 }}
 ");
-
         }
-
 
         public override void GenerateInvoke(MethodBridgeSig method, List<string> lines)
         {
             //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
             int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
 
+
+
             string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
             string paramTypeListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()}").Concat(new string[] { "const MethodInfo*" })); ;
             string paramNameListStr = string.Join(", ", method.ParamInfos.Select(p => p.Managed2NativeParamValue(this.CallConventionType)).Concat(new string[] { "method" }));
 
             string invokeAssignArgs = @$"
-	if (huatuo::IsInstanceMethod(method))
+	if (hybridclr::IsInstanceMethod(method))
 	{{
         args[0].ptr = __this;
 {string.Join("\n", method.ParamInfos.Skip(1).Select(p => $"\t\targs[{p.Index}].u64 = *(uint64_t*)__args[{p.Index - 1}];"))}
@@ -200,7 +298,7 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
 
 
             lines.Add($@"
-#ifdef HUATUO_UNITY_2021_OR_NEW
+#ifdef HYBRIDCLR_UNITY_2021_OR_NEW
 static void __Invoke_instance_{method.CreateCallSigName()}(Il2CppMethodPointer __methodPtr, const MethodInfo* __method, void* __this, void** __args, void* __ret)
 {{
     StackObject args[{totalQuadWordNum + 1}] = {{ (uint64_t)__this }};
@@ -236,5 +334,4 @@ static void* __Invoke_static_{method.CreateCallSigName()}(Il2CppMethodPointer __
 ");
         }
     }
-
 }

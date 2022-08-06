@@ -8,14 +8,8 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Generators.MethodBridge
 {
-    public enum CallConventionType
-    {
-        General32,
-        General64,
-        Arm64,
-    }
 
     public class TypeGenInfo
     {
@@ -28,7 +22,7 @@ namespace HybridCLR.Generators
     {
         public List<Assembly> Assemblies { get; set; }
 
-        public CallConventionType CallConvention { get; set; }
+        public PlatformABI CallConvention { get; set; }
 
         public string OutputFile { get; set; }
     }
@@ -37,7 +31,7 @@ namespace HybridCLR.Generators
     {
         private readonly List<Assembly> _assemblies;
 
-        private readonly CallConventionType _callConvention;
+        private readonly PlatformABI _callConvention;
 
         private readonly string _outputFile;
 
@@ -59,13 +53,13 @@ namespace HybridCLR.Generators
             _platformAdaptor = CreatePlatformAdaptor(options.CallConvention);
         }
 
-        private static IPlatformAdaptor CreatePlatformAdaptor(CallConventionType type)
+        private static IPlatformAdaptor CreatePlatformAdaptor(PlatformABI type)
         {
             return type switch
             {
-                CallConventionType.General32 => new PlatformAdaptor_General32(),
-                CallConventionType.General64 => new PlatformAdaptor_General64(),
-                CallConventionType.Arm64 => new PlatformAdaptor_Arm64(),
+                PlatformABI.Universal32 => new PlatformAdaptor_Universal32(),
+                PlatformABI.Universal64 => new PlatformAdaptor_Universal64(),
+                PlatformABI.Arm64 => new PlatformAdaptor_Arm64(),
                 _ => throw new NotSupportedException(),
             };
         }
@@ -74,9 +68,9 @@ namespace HybridCLR.Generators
         {
             string tplFile = _callConvention switch
             {
-                CallConventionType.General32 => "General32",
-                CallConventionType.General64 => "General64",
-                CallConventionType.Arm64 => "Arm64",
+                PlatformABI.Universal32 => "Universal32",
+                PlatformABI.Universal64 => "Universal64",
+                PlatformABI.Arm64 => "Arm64",
                 _ => throw new NotSupportedException(),
             };
             return $"{Application.dataPath}/Editor/HybridCLR/Generators/Templates/MethodBridge_{tplFile}.cpp";
@@ -125,9 +119,26 @@ namespace HybridCLR.Generators
 
         private void ScanType(Type type)
         {
-            var typeDel = typeof(Delegate);
             if (type.IsGenericTypeDefinition)
             {
+                return;
+            }
+            var typeDel = typeof(MulticastDelegate);
+            if (typeDel.IsAssignableFrom(type))
+            {
+                var method = type.GetMethod("Invoke");
+                if (method == null)
+                {
+                    //Debug.LogError($"delegate:{typeDel.FullName} Invoke not exists");
+                    return;
+                }
+                var instanceCallMethod = CreateMethodBridgeSig(false, method.ReturnParameter, method.GetParameters());
+                AddCallMethod(instanceCallMethod);
+                var staticCallMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                AddCallMethod(staticCallMethod);
+
+                var invokeMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                AddInvokeMethod(invokeMethod);
                 return;
             }
             foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public
