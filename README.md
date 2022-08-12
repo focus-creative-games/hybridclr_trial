@@ -45,20 +45,14 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 - 安装HybridCLR （安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/)）
   - 进入HybridCLRData目录
   - 酌情修改 init_local_il2cpp_data.bat(或.sh)文件中代码
-    - `set IL2CPP_BRANCH=2020.3.33` 改成与你项目Unity**年度版本匹配**的版本（2020.3.x系列选2020.3.33，2021.3.x系列选2021.3.1），注意**不是你项目的Unity版本**
-    - `set IL2CPP_PATH=<你的Unity editor的il2cpp目录的路径>` 改成与上一步IL2CPP_BRANCH对应版本的Unity安装目录下的il2cpp目录
+    - `set IL2CPP_BRANCH=2020.3.33`或`set IL2CPP_BRANCH=2021.3.1` 选择与你项目Unity**年度版本匹配**的版本（2020.3.x系列选2020.3.33，2021.3.x系列选2021.3.1），注意**不是你项目的Unity版本**
+    - `set IL2CPP_PATH=xxx` 改成IL2CPP_BRANCH（即2020.3.33或者2021.3.1）版本的Unity安装目录下的il2cpp目录，**注意不是你项目的Unity版本！！！**
   - 运行 init_local_il2cpp_data.bat 或.sh 文件 创建本地il2cpp目录，即 LocalIl2CppData 目录。
-  - **务必检查命令行的运行结果**，确保输出了 succ ，而不是其他错误。遇到错误，请先用自己对命令行的了解去解决它！！！
-  - **务必检查命令行的运行结果**，确保输出了 succ ，而不是其他错误。遇到错误，请先用自己对命令行的了解去解决它！！！
-  - **务必检查命令行的运行结果**，确保输出了 succ ，而不是其他错误。遇到错误，请先用自己对命令行的了解去解决它！！！
-  - 重复三遍，是因为太多新手没有根据上面要求修改脚本，无脑运行而出错，却连日志都不看！！！
+  - **务必检查命令行的运行过程中没有错误**。遇到错误，请先用自己对命令行的了解去解决它！！！
   - 至此完成包含HybridCLR的本地il2cpp安装
 - 打包主工程
   - **请确保你已经掌握了常规的il2cpp为backend的打包过程**
-  - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**
-  - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**
-  - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**
-  - 重复三遍是因为太多新连il2cpp模块都没安装，也不了解打包，就想尝试热更新，结果遇到各种低级的错误来群里问。请自行找其他人或者群解决！！！
+  - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**，也就是打包环境是正常的！
   - 菜单 HybridCLR/Build/Win64 ，运行完成后，会在Release_Win64目录下生成程序
   - 运行Release_Win64/HybridCLRTrial.exe，会看到打出 hello, HybridCLR.prefab
 - 更新ab包
