@@ -303,14 +303,7 @@ namespace HybridCLR.Generators.MethodBridge
                 _platformAdaptor.GenerateCall(method, lines);
             }
 
-            Debug.LogFormat("== invoke method count:{0}", _invokeMethodList.Count);
-            foreach (var method in _invokeMethodList)
-            {
-                _platformAdaptor.GenerateInvoke(method, lines);
-            }
-
             _platformAdaptor.GenCallStub(_callMethodList, lines);
-            _platformAdaptor.GenInvokeStub(_invokeMethodList, lines);
 
             frr.Replace("INVOKE_STUB", string.Join("\n", lines));
 

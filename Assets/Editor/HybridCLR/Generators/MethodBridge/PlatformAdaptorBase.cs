@@ -21,8 +21,6 @@ namespace HybridCLR.Generators.MethodBridge
 
         public abstract void GenerateCall(MethodBridgeSig method, List<string> lines);
 
-        public abstract void GenerateInvoke(MethodBridgeSig method, List<string> lines);
-
         public abstract IEnumerable<MethodBridgeSig> GetPreserveMethods();
 
         private static Dictionary<Type, (int, int)> _typeSizeCache64 = new Dictionary<Type, (int, int)>();
@@ -122,22 +120,6 @@ NativeCallMethod hybridclr::interpreter::g_callStub[] =
             }
 
             lines.Add($"\t{{nullptr, nullptr}},");
-            lines.Add("};");
-        }
-
-        public void GenInvokeStub(List<MethodBridgeSig> methods, List<string> lines)
-        {
-            lines.Add($@"
-NativeInvokeMethod hybridclr::interpreter::g_invokeStub[] = 
-{{
-");
-
-            foreach (var method in methods)
-            {
-                lines.Add($"\t{{\"{method.CreateInvokeSigName()}\", __Invoke_instance_{method.CreateInvokeSigName()}, __Invoke_static_{method.CreateInvokeSigName()}}},");
-            }
-
-            lines.Add($"\t{{nullptr, nullptr, nullptr}},");
             lines.Add("};");
         }
     }
