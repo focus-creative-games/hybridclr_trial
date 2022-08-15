@@ -13,9 +13,13 @@ namespace HybridCLR.Generators.MethodBridge
 
         TypeInfo CreateTypeInfo(Type type, bool returnValue);
 
-        void GenerateNormalMethod(MethodBridgeSig method, List<string> outputLines);
+        void GenerateManaged2NativeMethod(MethodBridgeSig method, List<string> outputLines);
 
-        void GenerateNormalStub(List<MethodBridgeSig> methods, List<string> lines);
+        void GenerateManaged2NativeStub(List<MethodBridgeSig> methods, List<string> lines);
+
+        void GenerateNative2ManagedMethod(MethodBridgeSig method, List<string> outputLines);
+
+        void GenerateNative2ManagedStub(List<MethodBridgeSig> methods, List<string> lines);
 
         void GenerateAdjustThunkMethod(MethodBridgeSig method, List<string> outputLines);
 

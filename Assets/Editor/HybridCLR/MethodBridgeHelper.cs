@@ -78,7 +78,9 @@ namespace HybridCLR
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = platform,
-                Assemblies = GetScanAssembiles(),
+                HotfixAssemblies = BuildConfig.AllHotUpdateDllNames.Select(name =>
+                    AppDomain.CurrentDomain.GetAssemblies().First(ass => ass.GetName().Name + ".dll" == name)).ToList(),
+                AllAssemblies = GetScanAssembiles(),
                 OutputFile = outputFile,
             });
 

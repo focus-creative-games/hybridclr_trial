@@ -20,7 +20,9 @@ namespace HybridCLR.Generators.MethodBridge
 
     public class MethodBridgeGeneratorOptions
     {
-        public List<Assembly> Assemblies { get; set; }
+        public List<Assembly> HotfixAssemblies { get; set; }
+
+        public List<Assembly> AllAssemblies { get; set; }
 
         public PlatformABI CallConvention { get; set; }
 
@@ -29,6 +31,8 @@ namespace HybridCLR.Generators.MethodBridge
 
     public class MethodBridgeGenerator
     {
+        private readonly HashSet<Assembly> _hotfixAssemblies;
+
         private readonly List<Assembly> _assemblies;
 
         private readonly PlatformABI _callConvention;
@@ -37,17 +41,27 @@ namespace HybridCLR.Generators.MethodBridge
 
         private readonly IPlatformAdaptor _platformAdaptor;
 
-        private readonly HashSet<MethodBridgeSig> _callMethodSet = new HashSet<MethodBridgeSig>();
+        private readonly HashSet<MethodBridgeSig> _managed2nativeMethodSet = new HashSet<MethodBridgeSig>();
 
-        private List<MethodBridgeSig> _callMethodList;
+        private List<MethodBridgeSig> _managed2nativeMethodList;
+
+        private readonly HashSet<MethodBridgeSig> _native2managedMethodSet = new HashSet<MethodBridgeSig>();
+
+        private List<MethodBridgeSig> _native2managedMethodList;
 
         private readonly HashSet<MethodBridgeSig> _adjustThunkMethodSet = new HashSet<MethodBridgeSig>();
 
         private List<MethodBridgeSig> _adjustThunkMethodList;
 
+        public bool IsHotFixType(Type type)
+        {
+            return _hotfixAssemblies.Contains(type.Assembly);
+        }
+
         public MethodBridgeGenerator(MethodBridgeGeneratorOptions options)
         {
-            _assemblies = options.Assemblies;
+            _hotfixAssemblies = new HashSet<Assembly>(options.HotfixAssemblies);
+            _assemblies = options.AllAssemblies;
             _callConvention = options.CallConvention;
             _outputFile = options.OutputFile;
             _platformAdaptor = CreatePlatformAdaptor(options.CallConvention);
@@ -101,9 +115,17 @@ namespace HybridCLR.Generators.MethodBridge
             return mbs;
         }
 
-        private void AddCallMethod(MethodBridgeSig method)
+        private void AddManaged2NativeMethod(MethodBridgeSig method)
         {
-            if (_callMethodSet.Add(method))
+            if (_managed2nativeMethodSet.Add(method))
+            {
+                method.Init();
+            }
+        }
+
+        private void AddNative2ManagedMethod(MethodBridgeSig method)
+        {
+            if (_native2managedMethodSet.Add(method))
             {
                 method.Init();
             }
@@ -123,6 +145,20 @@ namespace HybridCLR.Generators.MethodBridge
             {
                 return;
             }
+            if (!type.IsNested)
+            {
+                if (!type.IsPublic)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (type.IsNestedPrivate)
+                {
+                    return;
+                }
+            }
             var typeDel = typeof(MulticastDelegate);
             if (typeDel.IsAssignableFrom(type))
             {
@@ -132,10 +168,14 @@ namespace HybridCLR.Generators.MethodBridge
                     //Debug.LogError($"delegate:{typeDel.FullName} Invoke not exists");
                     return;
                 }
+                // Debug.Log($"== delegate:{type}");
                 var instanceCallMethod = CreateMethodBridgeSig(false, method.ReturnParameter, method.GetParameters());
-                AddCallMethod(instanceCallMethod);
+                AddManaged2NativeMethod(instanceCallMethod);
+                AddNative2ManagedMethod(instanceCallMethod);
+
                 var staticCallMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
-                AddCallMethod(staticCallMethod);
+                AddManaged2NativeMethod(staticCallMethod);
+                AddNative2ManagedMethod(staticCallMethod);
                 return;
             }
             foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public
@@ -145,26 +185,48 @@ namespace HybridCLR.Generators.MethodBridge
                 {
                     continue;
                 }
-                var callMethod = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
-                AddCallMethod(callMethod);
 
-                if (type.IsValueType && !method.IsStatic)
+                if (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily))
                 {
-                    var adjustThunkMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
-                    AddAdjustThunkMethod(adjustThunkMethod);
+                    continue;
+                }
+
+                if (method.IsFamily || method.IsPublic)
+                {
+                    var m2nMethod = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
+                    AddManaged2NativeMethod(m2nMethod);
+
+                    if (type.IsValueType && !method.IsStatic)
+                    {
+                        var adjustThunkMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                        AddAdjustThunkMethod(adjustThunkMethod);
+                    }
+
+                    if (method.IsVirtual)
+                    {
+                        AddNative2ManagedMethod(m2nMethod);
+                    }
                 }
             }
 
             foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
 | BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
             {
-                var callMethod = CreateMethodBridgeSig(false, null, method.GetParameters());
-                AddCallMethod(callMethod);
-
-                if (type.IsValueType && !method.IsStatic)
+                if (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily))
                 {
-                    var invokeMethod = CreateMethodBridgeSig(true, null, method.GetParameters());
-                    AddAdjustThunkMethod(invokeMethod);
+                    continue;
+                }
+
+                if (method.IsFamily || method.IsPublic)
+                {
+                    var callMethod = CreateMethodBridgeSig(false, null, method.GetParameters());
+                    AddManaged2NativeMethod(callMethod);
+
+                    if (type.IsValueType && !method.IsStatic)
+                    {
+                        var invokeMethod = CreateMethodBridgeSig(true, null, method.GetParameters());
+                        AddAdjustThunkMethod(invokeMethod);
+                    }
                 }
             }
 
@@ -178,6 +240,10 @@ namespace HybridCLR.Generators.MethodBridge
         {
             foreach (var ass in _assemblies)
             {
+                if (_hotfixAssemblies.Contains(ass))
+                {
+                    continue;
+                }
                 //Debug.Log("prepare assembly:" + ass.FullName);
                 foreach (var type in ass.GetTypes())
                 {
@@ -202,18 +268,26 @@ namespace HybridCLR.Generators.MethodBridge
             foreach(var methodSig in _platformAdaptor.IsArch32 ? GeneratorConfig.PrepareCustomMethodSignatures32() : GeneratorConfig.PrepareCustomMethodSignatures64())
             {
                 var method = MethodBridgeSig.CreateBySignatuer(methodSig);
-                AddCallMethod(method);
+                AddManaged2NativeMethod(method);
                 AddAdjustThunkMethod(method);
             }
             PrepareFromAssemblies();
 
             {
                 var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
-                foreach (var method in _callMethodSet)
+                foreach (var method in _managed2nativeMethodSet)
                 {
                     sortedMethods.Add(method.CreateCallSigName(), method);
                 }
-                _callMethodList = sortedMethods.Values.ToList();
+                _managed2nativeMethodList = sortedMethods.Values.ToList();
+            }
+            {
+                var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
+                foreach (var method in _native2managedMethodSet)
+                {
+                    sortedMethods.Add(method.CreateCallSigName(), method);
+                }
+                _native2managedMethodList = sortedMethods.Values.ToList();
             }
             {
                 var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
@@ -231,14 +305,23 @@ namespace HybridCLR.Generators.MethodBridge
 
             List<string> lines = new List<string>(20_0000);
 
-            Debug.LogFormat("== call method count:{0}", _callMethodList.Count);
+            Debug.LogFormat("== managed2native method count:{0}", _managed2nativeMethodList.Count);
 
-            foreach(var method in _callMethodList)
+            foreach(var method in _managed2nativeMethodList)
             {
-                _platformAdaptor.GenerateNormalMethod(method, lines);
+                _platformAdaptor.GenerateManaged2NativeMethod(method, lines);
             }
 
-            _platformAdaptor.GenerateNormalStub(_callMethodList, lines);
+            _platformAdaptor.GenerateManaged2NativeStub(_managed2nativeMethodList, lines);
+
+            Debug.LogFormat("== native2managed method count:{0}", _native2managedMethodList.Count);
+
+            foreach (var method in _native2managedMethodList)
+            {
+                _platformAdaptor.GenerateNative2ManagedMethod(method, lines);
+            }
+
+            _platformAdaptor.GenerateNative2ManagedStub(_native2managedMethodList, lines);
 
             Debug.LogFormat("== adjustThunk method count:{0}", _adjustThunkMethodList.Count);
 
