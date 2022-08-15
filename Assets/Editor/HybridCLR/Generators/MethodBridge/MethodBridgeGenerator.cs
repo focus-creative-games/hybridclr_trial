@@ -41,9 +41,9 @@ namespace HybridCLR.Generators.MethodBridge
 
         private List<MethodBridgeSig> _callMethodList;
 
-        private readonly HashSet<MethodBridgeSig> _invokeMethodSet = new HashSet<MethodBridgeSig>();
+        private readonly HashSet<MethodBridgeSig> _adjustThunkMethodSet = new HashSet<MethodBridgeSig>();
 
-        private List<MethodBridgeSig> _invokeMethodList;
+        private List<MethodBridgeSig> _adjustThunkMethodList;
 
         public MethodBridgeGenerator(MethodBridgeGeneratorOptions options)
         {
@@ -109,9 +109,9 @@ namespace HybridCLR.Generators.MethodBridge
             }
         }
 
-        private void AddInvokeMethod(MethodBridgeSig method)
+        private void AddAdjustThunkMethod(MethodBridgeSig method)
         {
-            if (_invokeMethodSet.Add(method))
+            if (_adjustThunkMethodSet.Add(method))
             {
                 method.Init();
             }
@@ -136,9 +136,6 @@ namespace HybridCLR.Generators.MethodBridge
                 AddCallMethod(instanceCallMethod);
                 var staticCallMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
                 AddCallMethod(staticCallMethod);
-
-                var invokeMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
-                AddInvokeMethod(invokeMethod);
                 return;
             }
             foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public
@@ -151,8 +148,11 @@ namespace HybridCLR.Generators.MethodBridge
                 var callMethod = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
                 AddCallMethod(callMethod);
 
-                var invokeMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
-                AddInvokeMethod(invokeMethod);
+                if (type.IsValueType && !method.IsStatic)
+                {
+                    var adjustThunkMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                    AddAdjustThunkMethod(adjustThunkMethod);
+                }
             }
 
             foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
@@ -161,8 +161,11 @@ namespace HybridCLR.Generators.MethodBridge
                 var callMethod = CreateMethodBridgeSig(false, null, method.GetParameters());
                 AddCallMethod(callMethod);
 
-                var invokeMethod = CreateMethodBridgeSig(true, null, method.GetParameters());
-                AddInvokeMethod(invokeMethod);
+                if (type.IsValueType && !method.IsStatic)
+                {
+                    var invokeMethod = CreateMethodBridgeSig(true, null, method.GetParameters());
+                    AddAdjustThunkMethod(invokeMethod);
+                }
             }
 
             foreach (var subType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
@@ -183,67 +186,6 @@ namespace HybridCLR.Generators.MethodBridge
             }
         }
 
-        public void PrepareCommon1()
-        {
-            // (void + int64 + float) * (int64 + float) * (0 - 20) = 120
-            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
-            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            int maxParamCount = 20;
-                
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeLong, typeDouble })
-            {
-                var rt = new ReturnInfo() { Type = returnType };
-                foreach (var argType in new TypeInfo[] { typeLong, typeDouble })
-                {
-                    for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
-                    {
-                        var paramInfos = new List<ParamInfo>();
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            paramInfos.Add(new ParamInfo() { Type = argType });
-                        }
-                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos =  paramInfos};
-                        AddCallMethod(mbs);
-                    }
-                }
-            }
-        }
-
-        public void PrepareCommon2()
-        {
-            // (void + int64 + float) * (int64 + float + sr) ^ (0 - 4) = 363
-            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
-            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-
-            int maxParamCount = 4;
-
-            var argTypes = new TypeInfo[] { typeLong, typeDouble };
-            int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeLong, typeDouble })
-            {
-                var rt = new ReturnInfo() { Type = returnType };
-                for(int paramCount = 1; paramCount <= maxParamCount; paramCount++)
-                {
-                    int totalCombinationNum = (int)Math.Pow(paramTypeNum, paramCount);
-
-                    for (int k = 0; k < totalCombinationNum; k++)
-                    {
-                        var paramInfos = new List<ParamInfo>();
-                        int c = k;
-                        for(int i = 0; i < paramCount; i++)
-                        {
-                            paramInfos.Add(new ParamInfo { Type = argTypes[c % paramTypeNum] });
-                            c /= paramTypeNum;
-                        }
-                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
-                        AddCallMethod(mbs);
-                    }
-                }
-            }
-        }
-
         private void PrepareMethodsFromCustomeGenericTypes()
         {
             foreach (var type in GeneratorConfig.PrepareCustomGenericTypes())
@@ -254,8 +196,6 @@ namespace HybridCLR.Generators.MethodBridge
 
         public void PrepareMethods()
         {
-            PrepareCommon1();
-            PrepareCommon2();
             PrepareMethodsFromCustomeGenericTypes();
 
 
@@ -263,12 +203,7 @@ namespace HybridCLR.Generators.MethodBridge
             {
                 var method = MethodBridgeSig.CreateBySignatuer(methodSig);
                 AddCallMethod(method);
-                AddInvokeMethod(method);
-            }
-            foreach(var method in _platformAdaptor.GetPreserveMethods())
-            {
-                AddCallMethod(method);
-                AddInvokeMethod(method);
+                AddAdjustThunkMethod(method);
             }
             PrepareFromAssemblies();
 
@@ -282,11 +217,11 @@ namespace HybridCLR.Generators.MethodBridge
             }
             {
                 var sortedMethods = new SortedDictionary<string, MethodBridgeSig>();
-                foreach (var method in _invokeMethodSet)
+                foreach (var method in _adjustThunkMethodSet)
                 {
                     sortedMethods.Add(method.CreateCallSigName(), method);
                 }
-                _invokeMethodList = sortedMethods.Values.ToList();
+                _adjustThunkMethodList = sortedMethods.Values.ToList();
             }
         }
 
@@ -300,10 +235,19 @@ namespace HybridCLR.Generators.MethodBridge
 
             foreach(var method in _callMethodList)
             {
-                _platformAdaptor.GenerateCall(method, lines);
+                _platformAdaptor.GenerateNormalMethod(method, lines);
             }
 
-            _platformAdaptor.GenCallStub(_callMethodList, lines);
+            _platformAdaptor.GenerateNormalStub(_callMethodList, lines);
+
+            Debug.LogFormat("== adjustThunk method count:{0}", _adjustThunkMethodList.Count);
+
+            foreach (var method in _adjustThunkMethodList)
+            {
+                _platformAdaptor.GenerateAdjustThunkMethod(method, lines);
+            }
+
+            _platformAdaptor.GenerateAdjustThunkStub(_adjustThunkMethodList, lines);
 
             frr.Replace("INVOKE_STUB", string.Join("\n", lines));
 

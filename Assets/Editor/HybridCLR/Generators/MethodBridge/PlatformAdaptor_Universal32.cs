@@ -46,107 +46,15 @@ namespace HybridCLR.Generators.MethodBridge
             return CreateGeneralValueType(type, typeSize, actualAliment);
         }
 
-        public IEnumerable<MethodBridgeSig> PrepareCommon1()
+        public override void GenerateNormalMethod(MethodBridgeSig method, List<string> lines)
         {
-            // (void + int32 + int64 + float + double) * (int32 + int64 + float + double) * (0 - 20) = 420
-            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-            TypeInfo typeInt = new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
-            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
-            TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
-            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            int maxParamCount = 20;
-
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
-            {
-                var rt = new ReturnInfo() { Type = returnType };
-                foreach (var argType in new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble })
-                {
-                    for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
-                    {
-                        var paramInfos = new List<ParamInfo>();
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            paramInfos.Add(new ParamInfo() { Type = argType });
-                        }
-                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
-                        yield return mbs;
-                    }
-                }
-            }
-        }
-
-        public IEnumerable<MethodBridgeSig> PrepareCommon2()
-        {
-            // (void + int32 + int64 + float + double + v2f + v3f + v4f + s2) * (int32 + int64 + float + double + v2f + v3f + v4f + s2 + sr) ^ (0 - 2) = 399
-            TypeInfo typeVoid = new TypeInfo(typeof(void), ParamOrReturnType.VOID);
-            TypeInfo typeInt = new TypeInfo(typeof(int), ParamOrReturnType.I4_U4);
-            TypeInfo typeLong = new TypeInfo(typeof(long), ParamOrReturnType.I8_U8);
-            TypeInfo typeFloat = new TypeInfo(typeof(float), ParamOrReturnType.R4);
-            TypeInfo typeDouble = new TypeInfo(typeof(double), ParamOrReturnType.R8);
-            //TypeInfo typeStructRef = new TypeInfo(null, ParamOrReturnType.STRUCTURE_AS_REF_PARAM);
-
-            int maxParamCount = 2;
-
-            var argTypes = new TypeInfo[] { typeInt, typeLong, typeFloat, typeDouble };
-            int paramTypeNum = argTypes.Length;
-            foreach (var returnType in new TypeInfo[] { typeVoid, typeInt, typeLong, typeFloat, typeDouble })
-            {
-                var rt = new ReturnInfo() { Type = returnType };
-                for (int paramCount = 0; paramCount <= maxParamCount; paramCount++)
-                {
-                    int totalCombinationNum = (int)Math.Pow(paramTypeNum, paramCount);
-
-                    for (int k = 0; k < totalCombinationNum; k++)
-                    {
-                        var paramInfos = new List<ParamInfo>();
-                        int c = k;
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            paramInfos.Add(new ParamInfo { Type = argTypes[c % paramTypeNum] });
-                            c /= paramTypeNum;
-                        }
-                        var mbs = new MethodBridgeSig() { ReturnInfo = rt, ParamInfos = paramInfos };
-                        yield return mbs;
-                    }
-                }
-            }
-        }
-
-        public override IEnumerable<MethodBridgeSig> GetPreserveMethods()
-        {
-            foreach (var method in PrepareCommon1())
-            {
-                yield return method;
-            }
-            foreach (var method in PrepareCommon2())
-            {
-                yield return method;
-            }
-        }
-
-        public override void GenerateCall(MethodBridgeSig method, List<string> lines)
-        {
-            //int totalQuadWordNum = method.ParamInfos.Sum(p => p.GetParamSlotNum(this.CallConventionType)) + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
             int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
-
             string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
             string paramTypeListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()}").Concat(new string[] { "const MethodInfo*" })); ;
             string paramNameListStr = string.Join(", ", method.ParamInfos.Select(p => p.Managed2NativeParamValue(this.CallConventionType)).Concat(new string[] { "method" }));
 
-            string invokeAssignArgs = @$"
-	if (hybridclr::IsInstanceMethod(method))
-	{{
-        args[0].ptr = __this;
-{string.Join("\n", method.ParamInfos.Skip(1).Select(p => $"\t\targs[{p.Index}].u64 = *(uint64_t*)__args[{p.Index - 1}];"))}
-    }}
-	else
-	{{
-{string.Join("\n", method.ParamInfos.Select(p => $"\t\targs[{p.Index}].u64 = *(uint64_t*)__args[{p.Index}];"))}
-    }}
-";
-
             lines.Add($@"
-static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_{method.CreateCallSigName()}({paramListStr})
+static {method.ReturnInfo.Type.GetTypeName()} __N2M_{method.CreateCallSigName()}({paramListStr})
 {{
     StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => p.Native2ManagedParamValue(this.CallConventionType)))} }};
     StackObject* ret = {(method.ReturnInfo.IsVoid ? "nullptr" : "args + " + method.ParamInfos.Count)};
@@ -154,15 +62,7 @@ static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_{method.Creat
     {(!method.ReturnInfo.IsVoid ? $"return *({method.ReturnInfo.Type.GetTypeName()}*)ret;" : "")}
 }}
 
-static {method.ReturnInfo.Type.GetTypeName()} __Native2ManagedCall_AdjustorThunk_{method.CreateCallSigName()}({paramListStr})
-{{
-    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"(uint64_t)(*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject))" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
-    StackObject* ret = {(method.ReturnInfo.IsVoid ? "nullptr" : "args + " + method.ParamInfos.Count)};
-    Interpreter::Execute(method, args, ret);
-    {(!method.ReturnInfo.IsVoid ? $"return *({method.ReturnInfo.Type.GetTypeName()}*)ret;" : "")}
-}}
-
-static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* method, uint16_t* argVarIndexs, StackObject* localVarBase, void* ret)
+static void __M2N_{method.CreateCallSigName()}(const MethodInfo* method, uint16_t* argVarIndexs, StackObject* localVarBase, void* ret)
 {{
     if (hybridclr::metadata::IsInstanceMethod(method) && !localVarBase[argVarIndexs[0]].obj)
     {{
@@ -171,6 +71,23 @@ static void __Managed2NativeCall_{method.CreateCallSigName()}(const MethodInfo* 
     Interpreter::RuntimeClassCCtorInit(method);
     typedef {method.ReturnInfo.Type.GetTypeName()} (*NativeMethod)({paramListStr});
     {(!method.ReturnInfo.IsVoid ? $"*({method.ReturnInfo.Type.GetTypeName()}*)ret = " : "")}((NativeMethod)(GetInterpreterDirectlyCallMethodPointer(method)))({paramNameListStr});
+}}
+");
+
+        }
+        public override void GenerateAdjustThunkMethod(MethodBridgeSig method, List<string> lines)
+        {
+            int totalQuadWordNum = method.ParamInfos.Count + method.ReturnInfo.GetParamSlotNum(this.CallConventionType);
+
+            string paramListStr = string.Join(", ", method.ParamInfos.Select(p => $"{p.Type.GetTypeName()} __arg{p.Index}").Concat(new string[] { "const MethodInfo* method" }));
+
+            lines.Add($@"
+static {method.ReturnInfo.Type.GetTypeName()} __N2M_AdjustorThunk_{method.CreateCallSigName()}({paramListStr})
+{{
+    StackObject args[{Math.Max(totalQuadWordNum, 1)}] = {{{string.Join(", ", method.ParamInfos.Select(p => (p.Index == 0 ? $"(uint64_t)(*(uint8_t**)&__arg{p.Index} + sizeof(Il2CppObject))" : p.Native2ManagedParamValue(this.CallConventionType))))} }};
+    StackObject* ret = {(method.ReturnInfo.IsVoid ? "nullptr" : "args + " + method.ParamInfos.Count)};
+    Interpreter::Execute(method, args, ret);
+    {(!method.ReturnInfo.IsVoid ? $"return *({method.ReturnInfo.Type.GetTypeName()}*)ret;" : "")}
 }}
 ");
 
