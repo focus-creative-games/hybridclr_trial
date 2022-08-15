@@ -166,11 +166,6 @@ namespace HybridCLR.Generators.MethodBridge
             lines.Add($@"
 static void __M2N_{method.CreateCallSigName()}(const MethodInfo* method, uint16_t* argVarIndexs, StackObject* localVarBase, void* ret)
 {{
-    if (hybridclr::metadata::IsInstanceMethod(method) && !localVarBase[argVarIndexs[0]].obj)
-    {{
-        il2cpp::vm::Exception::RaiseNullReferenceException();
-    }}
-    Interpreter::RuntimeClassCCtorInit(method);
     typedef {method.ReturnInfo.Type.GetTypeName()} (*NativeMethod)({paramListStr});
     {(!method.ReturnInfo.IsVoid ? $"*({method.ReturnInfo.Type.GetTypeName()}*)ret = " : "")}((NativeMethod)(GetInterpreterDirectlyCallMethodPointer(method)))({paramNameListStr});
 }}
