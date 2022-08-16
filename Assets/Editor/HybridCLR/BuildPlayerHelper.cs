@@ -60,7 +60,7 @@ namespace HybridCLR
             CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
 
 #if UNITY_EDITOR
-            Application.OpenURL($"file:///{outputPath}");
+            Application.OpenURL($"file:///{location}");
 #endif
         }
 

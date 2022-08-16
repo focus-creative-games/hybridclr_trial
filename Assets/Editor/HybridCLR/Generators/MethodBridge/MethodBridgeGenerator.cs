@@ -198,7 +198,7 @@ namespace HybridCLR.Generators.MethodBridge
 
                     if (type.IsValueType && !method.IsStatic)
                     {
-                        var adjustThunkMethod = CreateMethodBridgeSig(true, method.ReturnParameter, method.GetParameters());
+                        var adjustThunkMethod = CreateMethodBridgeSig(false, method.ReturnParameter, method.GetParameters());
                         AddAdjustThunkMethod(adjustThunkMethod);
                     }
 
@@ -224,7 +224,7 @@ namespace HybridCLR.Generators.MethodBridge
 
                     if (type.IsValueType && !method.IsStatic)
                     {
-                        var invokeMethod = CreateMethodBridgeSig(true, null, method.GetParameters());
+                        var invokeMethod = CreateMethodBridgeSig(false, null, method.GetParameters());
                         AddAdjustThunkMethod(invokeMethod);
                     }
                 }
