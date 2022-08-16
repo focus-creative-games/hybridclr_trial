@@ -7,7 +7,7 @@ public class CreateByCode : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Õâ¸ö½Å±¾ÊÇÍ¨¹ı´úÂëAddComponentÖ±½Ó´´½¨µÄ");
+        Debug.Log("è¿™ä¸ªè„šæœ¬æ˜¯é€šè¿‡ä»£ç AddComponentç›´æ¥åˆ›å»ºçš„");
     }
 
     // Update is called once per frame

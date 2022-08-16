@@ -1,4 +1,5 @@
 ﻿using HybridCLR.Generators;
+using HybridCLR.Generators.MethodBridge;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -71,13 +72,15 @@ namespace HybridCLR
             return rootAssemblies;
         }
 
-        private static void GenerateMethodBridgeCppFile(CallConventionType platform, string fileName)
+        private static void GenerateMethodBridgeCppFile(PlatformABI platform, string fileName)
         {
             string outputFile = $"{BuildConfig.MethodBridgeCppDir}/{fileName}.cpp";
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = platform,
-                Assemblies = GetScanAssembiles(),
+                HotfixAssemblies = BuildConfig.AllHotUpdateDllNames.Select(name =>
+                    AppDomain.CurrentDomain.GetAssemblies().First(ass => ass.GetName().Name + ".dll" == name)).ToList(),
+                AllAssemblies = GetScanAssembiles(),
                 OutputFile = outputFile,
             });
 
@@ -90,19 +93,27 @@ namespace HybridCLR
         [MenuItem("HybridCLR/MethodBridge/Arm64")]
         public static void MethodBridge_Arm64()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.Arm64, "MethodBridge_Arm64");
+            GenerateMethodBridgeCppFile(PlatformABI.Arm64, "MethodBridge_Arm64");
         }
 
-        [MenuItem("HybridCLR/MethodBridge/General64")]
-        public static void MethodBridge_General64()
+        [MenuItem("HybridCLR/MethodBridge/Universal64")]
+        public static void MethodBridge_Universal64()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.General64, "MethodBridge_General64");
+            GenerateMethodBridgeCppFile(PlatformABI.Universal64, "MethodBridge_Universal64");
         }
 
-        [MenuItem("HybridCLR/MethodBridge/General32")]
-        public static void MethodBridge_General32()
+        [MenuItem("HybridCLR/MethodBridge/Universal32")]
+        public static void MethodBridge_Universal32()
         {
-            GenerateMethodBridgeCppFile(CallConventionType.General32, "MethodBridge_General32");
+            GenerateMethodBridgeCppFile(PlatformABI.Universal32, "MethodBridge_Universal32");
+        }
+
+        [MenuItem("HybridCLR/MethodBridge/All")]
+        public static void MethodBridge_All()
+        {
+            GenerateMethodBridgeCppFile(PlatformABI.Arm64, "MethodBridge_Arm64");
+            GenerateMethodBridgeCppFile(PlatformABI.Universal64, "MethodBridge_Universal64");
+            GenerateMethodBridgeCppFile(PlatformABI.Universal32, "MethodBridge_Universal32");
         }
     }
 }

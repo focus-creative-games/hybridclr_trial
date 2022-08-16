@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Generators.MethodBridge
 {
 
     public class ParamInfo
@@ -19,12 +19,12 @@ namespace HybridCLR.Generators
 
         public bool IsPassToNativeByAddress => Type.PorType == ParamOrReturnType.STRUCTURE_AS_REF_PARAM;
 
-        public string Native2ManagedParamValue(CallConventionType canv)
+        public string Native2ManagedParamValue(PlatformABI canv)
         {
             return IsPassToManagedByAddress ? $"(uint64_t)&__arg{Index}" : $"*(uint64_t*)&__arg{Index}";
         }
 
-        public string Managed2NativeParamValue(CallConventionType canv)
+        public string Managed2NativeParamValue(PlatformABI canv)
         {
             return IsPassToNativeByAddress ? $"(uint64_t)(localVarBase+argVarIndexs[{Index}])" : $"*({Type.GetTypeName()}*)(localVarBase+argVarIndexs[{Index}])";
         }
@@ -36,7 +36,7 @@ namespace HybridCLR.Generators
 
         public bool IsVoid => Type.PorType == ParamOrReturnType.VOID;
 
-        public int GetParamSlotNum(CallConventionType canv)
+        public int GetParamSlotNum(PlatformABI canv)
         {
             return Type.GetParamSlotNum();
         }

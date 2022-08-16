@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Generators.MethodBridge
 {
     internal abstract class PlatformAdaptorBase : IPlatformAdaptor
     {
@@ -19,11 +19,11 @@ namespace HybridCLR.Generators
 
         protected abstract TypeInfo CreateValueType(Type type, bool returnValue);
 
-        public abstract void GenerateCall(MethodBridgeSig method, List<string> lines);
+        public abstract void GenerateManaged2NativeMethod(MethodBridgeSig method, List<string> lines);
 
-        public abstract void GenerateInvoke(MethodBridgeSig method, List<string> lines);
+        public abstract void GenerateNative2ManagedMethod(MethodBridgeSig method, List<string> lines);
 
-        public abstract IEnumerable<MethodBridgeSig> GetPreserveMethods();
+        public abstract void GenerateAdjustThunkMethod(MethodBridgeSig method, List<string> outputLines);
 
         private static Dictionary<Type, (int, int)> _typeSizeCache64 = new Dictionary<Type, (int, int)>();
 
@@ -109,35 +109,51 @@ namespace HybridCLR.Generators
             }
         }
 
-        public void GenCallStub(List<MethodBridgeSig> methods, List<string> lines)
+        public void GenerateManaged2NativeStub(List<MethodBridgeSig> methods, List<string> lines)
         {
             lines.Add($@"
-NativeCallMethod huatuo::interpreter::g_callStub[] = 
+Managed2NativeMethodInfo hybridclr::interpreter::g_managed2nativeStub[] = 
 {{
 ");
 
             foreach (var method in methods)
             {
-                lines.Add($"\t{{\"{method.CreateInvokeSigName()}\", (Il2CppMethodPointer)__Native2ManagedCall_{method.CreateInvokeSigName()}, (Il2CppMethodPointer)__Native2ManagedCall_AdjustorThunk_{method.CreateCallSigName()}, __Managed2NativeCall_{method.CreateInvokeSigName()}}},");
+                lines.Add($"\t{{\"{method.CreateInvokeSigName()}\", __M2N_{method.CreateInvokeSigName()}}},");
             }
 
             lines.Add($"\t{{nullptr, nullptr}},");
             lines.Add("};");
         }
 
-        public void GenInvokeStub(List<MethodBridgeSig> methods, List<string> lines)
+        public void GenerateNative2ManagedStub(List<MethodBridgeSig> methods, List<string> lines)
         {
             lines.Add($@"
-NativeInvokeMethod huatuo::interpreter::g_invokeStub[] = 
+Native2ManagedMethodInfo hybridclr::interpreter::g_native2managedStub[] = 
 {{
 ");
 
             foreach (var method in methods)
             {
-                lines.Add($"\t{{\"{method.CreateInvokeSigName()}\", __Invoke_instance_{method.CreateInvokeSigName()}, __Invoke_static_{method.CreateInvokeSigName()}}},");
+                lines.Add($"\t{{\"{method.CreateInvokeSigName()}\", (Il2CppMethodPointer)__N2M_{method.CreateInvokeSigName()}}},");
             }
 
-            lines.Add($"\t{{nullptr, nullptr, nullptr}},");
+            lines.Add($"\t{{nullptr, nullptr}},");
+            lines.Add("};");
+        }
+
+        public void GenerateAdjustThunkStub(List<MethodBridgeSig> methods, List<string> lines)
+        {
+            lines.Add($@"
+NativeAdjustThunkMethodInfo hybridclr::interpreter::g_adjustThunkStub[] = 
+{{
+");
+
+            foreach (var method in methods)
+            {
+                lines.Add($"\t{{\"{method.CreateInvokeSigName()}\", (Il2CppMethodPointer)__N2M_AdjustorThunk_{method.CreateCallSigName()}}},");
+            }
+
+            lines.Add($"\t{{nullptr, nullptr}},");
             lines.Add("};");
         }
     }

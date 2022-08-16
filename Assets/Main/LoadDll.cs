@@ -20,6 +20,16 @@ public class LoadDll : MonoBehaviour
         return s_abBytes[dllName];
     }
 
+    private string GetWebRequestPath(string asset)
+    {
+        var path = $"{Application.streamingAssetsPath}/{asset}";
+        if (!path.Contains("://"))
+        {
+            path = "file://" + path;
+        }
+        return path;
+    }
+
     IEnumerator DownLoadDlls(Action onDownloadComplete)
     {
         var abs = new string[]
@@ -28,7 +38,7 @@ public class LoadDll : MonoBehaviour
         };
         foreach (var ab in abs)
         {
-            string dllPath = $"{Application.streamingAssetsPath}/{ab}";
+            string dllPath = GetWebRequestPath(ab);
             Debug.Log($"start download ab:{ab}");
             UnityWebRequest www = UnityWebRequest.Get(dllPath);
             yield return www.SendWebRequest();

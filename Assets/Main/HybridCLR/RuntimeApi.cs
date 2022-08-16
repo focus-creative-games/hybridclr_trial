@@ -18,19 +18,19 @@ namespace HybridCLR
     private const string dllName = "il2cpp";
 #endif
 
-        [DllImport(dllName, EntryPoint = "HuatuoApi_LoadMetadataForAOTAssembly")]
+        [DllImport(dllName, EntryPoint = "RuntimeApi_LoadMetadataForAOTAssembly")]
         public static extern int LoadMetadataForAOTAssembly(IntPtr dllBytes, int dllSize);
 
-        [DllImport(dllName, EntryPoint = "HuatuoApi_GetInterpreterThreadObjectStackSize")]
+        [DllImport(dllName, EntryPoint = "RuntimeApi_GetInterpreterThreadObjectStackSize")]
         public static extern int GetInterpreterThreadObjectStackSize();
 
-        [DllImport(dllName, EntryPoint = "HuatuoApi_SetInterpreterThreadObjectStackSize")]
+        [DllImport(dllName, EntryPoint = "RuntimeApi_SetInterpreterThreadObjectStackSize")]
         public static extern void SetInterpreterThreadObjectStackSize(int size);
 
-        [DllImport(dllName, EntryPoint = "HuatuoApi_GetInterpreterThreadFrameStackSize")]
+        [DllImport(dllName, EntryPoint = "RuntimeApi_GetInterpreterThreadFrameStackSize")]
         public static extern int GetInterpreterThreadFrameStackSize();
 
-        [DllImport(dllName, EntryPoint = "HuatuoApi_SetInterpreterThreadFrameStackSize")]
+        [DllImport(dllName, EntryPoint = "RuntimeApi_SetInterpreterThreadFrameStackSize")]
         public static extern void SetInterpreterThreadFrameStackSize(int size);
     }
 }

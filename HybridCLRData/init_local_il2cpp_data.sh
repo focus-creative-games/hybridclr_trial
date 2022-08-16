@@ -4,7 +4,7 @@
 IL2CPP_BRANCH=2020.3.33
 
 rm -rf hybridclr_repo
-# clone huatuo仓库,国内推荐用 gitee
+# clone hybridclr仓库,国内推荐用 gitee
 # git clone https://github.com/focus-creative-games/hybridclr
 git clone --depth=1 https://gitee.com/focus-creative-games/hybridclr hybridclr_repo
 
@@ -47,9 +47,9 @@ if [ ! -d "$IL2CPP" ]; then
     cp -r "$IL2CPP_PATH" "$IL2CPP"
 fi
 
-# 接下来替换 il2cpp目录下的libil2cpp为 huatuo修改后的版本
+# 接下来替换 il2cpp目录下的libil2cpp为 hybridclr修改后的版本
 # 需要使用 {https://gitee.com/focus-creative-games/il2cpp_plus}/libil2cpp 替换 il2cpp/libil2cpp目录
-# 需要使用 {https://gitee.com/focus-creative-games/hybridclr}/huatuo 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/huatuo
+# 需要使用 {https://gitee.com/focus-creative-games/hybridclr}/hybridclr 添加到 il2cpp/libil2cpp目录下，即il2cpp/libil2cpp/hybridclr
 
 HYBRIDCLR_REPO_DIR=hybridclr_repo
 IL2CPP_PLUS_REPO_DIR=il2cpp_plus_repo
@@ -58,7 +58,7 @@ LIBIL2CPP_PATH=$LOCAL_IL2CPP_DATA/il2cpp/libil2cpp
 rm -rf "$LIBIL2CPP_PATH"
 
 cp -r "$IL2CPP_PLUS_REPO_DIR/libil2cpp" "$LIBIL2CPP_PATH"
-cp -r "$HYBRIDCLR_REPO_DIR/huatuo" "$LIBIL2CPP_PATH/huatuo"
+cp -r "$HYBRIDCLR_REPO_DIR/hybridclr" "$LIBIL2CPP_PATH/hybridclr"
 
 # 务必清除缓存，不然build仍然使用旧版本。
 # 只影响直接build的情况，不影响导出工程的情形。

@@ -45,11 +45,11 @@ OBJECTIVE_FILE_NAME=${GEN_SOURCE_DIR}/lump_mm/lump_libil2cpp_ojective.mm
 echo "#include \"${BASE_DIR}/il2cpp-config.h\"" > ${OBJECTIVE_FILE_NAME}
 echo gen file: ${OBJECTIVE_FILE_NAME}
 
-for FOLDER in huatuo vm pch utils vm-utils codegen metadata os debugger mono gc icalls
+for FOLDER in hybridclr vm pch utils vm-utils codegen metadata os debugger mono gc icalls
 do
     OUTPUT_FILE_NAME=${GEN_SOURCE_DIR}/lump_cpp/lump_libil2cpp_${FOLDER}.cpp
     echo "#include \"${BASE_DIR}/il2cpp-config.h\"" > ${OUTPUT_FILE_NAME}
-    if  [ $FOLDER = huatuo ] || [ $FOLDER = vm ]
+    if  [ $FOLDER = hybridclr ] || [ $FOLDER = vm ]
     then
         echo "#include \"${BASE_DIR}/codegen/il2cpp-codegen.h\"" >> ${OUTPUT_FILE_NAME}
     fi
