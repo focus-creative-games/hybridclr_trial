@@ -19,6 +19,7 @@ namespace HybridCLR
         Ok,
         Il2CppInstallPathNotMatchIl2CppBranch,
         Il2CppInstallPathNotExists,
+        NotIl2CppPath,
     }
 
     public partial class InstallController
@@ -33,7 +34,7 @@ namespace HybridCLR
             }
             set
             {
-                m_Il2CppInstallDirectory = value;
+                m_Il2CppInstallDirectory = value?.Replace('\\', '/');
                 if (!string.IsNullOrEmpty(m_Il2CppInstallDirectory))
                 {
                     EditorPrefs.SetString("UnityInstallDirectory", m_Il2CppInstallDirectory);
@@ -98,7 +99,7 @@ namespace HybridCLR
         {
             if (CheckValidIl2CppInstallDirectory(il2cppBranch, il2cppInstallPath) != InstallErrorCode.Ok)
             {
-                Debug.LogError($"ÇëÕýÈ·ÉèÖÃ il2cpp °²×°Ä¿Â¼");
+                Debug.LogError($"è¯·æ­£ç¡®è®¾ç½® il2cpp å®‰è£…ç›®å½•");
                 return;
             }
 
@@ -114,6 +115,7 @@ namespace HybridCLR
 
         public InstallErrorCode CheckValidIl2CppInstallDirectory(string il2cppBranch, string installDir)
         {
+            installDir = installDir.Replace('\\', '/');
             if (!Directory.Exists(installDir))
             {
                 return InstallErrorCode.Il2CppInstallPathNotExists;
@@ -122,6 +124,11 @@ namespace HybridCLR
             if (!installDir.Contains(il2cppBranch))
             {
                 return InstallErrorCode.Il2CppInstallPathNotMatchIl2CppBranch;
+            }
+
+            if (!installDir.EndsWith("/Editor/Data/il2cpp"))
+            {
+                return InstallErrorCode.NotIl2CppPath;
             }
 
             return InstallErrorCode.Ok;

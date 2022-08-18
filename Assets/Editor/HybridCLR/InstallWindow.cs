@@ -14,10 +14,10 @@ namespace HybridCLR
     {
         private InstallController m_Controller;
 
-        [MenuItem("HybridCLR/Install", false, 0)]
+        [MenuItem("HybridCLR/Install...", false, 0)]
         private static void Open()
         {
-            InstallWindow window = GetWindow<InstallWindow>("HybridCLR Builder", true);
+            InstallWindow window = GetWindow<InstallWindow>("HybridCLR Installer", true);
             window.minSize = new Vector2(800f, 500f);
         }
 
@@ -29,13 +29,13 @@ namespace HybridCLR
         private void OnGUI()
         {
             GUILayout.Space(5f);
-            EditorGUILayout.LabelField("Install HybridCLR£º", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Install HybridCLRï¼š", EditorStyles.boldLabel);
             //EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField($"Unity version: {Application.unityVersion}", EditorStyles.boldLabel);
             EditorGUILayout.LabelField($"il2cpp_plus branch: {m_Controller.Il2CppBranch}", EditorStyles.boldLabel);
-            GUISelectUnityDirectory("il2cpp°²×°Â·¾¶", "Select");
-            GUIItem("³õÊ¼»¯HybridCLR²Ö¿â²¢°²×°µ½µ½±¾ÏîÄ¿¡£", "Install", InitHybridCLR);
+            GUISelectUnityDirectory("il2cppå®‰è£…è·¯å¾„", "Select");
+            GUIItem("åˆå§‹åŒ–HybridCLRä»“åº“å¹¶å®‰è£…åˆ°åˆ°æœ¬é¡¹ç›®ã€‚", "Install", InitHybridCLR);
             EditorGUILayout.EndVertical();
         }
 
@@ -62,7 +62,7 @@ namespace HybridCLR
                 string temp = EditorUtility.OpenFolderPanel(content, m_Controller.Il2CppInstallDirectory, string.Empty);
                 if (!string.IsNullOrEmpty(temp))
                 {
-                    m_Controller.Il2CppInstallDirectory = temp;
+                    il2cppInstallDirectory = m_Controller.Il2CppInstallDirectory = temp;
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -74,20 +74,26 @@ namespace HybridCLR
                     {
                         if (!il2cppInstallDirectory.Contains(m_Controller.Il2CppBranch))
                         {
-                            EditorGUILayout.HelpBox($"li2cpp Â·¾¶Î´°üº¬ '{m_Controller.Il2CppBranch}',ÇëÈ·±£Ñ¡ÔñÁË {m_Controller.Il2CppBranch} °æ±¾µÄ°²×°Ä¿Â¼ ", MessageType.Warning);
+                            EditorGUILayout.HelpBox($"li2cpp è·¯å¾„æœªåŒ…å« '{m_Controller.Il2CppBranch}',è¯·ç¡®ä¿é€‰æ‹©äº† {m_Controller.Il2CppBranch} ç‰ˆæœ¬çš„å®‰è£…ç›®å½• ", MessageType.Warning);
                         }
                         break;
                     }
                 case InstallErrorCode.Il2CppInstallPathNotExists:
                     {
-                        EditorGUILayout.HelpBox("li2cpp Â·¾¶²»´æÔÚ", MessageType.Error);
+                        EditorGUILayout.HelpBox("li2cpp è·¯å¾„ä¸å­˜åœ¨", MessageType.Error);
                         break;
                     }
                 case InstallErrorCode.Il2CppInstallPathNotMatchIl2CppBranch:
                     {
-                        EditorGUILayout.HelpBox($"il2cpp °æ±¾²»Æ¥Åä£¬±ØĞëÎª {m_Controller.Il2CppBranch} °æ±¾ÏàÓ¦Ä¿Â¼", MessageType.Error);
+                        EditorGUILayout.HelpBox($"il2cpp ç‰ˆæœ¬ä¸åŒ¹é…ï¼Œå¿…é¡»ä¸º {m_Controller.Il2CppBranch} ç‰ˆæœ¬ç›¸åº”ç›®å½•", MessageType.Error);
                         break;
                     }
+                case InstallErrorCode.NotIl2CppPath:
+                    {
+                        EditorGUILayout.HelpBox($"å½“å‰é€‰æ‹©çš„è·¯å¾„ä¸æ˜¯il2cppç›®å½•ï¼ˆå¿…é¡»ç±»ä¼¼ xxx/Editor/Data/il2cppï¼‰", MessageType.Error);
+                        break;
+                    }
+                default: throw new Exception($"not support {err}");
             }
         }
 
