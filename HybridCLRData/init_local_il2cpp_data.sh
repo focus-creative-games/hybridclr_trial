@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 设置默认分支为2020.3.33，避免很多人忘了切分支
-IL2CPP_BRANCH=2020.3.33
+IL2CPP_BRANCH=$1
 
 rm -rf hybridclr_repo
 # clone hybridclr仓库,国内推荐用 gitee
@@ -17,7 +17,7 @@ git clone --depth=1 -b $IL2CPP_BRANCH https://gitee.com/focus-creative-games/il2
 # 一般像这样 
 # C:\Program Files\Unity\Hub\Editor\2020.3.33f1c2\Editor\Data\il2cpp
 # /Applications/Unity/Hub/Editor/2020.3.33f1/Unity.app/Contents/il2cpp
-IL2CPP_PATH='/Applications/Unity/Hub/Editor/2020.3.33f1/Unity.app/Contents/il2cpp'
+IL2CPP_PATH=$2
 
 if [ ! -d "$IL2CPP_PATH" ] ; then
     echo "你未指定正确的il2cpp路径"
@@ -67,3 +67,5 @@ echo 清除 Library/Il2cppBuildCache 缓存目录
 rm -rf ../Library/Il2cppBuildCache
 
 echo 初始化成功
+
+read -p "Press enter to continue" -t 10
