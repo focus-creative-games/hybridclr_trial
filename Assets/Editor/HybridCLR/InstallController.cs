@@ -68,6 +68,32 @@ namespace HybridCLR
 
         void PrepareIl2CppInstallPath()
         {
+#if UNITY_EDITOR_OSX
+            m_Il2CppInstallDirectory = EditorPrefs.GetString("Il2CppInstallDirectory");
+            if (CheckValidIl2CppInstallDirectory(Il2CppBranch, m_Il2CppInstallDirectory) == InstallErrorCode.Ok)
+            {
+                return;
+            }
+            var il2cppBranch = Il2CppBranch;
+            var curAppInstallPath = EditorApplication.applicationPath;
+            if (curAppInstallPath.Contains(il2cppBranch))
+            {
+                Il2CppInstallDirectory = $"{curAppInstallPath}/Contents/il2cpp";
+                return;
+            }
+            string unityHubRootDir = Directory.GetParent(curAppInstallPath).Parent.Parent.ToString();
+            foreach (var unityInstallDir in Directory.GetDirectories(unityHubRootDir, "*", SearchOption.TopDirectoryOnly))
+            {
+                Debug.Log("nity install dir:" + unityInstallDir);
+                if (unityInstallDir.Contains(il2cppBranch))
+                {
+                    Il2CppInstallDirectory = $"{unityInstallDir}/Unity.app/Contents/il2cpp";
+                    return;
+                }
+            }
+
+            Il2CppInstallDirectory = $"{curAppInstallPath}/Contents/il2cpp";
+#else
             m_Il2CppInstallDirectory = EditorPrefs.GetString("Il2CppInstallDirectory");
             if (CheckValidIl2CppInstallDirectory(Il2CppBranch, m_Il2CppInstallDirectory) == InstallErrorCode.Ok)
             {
@@ -93,6 +119,7 @@ namespace HybridCLR
             }
 
             Il2CppInstallDirectory = $"{Directory.GetParent(curAppInstallPath)}/Data/il2cpp";
+#endif
         }
 
         public void InitHybridCLR(string il2cppBranch, string il2cppInstallPath)
@@ -126,7 +153,7 @@ namespace HybridCLR
                 return InstallErrorCode.Il2CppInstallPathNotMatchIl2CppBranch;
             }
 
-            if (!installDir.EndsWith("/Editor/Data/il2cpp"))
+            if (!installDir.EndsWith("/il2cpp"))
             {
                 return InstallErrorCode.NotIl2CppPath;
             }
@@ -152,9 +179,10 @@ namespace HybridCLR
             using (Process p = new Process())
             {
                 p.StartInfo.WorkingDirectory = Application.dataPath + "/../HybridCLRData";
-                p.StartInfo.FileName = InitLocalIl2CppBashFile;
+                p.StartInfo.FileName = "/bin/bash";
                 p.StartInfo.UseShellExecute = true;
-                p.StartInfo.Arguments = $"{il2cppBranch} '{il2cppInstallPath}'";
+                p.StartInfo.CreateNoWindow = false;
+                p.StartInfo.Arguments = $"init_local_il2cpp_data.sh {il2cppBranch} '{il2cppInstallPath}'";
                 p.Start();
                 p.WaitForExit();
             }

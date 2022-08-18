@@ -90,7 +90,7 @@ namespace HybridCLR
                     }
                 case InstallErrorCode.NotIl2CppPath:
                     {
-                        EditorGUILayout.HelpBox($"当前选择的路径不是il2cpp目录（必须类似 xxx/Editor/Data/il2cpp）", MessageType.Error);
+                        EditorGUILayout.HelpBox($"当前选择的路径不是il2cpp目录（必须类似 xxx/il2cpp）", MessageType.Error);
                         break;
                     }
                 default: throw new Exception($"not support {err}");
