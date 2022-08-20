@@ -22,7 +22,7 @@ namespace HybridCLR
         NotIl2CppPath,
     }
 
-    public partial class InstallController
+    public partial class InstallerController
     {
         private string m_Il2CppInstallDirectory;
 
@@ -61,7 +61,7 @@ namespace HybridCLR
 
         public string InitLocalIl2CppBashFile => Application.dataPath + "/../HybridCLRData/init_local_il2cpp_data.sh";
 
-        public InstallController()
+        public InstallerController()
         {
             PrepareIl2CppInstallPath();
         }
@@ -140,6 +140,11 @@ namespace HybridCLR
             }
         }
 
+        public bool HasInstalledHybridCLR()
+        {
+            return Directory.Exists($"{BuildConfig.LocalIl2CppDir}/libil2cpp/hybridclr");
+        }
+
         public InstallErrorCode CheckValidIl2CppInstallDirectory(string il2cppBranch, string installDir)
         {
             installDir = installDir.Replace('\\', '/');
@@ -171,6 +176,10 @@ namespace HybridCLR
                 p.StartInfo.Arguments = $"{il2cppBranch} \"{il2cppInstallPath}\"";
                 p.Start();
                 p.WaitForExit();
+                if (p.ExitCode == 0 && HasInstalledHybridCLR())
+                {
+                    Debug.Log("安装成功!!!");
+                }
             }
         }
 
@@ -185,6 +194,10 @@ namespace HybridCLR
                 p.StartInfo.Arguments = $"init_local_il2cpp_data.sh {il2cppBranch} '{il2cppInstallPath}'";
                 p.Start();
                 p.WaitForExit();
+                if (p.ExitCode == 0 && HasInstalledHybridCLR())
+                {
+                    Debug.Log("安装成功!!!");
+                }
             }
         }
     }
