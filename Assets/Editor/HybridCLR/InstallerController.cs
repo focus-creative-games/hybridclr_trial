@@ -189,12 +189,16 @@ namespace HybridCLR
             {
                 p.StartInfo.WorkingDirectory = Application.dataPath + "/../HybridCLRData";
                 p.StartInfo.FileName = "/bin/bash";
-                p.StartInfo.UseShellExecute = true;
-                p.StartInfo.CreateNoWindow = false;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.CreateNoWindow = true;
                 p.StartInfo.Arguments = $"init_local_il2cpp_data.sh {il2cppBranch} '{il2cppInstallPath}'";
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
                 p.Start();
+                string output = p.StandardOutput.ReadToEnd();
+                Debug.Log(output);
                 p.WaitForExit();
-                if (p.ExitCode == 0 && HasInstalledHybridCLR())
+                if (HasInstalledHybridCLR())
                 {
                     Debug.Log("安装成功!!!");
                 }
