@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace HybridCLR.Generators.MethodBridge
+namespace HybridCLR.Editor.Generators.MethodBridge
 {
     public class TypeInfo : IEquatable<TypeInfo>
     {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace HybridCLR
+namespace HybridCLR.Editor
 {
     public static partial class BuildConfig
     {
@@ -61,6 +61,27 @@ namespace HybridCLR
         }
 
         public static string GetOriginBuildStripAssembliesDir(BuildTarget target)
+        {
+#if UNITY_2021_1_OR_NEWER
+#if UNITY_STANDALONE_WIN
+            return $"{ProjectDir}/Library/Bee/artifacts/WinPlayerBuildProgram/ManagedStripped";
+#elif UNITY_ANDROID
+            return $"{ProjectDir}/Library/Bee/artifacts/Android/ManagedStripped";
+#elif UNITY_IOS
+            return $"{ProjectDir}/Library/PlayerDataCache/iOS/Data/Managed";
+#elif UNITY_WEBGL
+            return $"{ProjectDir}/Library/Bee/artifacts/WebGL/ManagedStripped";
+#else
+            throw new NotSupportedException("GetOriginBuildStripAssembliesDir");
+#endif
+#else
+            return target == BuildTarget.Android ?
+                $"{ProjectDir}/Temp/StagingArea/assets/bin/Data/Managed" :
+                $"{ProjectDir}/Temp/StagingArea/Data/Managed/";
+#endif
+        }
+
+        public static string GetBeeStripAssembliesDir(BuildTarget target)
         {
 #if UNITY_2021_1_OR_NEWER
 #if UNITY_STANDALONE_WIN

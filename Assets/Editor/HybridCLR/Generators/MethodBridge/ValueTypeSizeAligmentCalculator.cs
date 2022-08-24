@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HybridCLR.Generators.MethodBridge
+namespace HybridCLR.Editor.Generators.MethodBridge
 {
 
 

@@ -1,5 +1,5 @@
-﻿using HybridCLR.Generators;
-using HybridCLR.Generators.MethodBridge;
+﻿using HybridCLR.Editor.Generators;
+using HybridCLR.Editor.Generators.MethodBridge;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace HybridCLR
+namespace HybridCLR.Editor
 {
     internal class MethodBridgeHelper
     {
@@ -57,7 +57,7 @@ namespace HybridCLR
             }
             //CompileDllHelper.CompileDllActiveBuildTarget();
 
-            var rootAssemblies = BuildConfig.AllHotUpdateDllNames
+            var rootAssemblies = BuildConfig.HotUpdateAssemblies
                 .Select(dll => Path.GetFileNameWithoutExtension(dll)).Concat(GeneratorConfig.GetExtraAssembiles())
                 .Where(name => allAssByName.ContainsKey(name)).Select(name => allAssByName[name]).ToList();
             //var rootAssemblies = GeneratorConfig.GetExtraAssembiles()
@@ -78,7 +78,7 @@ namespace HybridCLR
             var g = new MethodBridgeGenerator(new MethodBridgeGeneratorOptions()
             {
                 CallConvention = platform,
-                HotfixAssemblies = BuildConfig.AllHotUpdateDllNames.Select(name =>
+                HotfixAssemblies = BuildConfig.HotUpdateAssemblies.Select(name =>
                     AppDomain.CurrentDomain.GetAssemblies().First(ass => ass.GetName().Name + ".dll" == name)).ToList(),
                 AllAssemblies = GetScanAssembiles(),
                 OutputFile = outputFile,

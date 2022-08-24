@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace HybridCLR
+namespace HybridCLR.Editor
 {
     public static class AssetBundleBuildHelper
     {
@@ -34,7 +34,7 @@ namespace HybridCLR
             List<string> notSceneAssets = new List<string>();
 
             string hotfixDllSrcDir = BuildConfig.GetHotFixDllsOutputDirByTarget(target);
-            foreach (var dll in BuildConfig.AllHotUpdateDllNames)
+            foreach (var dll in BuildConfig.HotUpdateAssemblies)
             {
                 string dllPath = $"{hotfixDllSrcDir}/{dll}";
                 string dllBytesPath = $"{tempDir}/{dll}.bytes";
@@ -43,7 +43,7 @@ namespace HybridCLR
             }
 
             string aotDllDir = BuildConfig.GetAssembliesPostIl2CppStripDir(target);
-            foreach (var dll in BuildConfig.AOTMetaDlls)
+            foreach (var dll in BuildConfig.AOTMetaAssemblies)
             {
                 string dllPath = $"{aotDllDir}/{dll}";
                 if (!File.Exists(dllPath))
@@ -68,7 +68,7 @@ namespace HybridCLR
             };
             abs.Add(notSceneAb);
 
-            BuildPipeline.BuildAssetBundles(outputDir, abs.ToArray(), BuildAssetBundleOptions.None, target);
+            UnityEditor.BuildPipeline.BuildAssetBundles(outputDir, abs.ToArray(), BuildAssetBundleOptions.None, target);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 

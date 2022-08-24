@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEditor.Build.Player;
 using UnityEngine;
 
-namespace HybridCLR
+namespace HybridCLR.Editor
 {
     internal class CompileDllHelper
     {

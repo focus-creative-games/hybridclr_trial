@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HybridCLR.Generators
+namespace HybridCLR.Editor.Generators
 {
     internal class GeneratorConfig
     {

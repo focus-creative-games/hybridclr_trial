@@ -8,7 +8,7 @@ using UnityEditor ;
 using UnityEngine;
  
 
-namespace HybridCLR
+namespace HybridCLR.Editor.Installer
 {
     public class InstallerWindow : EditorWindow
     {

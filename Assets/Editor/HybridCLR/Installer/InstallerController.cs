@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 using Debug = UnityEngine.Debug;
 
-namespace HybridCLR
+namespace HybridCLR.Editor.Installer
 {
     public enum InstallErrorCode
     {
