@@ -13,24 +13,40 @@ using UnityEngine;
 
 namespace HybridCLR.Editor.BuildProcessors
 {
-    internal class BPCopyStrippedAOTAssemblies
+    internal class BPCopyStrippedAOTAssemblies : IPostprocessBuildWithReport
 #if !UNITY_2021_1_OR_NEWER
-     : IIl2CppProcessor
+     , IIl2CppProcessor
 #endif
     {
         [InitializeOnLoadMethod]
         private static void Setup()
         {
 #if UNITY_2021_1_OR_NEWER && UNITY_EDITOR_WIN
-            HookEditorStripAOTAction.InstallHook();
-            HookEditorStripAOTAction.OnAssembliyScripped2 += CopyStripDlls;
+            //HookEditorStripAOTAction.InstallHook();
+            //HookEditorStripAOTAction.OnAssembliyScripped2 += CopyStripDlls;
 #endif
         }
 
         public int callbackOrder => 0;
 
-#if !UNITY_2021_1_OR_NEWER
-        private string GetBuildStripAssembliesDir2020(BuildTarget target)
+#if UNITY_2021_1_OR_NEWER
+        public static string GetStripAssembliesDir2021(BuildTarget target)
+        {
+            string projectDir = BuildConfig.ProjectDir;
+#if UNITY_STANDALONE_WIN
+            return $"{projectDir}/Library/Bee/artifacts/WinPlayerBuildProgram/ManagedStripped";
+#elif UNITY_ANDROID
+            return $"{projectDir}/Library/Bee/artifacts/Android/ManagedStripped";
+#elif UNITY_IOS
+            return $"{projectDir}/Temp/StagingArea/Data/Managed/tempStrip";
+#elif UNITY_WEBGL
+            return $"{projectDir}/Library/Bee/artifacts/WebGL/ManagedStripped";
+#else
+            throw new NotSupportedException("GetOriginBuildStripAssembliesDir");
+#endif
+        }
+#else
+        private string GetStripAssembliesDir2020(BuildTarget target)
         {
             string subPath = target == BuildTarget.Android ?
                 "assets/bin/Data/Managed" :
@@ -41,7 +57,7 @@ namespace HybridCLR.Editor.BuildProcessors
         public void OnBeforeConvertRun(BuildReport report, Il2CppBuildPipelineData data)
         {            
             // 此回调只在 2020中调用
-            CopyStripDlls(GetBuildStripAssembliesDir2020(data.target), data.target);
+            CopyStripDlls(GetStripAssembliesDir2020(data.target), data.target);
         }
 #endif
 
@@ -61,6 +77,14 @@ namespace HybridCLR.Editor.BuildProcessors
                 Debug.Log($"[BPCopyStrippedAOTAssemblies] copy strip dll {fileFullPath} ==> {dstPath}/{file}");
                 File.Copy($"{fileFullPath}", $"{dstPath}/{file}", true);
             }
+        }
+
+        public void OnPostprocessBuild(BuildReport report)
+        {
+#if UNITY_2021_1_OR_NEWER && !UNITY_IOS
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            CopyStripDlls(GetStripAssembliesDir2021(target), target);
+#endif
         }
     }
 }

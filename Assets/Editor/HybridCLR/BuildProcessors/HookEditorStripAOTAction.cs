@@ -57,53 +57,16 @@ namespace HybridCLR.Editor.BuildProcessors
         }
         #endregion
 
-        public static string GetStripAssembliesDir_2021_6_OR_OLD(BuildTarget target)
-        {
-            string projectDir = BuildConfig.ProjectDir;
-#if UNITY_STANDALONE_WIN
-            return $"{projectDir}/Library/Bee/artifacts/WinPlayerBuildProgram/ManagedStripped";
-#elif UNITY_ANDROID
-            return $"{projectDir}/Library/Bee/artifacts/Android/ManagedStripped";
-//#elif UNITY_IOS
-//            return $"{projectDir}/Temp/StagingArea/Data/Managed";
-#elif UNITY_WEBGL
-            return $"{projectDir}/Library/Bee/artifacts/WebGL/ManagedStripped";
-#else
-            throw new NotSupportedException("GetOriginBuildStripAssembliesDir");
-#endif
-        }
-
-        static string GetStripAssembliesOutputDir(BuildTarget target, string outputFolder, BuildPostProcessArgs? args, BeeDriverResult result)
-        {
-            if (!string.IsNullOrEmpty(outputFolder))
-            {
-                return outputFolder;
-            }
-            if (args != null)
-            {
-                return args.Value.stagingAreaDataManaged;
-            }
-            if (result != null)
-            {
-                return GetStripAssembliesDir_2021_6_OR_OLD(target);// result.
-            }
-            throw new Exception($"unknown stripped AOT assemblies dir");
-        }
-
         /// <summary>
         /// 示例裁剪回调函数
         /// </summary>
         /// <param name="outputFolder"></param>
         /// <param name="args"></param>
         /// <param name="result"></param>
-        static void OnAssemblyStripped(string outputFolder, BuildPostProcessArgs? args, BeeDriverResult result)
+        static void OnAssemblyStripped(string outputFolder)
         {
-            if (result != null && !result.Success)
-            {
-                return;
-            }
             BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
-            string strippedAssemblyDir = GetStripAssembliesOutputDir(target, outputFolder, args, result);
+            string strippedAssemblyDir = outputFolder;
             Debug.Log($"[HookEditorStripAOTAction] strippedAssemblyDir:{strippedAssemblyDir}");
             OnAssembliyScripped2?.Invoke(strippedAssemblyDir, target);
         }
@@ -256,7 +219,7 @@ namespace HybridCLR.Editor.BuildProcessors
             // TODO: 可以在这里把 Library\Bee\artifacts\WinPlayerBuildProgram\ManagedStripped 目录下的文件复制出来
             Debug.Log("ReportBuildResults_Replace called");
 
-            OnAssemblyStripped(null, null, result);
+            //OnAssemblyStripped(null, null, result);
             ReportBuildResults_Proxy(obj, result);
         }
 
@@ -267,7 +230,7 @@ namespace HybridCLR.Editor.BuildProcessors
             // TODO: 可以在这里把 Temp\StagingArea\Data\Managed\tempStrip 目录下的文件复制出来
             Debug.Log("StripAssembliesTo_Replace called");
 
-            OnAssemblyStripped(outputFolder, null, null);
+            OnAssemblyStripped(outputFolder);
             return ret;
         }
 
