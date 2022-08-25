@@ -13,18 +13,18 @@ using System.IO;
 
 namespace HybridCLR.Editor.BuildProcessors
 {
-    // ÓĞĞèÇóÊ±¿ÉÒÔ´ò¿ª£¬Ò²¿ÉÒÔÊÖ¶¯°´Ğè×¢²áHook
+    // æœ‰éœ€æ±‚æ—¶å¯ä»¥æ‰“å¼€ï¼Œä¹Ÿå¯ä»¥æ‰‹åŠ¨æŒ‰éœ€æ³¨å†ŒHook
     [InitializeOnLoad]
     public class HookEditorStripAOTAction
     {
         /// <summary>
-        /// ²Ã¼ôÖ´ĞĞÍê±ÏµÄ»Øµ÷£¬¿ÉÄÜ»á±»µ÷ÓÃ¶à´Î£¬Ò»°ã¶øÑÔÍ¬Ò»´Î´ò°üÖ»ĞèÒª´¦ÀíµÚÒ»´Î»Øµ÷
+        /// è£å‰ªæ‰§è¡Œå®Œæ¯•çš„å›è°ƒï¼Œå¯èƒ½ä¼šè¢«è°ƒç”¨å¤šæ¬¡ï¼Œä¸€èˆ¬è€Œè¨€åŒä¸€æ¬¡æ‰“åŒ…åªéœ€è¦å¤„ç†ç¬¬ä¸€æ¬¡å›è°ƒ
         /// </summary>
         //private static event Action<string, BuildPostProcessArgs, BeeDriverResult> OnAssemblyStripped;
 
         public static event Action<string, BuildTarget> OnAssembliyScripped2;
 
-        // ³¢ÊÔ Hook 4¸öº¯Êı£¬ÖÁÉÙÒ»¸ö±»µ÷ÓÃ¾Í¿ÉÒÔ´ïµ½ÒªÇó
+        // å°è¯• Hook 4ä¸ªå‡½æ•°ï¼Œè‡³å°‘ä¸€ä¸ªè¢«è°ƒç”¨å°±å¯ä»¥è¾¾åˆ°è¦æ±‚
         private static MethodHook _hook_PostprocessBuildPlayer_CompleteBuild;
         private static MethodHook _hook_Default_PostProcess;
         private static MethodHook _hook_ReportBuildResults;
@@ -91,7 +91,7 @@ namespace HybridCLR.Editor.BuildProcessors
         }
 
         /// <summary>
-        /// Ê¾Àı²Ã¼ô»Øµ÷º¯Êı
+        /// ç¤ºä¾‹è£å‰ªå›è°ƒå‡½æ•°
         /// </summary>
         /// <param name="outputFolder"></param>
         /// <param name="args"></param>
@@ -235,7 +235,7 @@ namespace HybridCLR.Editor.BuildProcessors
         {
             try
             {
-                // ×¢Òâ£º´Ëº¯ÊıÖĞÍ¾¿ÉÄÜ»á±» Unity throw Exception
+                // æ³¨æ„ï¼šæ­¤å‡½æ•°ä¸­é€”å¯èƒ½ä¼šè¢« Unity throw Exception
                 Default_PostProcess_Proxy(obj, args, out outProperties);
             }
             catch(Exception ex)
@@ -253,7 +253,7 @@ namespace HybridCLR.Editor.BuildProcessors
 
         static void ReportBuildResults_Replace(object obj, BeeDriverResult result)
         {
-            // TODO: ¿ÉÒÔÔÚÕâÀï°Ñ Library\Bee\artifacts\WinPlayerBuildProgram\ManagedStripped Ä¿Â¼ÏÂµÄÎÄ¼ş¸´ÖÆ³öÀ´
+            // TODO: å¯ä»¥åœ¨è¿™é‡ŒæŠŠ Library\Bee\artifacts\WinPlayerBuildProgram\ManagedStripped ç›®å½•ä¸‹çš„æ–‡ä»¶å¤åˆ¶å‡ºæ¥
             Debug.Log("ReportBuildResults_Replace called");
 
             OnAssemblyStripped(null, null, result);
@@ -264,7 +264,7 @@ namespace HybridCLR.Editor.BuildProcessors
         {
             bool ret = StripAssembliesTo_Proxy(outputFolder, out output, out error, linkXmlFiles, runInformation);
 
-            // TODO: ¿ÉÒÔÔÚÕâÀï°Ñ Temp\StagingArea\Data\Managed\tempStrip Ä¿Â¼ÏÂµÄÎÄ¼ş¸´ÖÆ³öÀ´
+            // TODO: å¯ä»¥åœ¨è¿™é‡ŒæŠŠ Temp\StagingArea\Data\Managed\tempStrip ç›®å½•ä¸‹çš„æ–‡ä»¶å¤åˆ¶å‡ºæ¥
             Debug.Log("StripAssembliesTo_Replace called");
 
             OnAssemblyStripped(outputFolder, null, null);
