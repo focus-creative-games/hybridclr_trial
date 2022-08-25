@@ -18,8 +18,11 @@ add_definitions(-DIL2CPP_THREADS_PTHREAD)
 #add_definitions(-DIL2CPP_TARGET_DARWIN)
 add_definitions(-DIL2CPP_PLATFORM_SUPPORTS_TIMEZONEINFO=0)
 
-add_definitions(-MMD)
+#add_definitions(-MMD)
 #add_definitions(-MT dependencies)
+
+#add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-MMD>)
+#add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-MT dependencies>)
 
 include_directories(${IL2CPP_SOURCE_DIR}/external/)
 include_directories(${IL2CPP_SOURCE_DIR}/external/baselib/Include/)

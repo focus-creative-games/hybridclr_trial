@@ -19,7 +19,7 @@ add_definitions(-DIL2CPP_THREADS_PTHREAD)
 #add_definitions(-DIL2CPP_TARGET_DARWIN)
 add_definitions(-DIL2CPP_PLATFORM_SUPPORTS_TIMEZONEINFO)
 
-add_definitions(-MMD)
+#add_definitions(-MMD)
 #add_definitions(-MT dependencies)
 
 
