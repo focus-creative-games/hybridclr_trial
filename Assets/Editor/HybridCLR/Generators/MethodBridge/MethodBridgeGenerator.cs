@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace HybridCLR.Generators.MethodBridge
+namespace HybridCLR.Editor.Generators.MethodBridge
 {
 
     public class TypeGenInfo
@@ -27,6 +27,8 @@ namespace HybridCLR.Generators.MethodBridge
         public PlatformABI CallConvention { get; set; }
 
         public string OutputFile { get; set; }
+
+        public bool Optimized { get; set; }
     }
 
     public class MethodBridgeGenerator
@@ -38,6 +40,8 @@ namespace HybridCLR.Generators.MethodBridge
         private readonly PlatformABI _callConvention;
 
         private readonly string _outputFile;
+
+        public readonly bool _optimized;
 
         private readonly IPlatformAdaptor _platformAdaptor;
 
@@ -65,6 +69,7 @@ namespace HybridCLR.Generators.MethodBridge
             _callConvention = options.CallConvention;
             _outputFile = options.OutputFile;
             _platformAdaptor = CreatePlatformAdaptor(options.CallConvention);
+            _optimized = options.Optimized;
         }
 
         private static IPlatformAdaptor CreatePlatformAdaptor(PlatformABI type)
@@ -145,18 +150,21 @@ namespace HybridCLR.Generators.MethodBridge
             {
                 return;
             }
-            if (!type.IsNested)
+            if (_optimized)
             {
-                if (!type.IsPublic)
+                if (!type.IsNested)
                 {
-                    return;
+                    if (!type.IsPublic)
+                    {
+                        return;
+                    }
                 }
-            }
-            else
-            {
-                if (type.IsNestedPrivate)
+                else
                 {
-                    return;
+                    if (type.IsNestedPrivate)
+                    {
+                        return;
+                    }
                 }
             }
             var typeDel = typeof(MulticastDelegate);
@@ -186,12 +194,12 @@ namespace HybridCLR.Generators.MethodBridge
                     continue;
                 }
 
-                if (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily))
+                if (_optimized && (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily)))
                 {
                     continue;
                 }
 
-                if (method.IsFamily || method.IsPublic)
+                if (!_optimized || (method.IsFamily || method.IsPublic))
                 {
                     var m2nMethod = CreateMethodBridgeSig(method.IsStatic, method.ReturnParameter, method.GetParameters());
                     AddManaged2NativeMethod(m2nMethod);
@@ -212,12 +220,12 @@ namespace HybridCLR.Generators.MethodBridge
             foreach (var method in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public
 | BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy))
             {
-                if (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily))
+                if (_optimized && (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily)))
                 {
                     continue;
                 }
 
-                if (method.IsFamily || method.IsPublic)
+                if (!_optimized || (method.IsFamily || method.IsPublic))
                 {
                     var callMethod = CreateMethodBridgeSig(false, null, method.GetParameters());
                     AddManaged2NativeMethod(callMethod);

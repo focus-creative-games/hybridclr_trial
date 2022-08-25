@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace HybridCLR
+namespace HybridCLR.Editor
 {
     public class BuildPlayerHelper
     {

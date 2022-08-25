@@ -40,16 +40,24 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 ### 体验热更新
 
+#### 预备工作
+
+根据你所使用的Unity年度版本，**还需要额外**安装2020.3.33或者2021.3.1版本，不限 f1、f1c1之类后缀。
+
+**注意！**对于需要打iOS版本的开发者，由于HybridCLR需要裁减后的AOT dll，但Unity Editor未提供公开接口可以复制出target为iOS
+时的AOT dll，故必须使用修改后的UnityEditor.CoreModule.dll覆盖Unity自带的相应文件。
+
+具体操作为将 `HybridCLRData/ModifiedUnityAssemblies/2021.3.1/UnityEditor.CoreModule-{Win,Mac}.dll` 覆盖 `{Editor安装目录}/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule`，具体覆盖目录有可能因为操作系统或者Unity版本而有不同。
+
+这个 UnityEditor.CoreModule.dll 每个Unity小版本都不相同，我们目前暂时只提供了2021.3.1版本，如需其他版本请自己手动制作，详情请见 [修改UnityEditor.CoreModule.dll](https://focus-creative-games.github.io/hybridclr/modify_unity_dll/)
+
 以Win64为例，其他平台同理。
 
 - 安装HybridCLR （安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/)）
-  - 进入HybridCLRData目录
-  - 酌情修改 init_local_il2cpp_data.bat(或.sh)文件中代码
-    - `set IL2CPP_BRANCH=2020.3.33`或`set IL2CPP_BRANCH=2021.3.1` 选择与你项目Unity**年度版本匹配**的版本（2020.3.x系列选2020.3.33，2021.3.x系列选2021.3.1），注意**不是你项目的Unity版本**
-    - `set IL2CPP_PATH=xxx` 改成IL2CPP_BRANCH（即2020.3.33或者2021.3.1）版本的Unity安装目录下的il2cpp目录，**注意不是你项目的Unity版本！！！**
-  - 运行 init_local_il2cpp_data.bat 或.sh 文件 创建本地il2cpp目录，即 LocalIl2CppData 目录。
-  - **务必检查命令行的运行过程中没有错误**。遇到错误，请先用自己对命令行的了解去解决它！！！
-  - 至此完成包含HybridCLR的本地il2cpp安装
+  - 需要已经安装 2020.3.33或2021.3.1（根据你的Unity大版本），不限 f1、f1c1之类后缀 
+  - 点击菜单 `HybridCLR/Install`，弹出安装界面
+  - 如果安装界面没有错误或者警告，则说明il2cpp路径设置正常，否则需要你手动选择正确的il2cpp目录
+  - 点击 install 按钮完成安装
 - 打包主工程
   - **请确保你已经掌握了常规的il2cpp为backend的打包过程**
   - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**，也就是打包环境是正常的！
