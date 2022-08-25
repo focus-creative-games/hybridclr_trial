@@ -40,6 +40,17 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 ### 体验热更新
 
+#### 预备工作
+
+根据你所使用的Unity年度版本，**还需要额外**安装2020.3.33或者2021.3.1版本，不限 f1、f1c1之类后缀。
+
+**注意！**对于需要打iOS版本的开发者，由于HybridCLR需要裁减后的AOT dll，但Unity Editor未提供公开接口可以复制出target为iOS
+时的AOT dll，故必须使用修改后的UnityEditor.CoreModule.dll覆盖Unity自带的相应文件。
+
+具体操作为将 `HybridCLRData/ModifiedUnityAssemblies/2021.3.1/UnityEditor.CoreModule.dll` 覆盖 `{Editor安装目录}/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule`，具体覆盖目录有可能因为操作系统或者Unity版本而有不同。
+
+这个 UnityEditor.CoreModule.dll 每个Unity小版本都不相同，我们目前暂时只提供了2021.3.1版本，如需其他版本请自己手动制作，详情请见 [修改的UnityEditor.CoreModule.dll](https://focus-creative-games.github.io/hybridclr/modify_unity_dll/)
+
 以Win64为例，其他平台同理。
 
 - 安装HybridCLR （安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/)）

@@ -18,14 +18,6 @@ namespace HybridCLR.Editor.BuildProcessors
      , IIl2CppProcessor
 #endif
     {
-        [InitializeOnLoadMethod]
-        private static void Setup()
-        {
-#if UNITY_2021_1_OR_NEWER && UNITY_EDITOR_WIN
-            //HookEditorStripAOTAction.InstallHook();
-            //HookEditorStripAOTAction.OnAssembliyScripped2 += CopyStripDlls;
-#endif
-        }
 
         public int callbackOrder => 0;
 
