@@ -13,6 +13,16 @@ struct MyValue
     public string s;
 }
 
+enum LoadImageErrorCode
+{
+    OK = 0,
+	BAD_IMAGE, // dll 不合法
+	NOT_IMPLEMENT, // 不支持的元数据特性
+	AOT_ASSEMBLY_NOT_FIND, // 对应的AOT assembly未找到
+	HOMOLOGOUS_ONLY_SUPPORT_AOT_ASSEMBLY, // 不能给解释器assembly补充元数据
+	HOMOLOGOUS_ASSEMBLY_HAS_LOADED, // 已经补充过了，不能再次补充
+};
+
 public class App
 {
     public static int Main()
@@ -58,6 +68,11 @@ public class App
             "mscorlib.dll",
             "System.dll",
             "System.Core.dll", // 如果使用了Linq，需要这个
+
+            //
+            // 注意！修改这个列表请同步修改 BuildConfig_Custom文件中的 AOTMetaAssemblies 列表。
+            // 两者需要完全一致
+            //
             // "Newtonsoft.Json.dll",
             // "protobuf-net.dll",
             // "Google.Protobuf.dll",
@@ -73,7 +88,7 @@ public class App
             fixed (byte* ptr = dllBytes)
             {
                 // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
-                int err = HybridCLR.RuntimeApi.LoadMetadataForAOTAssembly((IntPtr)ptr, dllBytes.Length);
+                LoadImageErrorCode err = (LoadImageErrorCode)HybridCLR.RuntimeApi.LoadMetadataForAOTAssembly((IntPtr)ptr, dllBytes.Length);
                 Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. ret:{err}");
             }
         }
