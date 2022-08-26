@@ -7,7 +7,7 @@ rm -rf build
 
 mkdir build
 cd build
-cmake ..
+/Applications/CMake.app/Contents/bin/cmake ..
 make -j4
 
 if [ -f "libil2cpp.a" ]
