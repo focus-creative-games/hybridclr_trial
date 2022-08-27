@@ -36,16 +36,15 @@ fi
 
 # 拷贝 MonoBleedingEdge 目录
 MBE=$LOCAL_IL2CPP_DATA/MonoBleedingEdge
-if [ ! -d "$MBE" ]; then
-    cp -r "$IL2CPP_PATH/../MonoBleedingEdge" $MBE
-fi
+rm -rf "$MBE"
+cp -r "$IL2CPP_PATH/../MonoBleedingEdge" $MBE
 
 
 # 拷贝il2cpp目录
 IL2CPP=$LOCAL_IL2CPP_DATA/il2cpp
-if [ ! -d "$IL2CPP" ]; then
-    cp -r "$IL2CPP_PATH" "$IL2CPP"
-fi
+rm -rf "$IL2CPP"
+cp -r "$IL2CPP_PATH" "$IL2CPP"
+
 
 # 接下来替换 il2cpp目录下的libil2cpp为 hybridclr修改后的版本
 # 需要使用 {https://gitee.com/focus-creative-games/il2cpp_plus}/libil2cpp 替换 il2cpp/libil2cpp目录
