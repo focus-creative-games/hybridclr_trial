@@ -44,6 +44,10 @@ namespace HybridCLR.Editor.Installer
 
         private string GetIl2CppPlusBranchByUnityVersion(string unityVersion)
         {
+            if (unityVersion.Contains("2019."))
+            {
+                return "2019.4.40";
+            }
             if (unityVersion.Contains("2020."))
             {
                 return "2020.3.33";
@@ -166,16 +170,28 @@ namespace HybridCLR.Editor.Installer
             return InstallErrorCode.Ok;
         }
 
+        public bool IsUnity2019(string branch)
+        {
+            return branch.Contains("2019.");
+        }
+
         private void RunInitLocalIl2CppDataBat(string il2cppBranch, string il2cppInstallPath)
         {
             using (Process p = new Process())
             {
-                p.StartInfo.WorkingDirectory = Application.dataPath + "/../HybridCLRData";
+                p.StartInfo.WorkingDirectory = BuildConfig.HybridCLRDataDir;
                 p.StartInfo.FileName = InitLocalIl2CppBatFile;
                 p.StartInfo.UseShellExecute = true;
                 p.StartInfo.Arguments = $"{il2cppBranch} \"{il2cppInstallPath}\"";
                 p.Start();
                 p.WaitForExit();
+                if (IsUnity2019(il2cppBranch))
+                {
+                    string srcIl2CppDll = $"{BuildConfig.HybridCLRDataDir}/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll";
+                    string dstIl2CppDll = $"{BuildConfig.LocalIl2CppDir}/build/deploy/net471/Unity.IL2CPP.dll";
+                    File.Copy(srcIl2CppDll, dstIl2CppDll, true);
+                    Debug.Log($"copy {srcIl2CppDll} => {dstIl2CppDll}");
+                }
                 if (p.ExitCode == 0 && HasInstalledHybridCLR())
                 {
                     Debug.Log("安装成功!!!");

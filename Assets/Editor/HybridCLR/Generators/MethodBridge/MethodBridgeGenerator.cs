@@ -74,23 +74,25 @@ namespace HybridCLR.Editor.Generators.MethodBridge
 
         private static IPlatformAdaptor CreatePlatformAdaptor(PlatformABI type)
         {
-            return type switch
+            switch (type)
             {
-                PlatformABI.Universal32 => new PlatformAdaptor_Universal32(),
-                PlatformABI.Universal64 => new PlatformAdaptor_Universal64(),
-                PlatformABI.Arm64 => new PlatformAdaptor_Arm64(),
-                _ => throw new NotSupportedException(),
-            };
+                case PlatformABI.Universal32: return new PlatformAdaptor_Universal32();
+                case PlatformABI.Universal64: return new PlatformAdaptor_Universal64();
+                case PlatformABI.Arm64: return new PlatformAdaptor_Arm64();
+                default: throw new NotSupportedException();
+            }
         }
 
         private string GetTemplateFile()
         {
-            string tplFile = _callConvention switch
+            string tplFile;
+
+            switch (_callConvention)
             {
-                PlatformABI.Universal32 => "Universal32",
-                PlatformABI.Universal64 => "Universal64",
-                PlatformABI.Arm64 => "Arm64",
-                _ => throw new NotSupportedException(),
+                case PlatformABI.Universal32: tplFile = "Universal32"; break;
+                case PlatformABI.Universal64: tplFile = "Universal64"; break;
+                case PlatformABI.Arm64: tplFile = "Arm64"; break;
+                default: throw new NotSupportedException();
             };
             return $"{Application.dataPath}/Editor/HybridCLR/Generators/Templates/MethodBridge_{tplFile}.cpp";
         }

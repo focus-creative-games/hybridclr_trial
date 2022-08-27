@@ -43,10 +43,17 @@ public class LoadDll : MonoBehaviour
             UnityWebRequest www = UnityWebRequest.Get(dllPath);
             yield return www.SendWebRequest();
 
+#if UNITY_2020_1_OR_NEWER
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.Log(www.error);
             }
+#else
+            if (www.isHttpError || www.isNetworkError)
+            {
+                Debug.Log(www.error);
+            }
+#endif
             else
             {
                 // Or retrieve results as binary data

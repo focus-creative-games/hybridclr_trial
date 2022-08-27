@@ -9,7 +9,7 @@
 
 你可以使用发布的包来体验HybridCLR热更新功能。
 
-**示例项目使用 Unity 2020.3.33(任意后缀子版本如f1、f1c1、f1c2都可以) 版本**，2020.3.x系列都可以，但为了避免新手无谓的出错，尽量使用对应版本。
+**示例项目使用 Unity 2020.3.33(任意后缀子版本如f1、f1c1、f1c2都可以) 版本**，2019.4.x、2020.3.x、2021.3.x系列都可以，但为了避免新手无谓的出错，尽量使用2020.3.33版本来体验。
 
 ## 目录介绍
 
@@ -42,7 +42,7 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 #### 预备工作
 
-根据你所使用的Unity年度版本，**还需要额外**安装2020.3.33或者2021.3.1版本，不限 f1、f1c1之类后缀。
+根据你所使用的Unity年度版本，**还需要额外**安装2019.4.44、2020.3.33或者2021.3.1版本，不限 f1、f1c1之类后缀。
 
 **注意！**对于需要打iOS版本的开发者，由于HybridCLR需要裁减后的AOT dll，但Unity Editor未提供公开接口可以复制出target为iOS
 时的AOT dll，故必须使用修改后的UnityEditor.CoreModule.dll覆盖Unity自带的相应文件。
@@ -50,6 +50,10 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 具体操作为将 `HybridCLRData/ModifiedUnityAssemblies/2021.3.1/UnityEditor.CoreModule-{Win,Mac}.dll` 覆盖 `{Editor安装目录}/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule`，具体覆盖目录有可能因为操作系统或者Unity版本而有不同。
 
 这个 UnityEditor.CoreModule.dll 每个Unity小版本都不相同，我们目前暂时只提供了2021.3.1版本，如需其他版本请自己手动制作，详情请见 [修改UnityEditor.CoreModule.dll](https://focus-creative-games.github.io/hybridclr/modify_unity_dll/)
+
+**注意！** 我们修改了2019版本的il2cpp.exe工具，故Installer的安装过程多了一个额外步骤：将 `HybridCLRData/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll` 复制到 `HybridCLRData/LocalIl2CppData/il2cpp/build/deploy/net471/Unity.IL2CPP.dll`
+
+#### 安装及打包及热更新测试
 
 以Win64为例，其他平台同理。
 

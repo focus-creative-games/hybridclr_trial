@@ -35,7 +35,7 @@ namespace HybridCLR.Editor.BuildProcessors
         {
             // 如果直接打包apk，没有机会在PostprocessBuild中修改ScriptingAssemblies.json。
             // 因此需要在这个时机处理
-            AddHotFixAssembliesToScriptingAssembliesJson(path);
+            PathScriptingAssembilesFile(path);
         }
 
         public void OnPostprocessBuild(BuildReport report)
@@ -44,7 +44,16 @@ namespace HybridCLR.Editor.BuildProcessors
             // 这里不再重复处理
 #if !UNITY_ANDROID
 
-            AddHotFixAssembliesToScriptingAssembliesJson(report.summary.outputPath);
+            PathScriptingAssembilesFile(report.summary.outputPath);
+#endif
+        }
+
+        private void PathScriptingAssembilesFile(string path)
+        {
+#if UNITY_2020_1_OR_NEWER
+            AddHotFixAssembliesToScriptingAssembliesJson(path);
+#else
+            AddBackHotFixAssembliesToBinFile(path);
 #endif
         }
 
@@ -87,7 +96,7 @@ namespace HybridCLR.Editor.BuildProcessors
             }
         }
 
-        private void AddBackHotFixAssembliesTo_BinFile(BuildReport report, string path)
+        private void AddBackHotFixAssembliesToBinFile(string path)
         {
             /*
              * Unity2019 中 dll 加载列表存储在 globalgamemanagers 文件中，此列表在游戏启动时自动加载，
@@ -98,7 +107,7 @@ namespace HybridCLR.Editor.BuildProcessors
             string[] binFiles = new string[] { "Temp/gradleOut/unityLibrary/src/main/assets/bin/Data/globalgamemanagers" }; // report.files 不包含 Temp/gradleOut 等目录
 #else
             // 直接出包和输出vs工程时路径不同，report.summary.outputPath 记录的是前者路径
-            string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(report.summary.outputPath), "globalgamemanagers", SearchOption.AllDirectories);
+            string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(path), "globalgamemanagers", SearchOption.AllDirectories);
 #endif
 
             if (binFiles.Length == 0)
@@ -127,13 +136,13 @@ namespace HybridCLR.Editor.BuildProcessors
             }
         }
 
-        #region useless
+#region useless
 
         public void OnPreprocessBuild(BuildReport report)
         {
 
         }
 
-        #endregion
+#endregion
     }
 }
