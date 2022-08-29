@@ -28,13 +28,16 @@ namespace HybridCLR.Editor.Installer
 
         private void OnGUI()
         {
+            string minCompatibleVersion = m_Controller.GetMinCompatibleVersion(m_Controller.Il2CppBranch);
             GUI.enabled = true;
             GUILayout.Space(10f);
             EditorGUILayout.LabelField("=======================说明====================");
             EditorGUILayout.LabelField(
                 $"你所在项目的Unity版本可以与il2cpp_plus版本:{m_Controller.Il2CppBranch} 不一样。\n"
-                + $"由于安装HybridCLR时需要从il2cpp_plus对应版本（而不是你项目版本）拷贝il2cpp目录，\n"
-                + $"你必须同时也安装相应版本 {m_Controller.Il2CppBranch}，否则无法安装", EditorStyles.wordWrappedLabel);
+                + $"如果你的Unity的版本号 >= {minCompatibleVersion}, 可以直接安装。\n"
+                + $"如果你的Unity的版本号 < {minCompatibleVersion}, \n"
+                + $"由于安装HybridCLR时需要从il2cpp_plus对应版本{m_Controller.Il2CppBranch}（而不是你项目版本）拷贝il2cpp目录，\n"
+                + $"你必须同时安装相应版本 {m_Controller.Il2CppBranch} 才能完成安装", EditorStyles.wordWrappedLabel);
             EditorGUILayout.LabelField("==============================================");
             GUILayout.Space(10f);
 
@@ -84,10 +87,6 @@ namespace HybridCLR.Editor.Installer
             {
                 case InstallErrorCode.Ok:
                     {
-                        if (!il2cppInstallDirectory.Contains(m_Controller.Il2CppBranch))
-                        {
-                            EditorGUILayout.HelpBox($"li2cpp 路径未包含 '{m_Controller.Il2CppBranch}',请确保选择了 {m_Controller.Il2CppBranch} 版本的安装目录 ", MessageType.Warning);
-                        }
                         break;
                     }
                 case InstallErrorCode.Il2CppInstallPathNotExists:
@@ -97,7 +96,7 @@ namespace HybridCLR.Editor.Installer
                     }
                 case InstallErrorCode.Il2CppInstallPathNotMatchIl2CppBranch:
                     {
-                        EditorGUILayout.HelpBox($"il2cpp 版本不匹配，必须为 {m_Controller.Il2CppBranch} 版本相应目录", MessageType.Error);
+                        EditorGUILayout.HelpBox($"il2cpp 版本不兼容，最小版本为 {m_Controller.GetMinCompatibleVersion(m_Controller.Il2CppBranch)}", MessageType.Error);
                         break;
                     }
                 case InstallErrorCode.NotIl2CppPath:
