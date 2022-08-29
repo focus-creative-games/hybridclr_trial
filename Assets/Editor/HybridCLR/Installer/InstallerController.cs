@@ -74,7 +74,7 @@ namespace HybridCLR.Editor.Installer
         private static readonly Regex s_unityVersionPat = new Regex(@"(\d+)\.(\d+)\.(\d+)");
 
         public const int min2019_4_CompatibleMinorVersion = 40;
-        public const int min2020_3_CompatibleMinorVersion = 30;
+        public const int min2020_3_CompatibleMinorVersion = 21;
         public const int min2021_3_CompatibleMinorVersion = 0;
 
         private bool TryParseMinorVersion(string installDir, out (int Major, int Minor1, int Minor2) unityVersion)
