@@ -57,17 +57,31 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 以Win64为例，其他平台同理。
 
-- 安装HybridCLR （安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/)）
-  - 需要已经安装 2020.3.33或2021.3.1（根据你的Unity大版本），不限 f1、f1c1之类后缀 
-  - 点击菜单 `HybridCLR/Install`，弹出安装界面
-  - 如果安装界面没有错误或者警告，则说明il2cpp路径设置正常，否则需要你手动选择正确的il2cpp目录
-  - 点击 install 按钮完成安装
+- 安装HybridCLR (安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/) )
+  - 安装git
+  - 安装 2020.3.33或2021.3.1（根据你的Unity大版本），不限 f1、f1c1之类后缀。哪怕你项目使用其他版本，也必须安装2020.3.33或者2021.3.1版本，因为安装时需要从这些版本安装目录复制il2cpp目录。
+  - 要求当前Unity版本必须安装了 il2cpp 组件。如果未安装，请自行在UnityHub中安装。新手自行google或百度。
+  - 安装 visual studio，要求必须安装 `使用c++的游戏开发` 这个组件
+  - 打开Unity工程时会自动安装HybridCLR，如果出现出现 `本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请在菜单 HybridCLR/Installer 中执行安装` 的错误，则：
+    - 点击菜单 `HybridCLR/Install`，弹出安装界面。
+    - 如果安装界面没有错误或者警告，则说明il2cpp路径设置正常，否则需要你手动选择正确的il2cpp目录
+    - 点击 install 按钮完成安装
 - 打包主工程
-  - **请确保你已经掌握了常规的il2cpp为backend的打包过程**
-  - **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**，也就是打包环境是正常的！
-  - 菜单 HybridCLR/Build/Win64 ，运行完成后，会在Release_Win64目录下生成程序
-  - 运行Release_Win64/HybridCLRTrial.exe，会看到打出 hello, HybridCLR.prefab
-- 更新ab包
+  
+  **请确保你已经掌握了常规的il2cpp为backend的打包过程**
+
+  **请确保你已经在你电脑上对于一个未使用HybrildCLR的项目成功打包出il2cpp为backend的相应包**，也就是打包环境是正常的！
+
+打包前需要先在 Player Settings里作如下设置：
+- script backend 必须选择 il2cpp
+- Api Compatibility Level 选择 .NET 4.x（unity 2021 及之后版本这里显示为 .NET framework）
+- 关闭 增量式gc 选项 (incremental gc)
+
+打包：
+- 菜单 HybridCLR/Build/Win64 ，运行完成后，会在Release_Win64目录下生成程序
+- 运行Release_Win64/HybridCLRTrial.exe，会看到打出 hello, HybridCLR.prefab
+
+更新ab包：
   - 修改HotFix项目的PrintHello代码，比如改成打印 "hello,world"。
   - 运行菜单 HybridCLR/BuildBundles/Win64，重新生成ab
   - 将StreamingAssets下的ab包复制到Release_Win64\HybridCLRTrial_Data\StreamingAssets。

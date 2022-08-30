@@ -270,7 +270,7 @@ namespace HybridCLR.Editor.Installer
             }
         }
 
-        private void RunInitLocalIl2CppDataBash(string il2cppBranch, string il2cppInstallPath)
+        public void RunInitLocalIl2CppDataBash(string il2cppBranch, string il2cppInstallPath)
         {
             using (Process p = new Process())
             {

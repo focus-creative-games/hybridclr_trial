@@ -19,10 +19,18 @@ namespace HybridCLR.Editor
             /// unity允许使用UNITY_IL2CPP_PATH环境变量指定il2cpp的位置，因此我们不再直接修改安装位置的il2cpp，
             /// 而是在本地目录
             ///
+            var installerController = new Installer.InstallerController();
             var localIl2cppDir = LocalIl2CppDir;
-            if (!Directory.Exists(localIl2cppDir))
+            if (!installerController.HasInstalledHybridCLR())
             {
-                Debug.LogError($"本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请在菜单 HybridCLR/Installer 中执行安装");
+                if (installerController.CheckValidIl2CppInstallDirectory(installerController.Il2CppBranch, installerController.Il2CppInstallDirectory) == Installer.InstallErrorCode.Ok)
+                {
+                    installerController.InitHybridCLR(installerController.Il2CppBranch, installerController.Il2CppInstallDirectory);
+                }
+                if (!installerController.HasInstalledHybridCLR())
+                {
+                    Debug.LogError($"未安装本地il2cpp。请在菜单 HybridCLR/Installer 中执行安装");
+                }
             }
             Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", localIl2cppDir);
         }
