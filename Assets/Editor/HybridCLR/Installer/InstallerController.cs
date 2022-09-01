@@ -80,18 +80,28 @@ namespace HybridCLR.Editor.Installer
         private bool TryParseMinorVersion(string installDir, out (int Major, int Minor1, int Minor2) unityVersion)
         {
             var matches = s_unityVersionPat.Matches(installDir);
-            if (matches.Count != 1)
+            if (matches.Count == 0)
             {
                 unityVersion = default;
                 return false;
             }
-            Match match = matches[0];
+            // 找最后一个匹配的，有的人居然会把Unity安装目录放到其他安装版本下。无语！
+            Match match = matches[matches.Count - 1];
             // Debug.Log($"capture count:{match.Groups.Count} {match.Groups[1].Value} {match.Groups[2].Value}");
             int major = int.Parse(match.Groups[1].Value);
             int minor1 = int.Parse(match.Groups[2].Value);
             int minor2 = int.Parse(match.Groups[3].Value);
             unityVersion = (major, minor1, minor2);
             return true;
+        }
+
+        public string GetCurVersionStr(string installDir)
+        {
+            if (TryParseMinorVersion(installDir, out var version))
+            {
+                return $"{version.Major}.{version.Minor1}.{version.Minor2}";
+            }
+            throw new Exception($"not support version:{installDir}");
         }
 
         public string GetMinCompatibleVersion(string branch)
@@ -246,6 +256,25 @@ namespace HybridCLR.Editor.Installer
             return branch.Contains("2019.");
         }
 
+
+        private string GetUnityIl2CppDllInstallLocation()
+        {
+#if UNITY_EDITOR_WIN
+            return $"{BuildConfig.LocalIl2CppDir}/build/deploy/net471/Unity.IL2CPP.dll";
+#else
+            return $"{BuildConfig.LocalIl2CppDir}/build/deploy/il2cppcore/Unity.IL2CPP.dll";
+#endif
+        }
+
+        private string GetUnityIl2CppDllModifiedPath(string curVersionStr)
+        {
+#if UNITY_EDITOR_WIN
+            return $"{BuildConfig.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Win.dll";
+#else
+            return $"{BuildConfig.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Mac.dll";
+#endif
+        }
+
         private void RunInitLocalIl2CppDataBat(string il2cppBranch, string il2cppInstallPath)
         {
             using (Process p = new Process())
@@ -258,10 +287,18 @@ namespace HybridCLR.Editor.Installer
                 p.WaitForExit();
                 if (IsUnity2019(il2cppBranch))
                 {
-                    string srcIl2CppDll = $"{BuildConfig.HybridCLRDataDir}/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll";
-                    string dstIl2CppDll = $"{BuildConfig.LocalIl2CppDir}/build/deploy/net471/Unity.IL2CPP.dll";
-                    File.Copy(srcIl2CppDll, dstIl2CppDll, true);
-                    Debug.Log($"copy {srcIl2CppDll} => {dstIl2CppDll}");
+                    string curVersionStr = GetCurVersionStr(il2cppInstallPath);
+                    string srcIl2CppDll = GetUnityIl2CppDllModifiedPath(curVersionStr);
+                    if (File.Exists(srcIl2CppDll))
+                    {
+                        string dstIl2CppDll = GetUnityIl2CppDllInstallLocation();
+                        File.Copy(srcIl2CppDll, dstIl2CppDll, true);
+                        Debug.Log($"copy {srcIl2CppDll} => {dstIl2CppDll}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"未找到当前版本:{curVersionStr} 对应的改造过的 Unity.IL2CPP.dll，打包出的程序将会崩溃");
+                    }
                 }
                 if (p.ExitCode == 0 && HasInstalledHybridCLR())
                 {
@@ -270,7 +307,7 @@ namespace HybridCLR.Editor.Installer
             }
         }
 
-        public void RunInitLocalIl2CppDataBash(string il2cppBranch, string il2cppInstallPath)
+        private void RunInitLocalIl2CppDataBash(string il2cppBranch, string il2cppInstallPath)
         {
             using (Process p = new Process())
             {
