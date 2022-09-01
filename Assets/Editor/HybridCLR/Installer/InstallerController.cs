@@ -322,6 +322,21 @@ namespace HybridCLR.Editor.Installer
                 string output = p.StandardOutput.ReadToEnd();
                 Debug.Log(output);
                 p.WaitForExit();
+                if (IsUnity2019(il2cppBranch))
+                {
+                    string curVersionStr = GetCurVersionStr(il2cppInstallPath);
+                    string srcIl2CppDll = GetUnityIl2CppDllModifiedPath(curVersionStr);
+                    if (File.Exists(srcIl2CppDll))
+                    {
+                        string dstIl2CppDll = GetUnityIl2CppDllInstallLocation();
+                        File.Copy(srcIl2CppDll, dstIl2CppDll, true);
+                        Debug.Log($"copy {srcIl2CppDll} => {dstIl2CppDll}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"未找到当前版本:{curVersionStr} 对应的改造过的 Unity.IL2CPP.dll，打包出的程序将会崩溃");
+                    }
+                }
                 if (HasInstalledHybridCLR())
                 {
                     Debug.Log("安装成功!!!");
