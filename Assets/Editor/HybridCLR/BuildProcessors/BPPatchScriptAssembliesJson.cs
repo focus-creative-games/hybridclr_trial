@@ -98,21 +98,20 @@ namespace HybridCLR.Editor.BuildProcessors
 
         private void AddBackHotFixAssembliesToBinFile(string path)
         {
+            Debug.Log($"AddBackHotFixAssembliesToBinFile. path:{path}");
+            if (!Directory.Exists(path))
+            {
+                path = Directory.GetParent(path).ToString();
+            }
             /*
-             * Unity2019 中 dll 加载列表存储在 globalgamemanagers 文件中，此列表在游戏启动时自动加载，
+             * ScriptingAssemblies.json 文件中记录了所有的dll名称，此列表在游戏启动时自动加载，
              * 不在此列表中的dll在资源反序列化时无法被找到其类型
              * 因此 OnFilterAssemblies 中移除的条目需要再加回来
              */
-#if UNITY_ANDROID
-            string[] binFiles = new string[] { "Temp/gradleOut/unityLibrary/src/main/assets/bin/Data/globalgamemanagers" }; // report.files 不包含 Temp/gradleOut 等目录
-#else
-            // 直接出包和输出vs工程时路径不同，report.summary.outputPath 记录的是前者路径
-            string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(path), "globalgamemanagers", SearchOption.AllDirectories);
-#endif
-
+            string[] binFiles = Directory.GetFiles(path, BuildConfig.GlobalgamemanagersBinFile, SearchOption.AllDirectories);
             if (binFiles.Length == 0)
             {
-                Debug.LogError("can not find file ScriptingAssemblies.json");
+                Debug.LogError($"can not find file {BuildConfig.GlobalgamemanagersBinFile}");
                 return;
             }
 
@@ -128,6 +127,7 @@ namespace HybridCLR.Editor.BuildProcessors
                     {
                         scriptsData.dllNames.Add(name);
                         scriptsData.dllTypes.Add(16); // user dll type
+                        Debug.Log($"[PatchScriptAssembliesJson] add hotfix assembly:{name} to {binPath}");
                     }
                 }
                 binFile.scriptsData = scriptsData;

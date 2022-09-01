@@ -40,6 +40,8 @@ namespace HybridCLR.Editor
 
         public static string ScriptingAssembliesJsonFile { get; } = "ScriptingAssemblies.json";
 
+        public static string GlobalgamemanagersBinFile { get; } = "globalgamemanagers";
+
         public static string HybridCLRBuildCacheDir => Application.dataPath + "/HybridCLRBuildCache";
 
         public static string HotFixDllsOutputDir => $"{HybridCLRDataDir}/HotFixDlls";
