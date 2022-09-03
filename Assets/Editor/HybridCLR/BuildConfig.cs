@@ -11,7 +11,7 @@ namespace HybridCLR.Editor
 {
     public static partial class BuildConfig
     {
-#if !UNITY_IOS
+#if !UNITY_2020_1_OR_NEWER || !UNITY_IOS
         [InitializeOnLoadMethod]
         private static void Setup()
         {
