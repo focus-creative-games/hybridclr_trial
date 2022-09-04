@@ -50,6 +50,11 @@ namespace HybridCLR.Editor.BuildProcessors
 
         private void PathScriptingAssembilesFile(string path)
         {
+            Debug.Log($"PathScriptingAssembilesFile. path:{path}");
+            if (!Directory.Exists(path))
+            {
+                path = Path.GetDirectoryName(path);
+            }
 #if UNITY_2020_1_OR_NEWER
             AddHotFixAssembliesToScriptingAssembliesJson(path);
 #else
@@ -60,10 +65,6 @@ namespace HybridCLR.Editor.BuildProcessors
         private void AddHotFixAssembliesToScriptingAssembliesJson(string path)
         {
             Debug.Log($"AddBackHotFixAssembliesToJson. path:{path}");
-            if (!Directory.Exists(path))
-            {
-                path = Directory.GetParent(path).ToString();
-            }
             /*
              * ScriptingAssemblies.json 文件中记录了所有的dll名称，此列表在游戏启动时自动加载，
              * 不在此列表中的dll在资源反序列化时无法被找到其类型
@@ -99,10 +100,6 @@ namespace HybridCLR.Editor.BuildProcessors
         private void AddBackHotFixAssembliesToBinFile(string path)
         {
             Debug.Log($"AddBackHotFixAssembliesToBinFile. path:{path}");
-            if (!Directory.Exists(path))
-            {
-                path = Directory.GetParent(path).ToString();
-            }
             /*
              * ScriptingAssemblies.json 文件中记录了所有的dll名称，此列表在游戏启动时自动加载，
              * 不在此列表中的dll在资源反序列化时无法被找到其类型
