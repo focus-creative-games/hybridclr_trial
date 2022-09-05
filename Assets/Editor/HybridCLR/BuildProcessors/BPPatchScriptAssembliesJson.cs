@@ -51,7 +51,9 @@ namespace HybridCLR.Editor.BuildProcessors
         private void PathScriptingAssembilesFile(string path)
         {
             Debug.Log($"PathScriptingAssembilesFile. path:{path}");
-            if (!Directory.Exists(path))
+            // File.Exists及Directory.Exist在Mac有下bug，所以使用这种办法
+            var file = new FileInfo(path);
+            if (file.Exists && !file.Attributes.HasFlag(FileAttributes.Directory))
             {
                 path = Path.GetDirectoryName(path);
             }
