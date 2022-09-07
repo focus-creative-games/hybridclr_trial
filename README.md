@@ -14,9 +14,10 @@
 ## 目录介绍
 
 - Assets Unity项目目录
-  - Main AOT主包模块
-  - Hotfix 热更新模块
+  - Main AOT主包模块，对应常规项目的主项目，资源更新模块
+  - 剩下代码在默认的全局Assembly-Csharp.dll中，均为热更新脚本
 - HybridCLRData 包含HybridCLR的il2cpp本地安装目录
+- Packages/com.focus-creative-games/hybridclr_unity 为HybridCLR for Unity包。暂时先作为local package，成熟后做成独立package。
 
 ## 使用介绍
 
@@ -24,25 +25,24 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 如何打包出一个可热更新的包，请先参阅 [快速开始](https://focus-creative-games.github.io/hybridclr/start_up/)。
 
-### 运行流程
+
+## 运行流程
 
 本示例演示了如下几部分内容
 
 - 将dll和资源打包成ab
-- 多热更新dll，并且按依赖顺序加载它们
 - 热更新脚本挂载到热更新资源中，并且正常运行
 - 直接反射运行普通热更新函数App::Main
 
-进入场景后，Main场景中的LoadDll会按顺序加载StreamingAssets目录下common AssetBundle里的HotFix.dll和HotFix2.dll，其中HotFix2.dll依赖HotFix.dll。
-接着运行HotFix2.dll里的App::Main函数。
+进入场景后，Main场景中的LoadDll会按顺序加载StreamingAssets目录下common AssetBundle里的Assembly-Csharp.dll。接着运行App::Main函数。
 
-注意！多热更新dll不是必须的！大多数项目完全可以只有HotFix.dll这一个热更新模块。纯粹出于演示才故意设计了两个热更新模块。
+## 体验热更新
 
-### 体验热更新
+### 预备工作
 
-#### 预备工作
+**===> 安装必须的Unity版本**
 
-根据你所使用的Unity年度版本，**还需要额外**安装2019.4.40、2020.3.33或者2021.3.1版本，不限 f1、f1c1之类后缀。
+根据你所使用的Unity年度版本，**还需要额外**安装2019.4.40、2020.3.33或者2021.3.1版本（必须包含il2cpp模块），不限 f1、f1c1之类后缀。
 
 **注意！**对于需要打iOS版本的开发者，由于HybridCLR需要裁减后的AOT dll，但Unity Editor未提供公开接口可以复制出target为iOS
 时的AOT dll，故必须使用修改后的UnityEditor.CoreModule.dll覆盖Unity自带的相应文件。
@@ -53,15 +53,42 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 **注意！** 我们修改了2019版本的il2cpp.exe工具，故Installer的安装过程多了一个额外步骤：将 `HybridCLRData/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll` 复制到 `HybridCLRData/LocalIl2CppData/il2cpp/build/deploy/net471/Unity.IL2CPP.dll`
 
-#### 安装及打包及热更新测试
+**再次提醒** 当前Unity版本必须安装了 il2cpp 组件。如果未安装，请自行在UnityHub中安装。新手自行google或百度。
+
+**===> 安装 visual studio**
+
+要求必须安装 `使用c++的游戏开发` 这个组件
+
+**===> 安装git**
+
+### 配置
+
+目前需要几个配置文件
+
+**===> HybridCLRGlobalSettings.asset**
+
+HybridCLR全局配置，单例。 trial项目已经创建。新项目请在 Unity Editor的 Project 窗口右键 `HybridCLR/GlobalSettings` 创建。
+
+关键参数介绍：
+
+- Enable。 是否开启HybridCLR。
+- HotFixAssmblyDefinitions。 以Assembly Definition形式存在的热更新模块。
+- Hotfix Dlls。 以dll形式存在的热更新模块
+
+**===> HybridCLRLinkSettings.asset**
+
+LinkGenerator配置，单例。trial项目已经创建。新项目请在 Unity Editor的 Project 窗口右键 `HybridCLR/LinkSettings` 创建
+
+**===> HybridMethodBridgeSettings.asset**
+
+桥接函数生成相关配置，单例。 trail项目中已经创建。 新项目请在 Unity Editor的 Project 窗口右键 `HybridCLR/MethodBridgeSettings` 创建
+
+### 安装及打包及热更新测试
 
 以Win64为例，其他平台同理。
 
 - 安装HybridCLR (安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/) )
-  - 安装git
-  - 安装 2020.3.33或2021.3.1（根据你的Unity大版本），不限 f1、f1c1之类后缀。哪怕你项目使用其他版本，也必须安装2020.3.33或者2021.3.1版本，因为安装时需要从这些版本安装目录复制il2cpp目录。
-  - 要求当前Unity版本必须安装了 il2cpp 组件。如果未安装，请自行在UnityHub中安装。新手自行google或百度。
-  - 安装 visual studio，要求必须安装 `使用c++的游戏开发` 这个组件
+
   - 打开Unity工程时会自动安装HybridCLR，如果出现出现 `本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请在菜单 HybridCLR/Installer 中执行安装` 的错误，则：
     - 点击菜单 `HybridCLR/Install`，弹出安装界面。
     - 如果安装界面没有错误或者警告，则说明il2cpp路径设置正常，否则需要你手动选择正确的il2cpp目录
@@ -83,8 +110,14 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 更新ab包：
   - 修改HotFix项目的PrintHello代码，比如改成打印 "hello,world"。
+  - 运行菜单命令 `HybridCLR/GenerateLinkXml` 更新 link.xml。在没有引用新的AOT类型的情况下可以跳过此操作。
   - 运行菜单 HybridCLR/BuildBundles/Win64，重新生成ab
   - 将StreamingAssets下的ab包复制到Release_Win64\HybridCLRTrial_Data\StreamingAssets。
   - 再将运行，屏幕上会打印"hello,world"。
 
+### 其他
+
+- 菜单 `HybridCLR/GenerateLinkXml` 自动生成热更新代码所需的link.xml。
+
 剩下的体验之旅，比如各种c#特性，自己体验吧。
+

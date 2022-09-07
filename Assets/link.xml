@@ -1,11 +1,5 @@
 <linker>
-	<assembly fullname="System" preserve="all" />
 	<assembly fullname="UnityEngine" preserve="all" />
 	<assembly fullname="UnityEngine.CoreModule" preserve="all" />
-	<assembly fullname="Assembly-CSharp" preserve="all" />
-	<assembly fullname="mscorlib" preserve="all" />
-	<assembly fullname="System.Core" preserve="all" />
-	<assembly fullname="UnityEngine.TextRenderingModule">
-		<type fullname="UnityEngine.TextMesh" preserve="all" />
-	</assembly>
+	<assembly fullname="Main" preserve="all" />
 </linker>
