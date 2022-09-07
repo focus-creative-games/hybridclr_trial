@@ -2,7 +2,7 @@
     "name": "HybridCLR.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:ec7e894280a62fb439cae3af161d18c3"
+        "UnityFS"
     ],
     "includePlatforms": [
         "Editor"

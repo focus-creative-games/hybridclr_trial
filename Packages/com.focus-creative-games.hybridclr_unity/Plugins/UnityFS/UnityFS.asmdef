@@ -2,7 +2,7 @@
     "name": "UnityFS",
     "rootNamespace": "",
     "references": [
-        "GUID:2cbbab4859728cc4786e422ed5e6e91e"
+        "SevenZip"
     ],
     "includePlatforms": [
         "Editor"
