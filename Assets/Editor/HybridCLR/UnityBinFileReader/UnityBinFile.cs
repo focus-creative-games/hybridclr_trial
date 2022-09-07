@@ -20,31 +20,46 @@ namespace HybridCLR.Editor.GlobalManagers
          */
         public const int kMonoManagerIdx = 6;
 
-        public string path { get; private set; }
-
         public FileHeader header;
         public MetaData metaData;
         public ScriptsData scriptsData;
 
-        public void LoadFromFile(string path)
+        private Stream _originStream;
+
+        public void LoadFromStream(Stream source)
         {
-            this.path = path;
-
-            var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var br = new BinaryReader(fs, Encoding.UTF8, true);
-            
-            header.LoadFromStream(br);
-            // 按理说 metaData 应该新开一个buffer来避免加载时的对齐逻辑问题，但由于 sizeof(Header) = 20，已经对齐到4了，所以可以连续读
-            metaData.LoadFromStream(br, header.dataOffset);
-            scriptsData = metaData.GetScriptData(br);
-
-            br.Close();
-            fs.Close();
+            _originStream = source;
+            using (var br = new BinaryReader(source, Encoding.UTF8, true))
+            {
+                header.LoadFromStream(br);
+                // 按理说 metaData 应该新开一个buffer来避免加载时的对齐逻辑问题，但由于 sizeof(Header) = 20，已经对齐到4了，所以可以连续读
+                metaData.LoadFromStream(br, header.dataOffset);
+                scriptsData = metaData.GetScriptData(br);
+            }
         }
 
-        public void RebuildAndFlushToFile(string newPath)
+        public void LoadFromFile(string path)
         {
-            var fsR = new FileStream(path, FileMode.Open, FileAccess.Read);
+            LoadFromStream(new MemoryStream(File.ReadAllBytes(path)));
+        }
+
+        public void AddScriptingAssemblies(List<string> assemblies)
+        {
+            foreach (string name in assemblies)
+            {
+                if (!scriptsData.dllNames.Contains(name))
+                {
+                    scriptsData.dllNames.Add(name);
+                    scriptsData.dllTypes.Add(16); // user dll type
+                    Debug.Log($"[PatchScriptAssembliesJson] add dll:{name} to globalgamemanagers");
+                }
+            }
+        }
+
+        public byte[] CreatePatchedBytes()
+        {
+            var fsR = _originStream;
+            fsR.Position = 0;
             var brR = new BinaryReader(fsR, Encoding.UTF8, true);
 
             var ms = new MemoryStream((int)(header.fileSize * 1.5f));
@@ -70,10 +85,10 @@ namespace HybridCLR.Editor.GlobalManagers
                 {// unity 的数据偏移貌似会对齐到 8
                     int newPos = (((int)ms.Position + 7) >> 3) << 3;
                     int gapSize = newPos - (int)ms.Position;
-                    
+
                     for (int i = 0; i < gapSize; i++)
                         bw.Write((byte)0);
-                    
+
                     objInfo.dataPos = (uint)ms.Position - header.dataOffset; // 重定位数据偏移
                 }
 
@@ -93,14 +108,16 @@ namespace HybridCLR.Editor.GlobalManagers
             metaData.SaveToStream(bw);
 
             brR.Close();
-            fsR.Close();
 
             // 写入新文件
             ms.Position = 0;
-            File.WriteAllBytes(newPath, ms.ToArray());
-            
-            bw.Close();
-            ms.Close();
+            return ms.ToArray();
+        }
+
+        public void RebuildAndFlushToFile(string newPath)
+        {
+            byte[] patchedBytes = CreatePatchedBytes();
+            File.WriteAllBytes(newPath, patchedBytes);
         }
     }
 

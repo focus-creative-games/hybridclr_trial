@@ -1,4 +1,5 @@
 ﻿using HybridCLR.Editor.GlobalManagers;
+using HybridCLR.Editor.UnityBinFileReader;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,7 +54,7 @@ namespace HybridCLR.Editor.BuildProcessors
             Debug.Log($"PathScriptingAssembilesFile. path:{path}");
             // File.Exists及Directory.Exist在Mac有下bug，所以使用这种办法
             var file = new FileInfo(path);
-            if (file.Exists && !file.Attributes.HasFlag(FileAttributes.Directory))
+            if (path.EndsWith(".exe") || path.EndsWith(".apk") || !file.Exists || !file.Attributes.HasFlag(FileAttributes.Directory))
             {
                 path = Path.GetDirectoryName(path);
             }
@@ -101,13 +102,17 @@ namespace HybridCLR.Editor.BuildProcessors
 
         private void AddBackHotFixAssembliesToBinFile(string path)
         {
-            Debug.Log($"AddBackHotFixAssembliesToBinFile. path:{path}");
-            /*
-             * ScriptingAssemblies.json 文件中记录了所有的dll名称，此列表在游戏启动时自动加载，
-             * 不在此列表中的dll在资源反序列化时无法被找到其类型
-             * 因此 OnFilterAssemblies 中移除的条目需要再加回来
-             */
-            string[] binFiles = Directory.GetFiles(path, BuildConfig.GlobalgamemanagersBinFile, SearchOption.AllDirectories);
+#if UNITY_ANDROID
+            AddBackHotFixAssembliesTodataunity3d(path);
+#else
+            AddBackHotFixAssembliesToGlobalgamemanagers(path);
+#endif
+        }
+
+        private void AddBackHotFixAssembliesToGlobalgamemanagers(string path)
+        {
+            string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(path), "globalgamemanagers", SearchOption.AllDirectories);
+
             if (binFiles.Length == 0)
             {
                 Debug.LogError($"can not find file {BuildConfig.GlobalgamemanagersBinFile}");
@@ -118,20 +123,27 @@ namespace HybridCLR.Editor.BuildProcessors
             {
                 var binFile = new UnityBinFile();
                 binFile.LoadFromFile(binPath);
-
-                ScriptsData scriptsData = binFile.scriptsData;
-                foreach (string name in BuildConfig.HotUpdateAssemblies)
-                {
-                    if (!scriptsData.dllNames.Contains(name))
-                    {
-                        scriptsData.dllNames.Add(name);
-                        scriptsData.dllTypes.Add(16); // user dll type
-                        Debug.Log($"[PatchScriptAssembliesJson] add hotfix assembly:{name} to {binPath}");
-                    }
-                }
-                binFile.scriptsData = scriptsData;
-
+                binFile.AddScriptingAssemblies(BuildConfig.HotUpdateAssemblies);
                 binFile.RebuildAndFlushToFile(binPath);
+                Debug.Log($"[PatchScriptAssembliesJson] patch {binPath}");
+            }
+        }
+
+        private void AddBackHotFixAssembliesTodataunity3d(string path)
+        {
+            string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(path), "data.unity3d", SearchOption.AllDirectories);
+
+            if (binFiles.Length == 0)
+            {
+                Debug.LogError("can not find file data.unity3d");
+                return;
+            }
+
+            foreach (string binPath in binFiles)
+            {
+                var patcher = new Dataunity3dPatcher();
+                patcher.ApplyPatch(binPath);
+                Debug.Log($"[PatchScriptAssembliesJson] patch {binPath}");
             }
         }
 
