@@ -75,7 +75,7 @@ namespace HybridCLR.Editor
                 string defaultNewAssetPath = $"Assets/{typeof(T).Name}.asset";
                 Debug.LogWarning($"没找到 {assetType} asset，自动创建创建一个:{defaultNewAssetPath}.");
 
-                var newAsset = new T();
+                var newAsset = ScriptableObject.CreateInstance<T>();
                 AssetDatabase.CreateAsset(newAsset, defaultNewAssetPath);
                 return newAsset;
             }

@@ -24,7 +24,7 @@ namespace HybridCLR.Editor.BuildProcessors
 #if UNITY_2021_1_OR_NEWER
         public static string GetStripAssembliesDir2021(BuildTarget target)
         {
-            string projectDir = BuildConfig.ProjectDir;
+            string projectDir = SettingsUtil.ProjectDir;
 #if UNITY_STANDALONE_WIN
             return $"{projectDir}/Library/Bee/artifacts/WinPlayerBuildProgram/ManagedStripped";
 #elif UNITY_ANDROID
@@ -62,8 +62,6 @@ namespace HybridCLR.Editor.BuildProcessors
             var dstPath = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
 
             Directory.CreateDirectory(dstPath);
-
-            //string srcStripDllPath = BuildConfig.GetOriginBuildStripAssembliesDir(target);
 
             foreach (var fileFullPath in Directory.GetFiles(srcStripDllPath, "*.dll"))
             {

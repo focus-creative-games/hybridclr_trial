@@ -153,32 +153,8 @@ namespace HybridCLR.Editor.Installer
 
         void PrepareIl2CppInstallPath()
         {
-#if UNITY_EDITOR_OSX
-            m_Il2CppInstallDirectory = EditorPrefs.GetString("Il2CppInstallDirectory");
-            if (CheckValidIl2CppInstallDirectory(Il2CppBranch, m_Il2CppInstallDirectory) == InstallErrorCode.Ok)
-            {
-                return;
-            }
-            var il2cppBranch = Il2CppBranch;
-            var curAppInstallPath = EditorApplication.applicationPath;
-            if (IsComaptibleWithIl2CppPlusBranch(il2cppBranch, curAppInstallPath))
-            {
-                Il2CppInstallDirectory = $"{curAppInstallPath}/Contents/il2cpp";
-                return;
-            }
-            string unityHubRootDir = Directory.GetParent(curAppInstallPath).Parent.Parent.ToString();
-            foreach (var unityInstallDir in Directory.GetDirectories(unityHubRootDir, "*", SearchOption.TopDirectoryOnly))
-            {
-                Debug.Log("nity install dir:" + unityInstallDir);
-                if (IsComaptibleWithIl2CppPlusBranch(il2cppBranch, unityInstallDir))
-                {
-                    Il2CppInstallDirectory = $"{unityInstallDir}/Unity.app/Contents/il2cpp";
-                    return;
-                }
-            }
+#if UNITY_EDITOR_WIN
 
-            Il2CppInstallDirectory = $"{curAppInstallPath}/Contents/il2cpp";
-#else
             m_Il2CppInstallDirectory = EditorPrefs.GetString("Il2CppInstallDirectory");
             if (CheckValidIl2CppInstallDirectory(Il2CppBranch, m_Il2CppInstallDirectory) == InstallErrorCode.Ok)
             {
@@ -204,6 +180,31 @@ namespace HybridCLR.Editor.Installer
             }
 
             Il2CppInstallDirectory = $"{Directory.GetParent(curAppInstallPath)}/Data/il2cpp";
+#else
+            m_Il2CppInstallDirectory = EditorPrefs.GetString("Il2CppInstallDirectory");
+            if (CheckValidIl2CppInstallDirectory(Il2CppBranch, m_Il2CppInstallDirectory) == InstallErrorCode.Ok)
+            {
+                return;
+            }
+            var il2cppBranch = Il2CppBranch;
+            var curAppInstallPath = EditorApplication.applicationPath;
+            if (IsComaptibleWithIl2CppPlusBranch(il2cppBranch, curAppInstallPath))
+            {
+                Il2CppInstallDirectory = $"{curAppInstallPath}/Contents/il2cpp";
+                return;
+            }
+            string unityHubRootDir = Directory.GetParent(curAppInstallPath).Parent.Parent.ToString();
+            foreach (var unityInstallDir in Directory.GetDirectories(unityHubRootDir, "*", SearchOption.TopDirectoryOnly))
+            {
+                Debug.Log("nity install dir:" + unityInstallDir);
+                if (IsComaptibleWithIl2CppPlusBranch(il2cppBranch, unityInstallDir))
+                {
+                    Il2CppInstallDirectory = $"{unityInstallDir}/Unity.app/Contents/il2cpp";
+                    return;
+                }
+            }
+
+            Il2CppInstallDirectory = $"{curAppInstallPath}/Contents/il2cpp";
 #endif
         }
 
@@ -262,7 +263,7 @@ namespace HybridCLR.Editor.Installer
 #if UNITY_EDITOR_WIN
             return $"{SettingsUtil.LocalIl2CppDir}/build/deploy/net471/Unity.IL2CPP.dll";
 #else
-            return $"{BuildConfig.LocalIl2CppDir}/build/deploy/il2cppcore/Unity.IL2CPP.dll";
+            return $"{SettingsUtil.LocalIl2CppDir}/build/deploy/il2cppcore/Unity.IL2CPP.dll";
 #endif
         }
 
@@ -271,7 +272,7 @@ namespace HybridCLR.Editor.Installer
 #if UNITY_EDITOR_WIN
             return $"{SettingsUtil.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Win.dll";
 #else
-            return $"{BuildConfig.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Mac.dll";
+            return $"{SettingsUtil.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Mac.dll";
 #endif
         }
 
