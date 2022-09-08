@@ -9,6 +9,8 @@ public class HybridCLRGlobalSettings : ScriptableObject
 {
     public bool enable = true;
 
+    public bool cloneFromGitee = true; // false 则从github上拉取
+
     public string BuildCacheDir = "HybridCLRBuildCache"; //
 
     public AssemblyDefinitionAsset[] hotfixAssemblyDefinitions;

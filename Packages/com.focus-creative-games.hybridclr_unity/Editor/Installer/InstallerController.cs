@@ -215,15 +215,7 @@ namespace HybridCLR.Editor.Installer
                 Debug.LogError($"请正确设置 il2cpp 安装目录");
                 return;
             }
-
-            if (Application.platform == RuntimePlatform.WindowsEditor)
-            {
-                RunInitLocalIl2CppDataBat(il2cppBranch, il2cppInstallPath);
-            }
-            else
-            {
-                RunInitLocalIl2CppDataBash(il2cppBranch, il2cppInstallPath);
-            }
+            RunInitLocalIl2CppData(il2cppBranch, il2cppInstallPath);
         }
 
         public bool HasInstalledHybridCLR()
@@ -276,57 +268,98 @@ namespace HybridCLR.Editor.Installer
 #endif
         }
 
-        private void RunInitLocalIl2CppDataBat(string il2cppBranch, string il2cppInstallPath)
+        private static string GetRepoUrl(string repoName)
         {
-            using (Process p = new Process())
-            {
-                p.StartInfo.WorkingDirectory = SettingsUtil.HybridCLRDataDir;
-                p.StartInfo.FileName = InitLocalIl2CppBatFile;
-                p.StartInfo.UseShellExecute = true;
-                p.StartInfo.Arguments = $"{il2cppBranch} \"{il2cppInstallPath}\"";
-                p.Start();
-                p.WaitForExit();
-                if (IsUnity2019(il2cppBranch))
-                {
-                    string curVersionStr = GetCurVersionStr(il2cppInstallPath);
-                    string srcIl2CppDll = GetUnityIl2CppDllModifiedPath(curVersionStr);
-                    if (File.Exists(srcIl2CppDll))
-                    {
-                        string dstIl2CppDll = GetUnityIl2CppDllInstallLocation();
-                        File.Copy(srcIl2CppDll, dstIl2CppDll, true);
-                        Debug.Log($"copy {srcIl2CppDll} => {dstIl2CppDll}");
-                    }
-                    else
-                    {
-                        Debug.LogError($"未找到当前版本:{curVersionStr} 对应的改造过的 Unity.IL2CPP.dll，打包出的程序将会崩溃");
-                    }
-                }
-                if (p.ExitCode == 0 && HasInstalledHybridCLR())
-                {
-                    Debug.Log("安装成功!!!");
-                }
-            }
+            string repoProvider = SettingsUtil.GlobalSettings.cloneFromGitee ? "gitee" : "github";
+            return $"https://{repoProvider}.com/focus-creative-games/{repoName}";
         }
 
-        private void RunInitLocalIl2CppDataBash(string il2cppBranch, string il2cppInstallPath)
+        private void RunInitLocalIl2CppData(string il2cppBranch, string il2cppInstallPath)
         {
-            using (Process p = new Process())
+            if (!BashUtil.ExistProgram("git"))
             {
-                p.StartInfo.WorkingDirectory = Application.dataPath + "/../HybridCLRData";
-                p.StartInfo.FileName = "/bin/bash";
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.Arguments = $"init_local_il2cpp_data.sh {il2cppBranch} '{il2cppInstallPath}'";
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.RedirectStandardError = true;
-                p.Start();
-                string output = p.StandardOutput.ReadToEnd();
-                Debug.Log(output);
-                p.WaitForExit();
-                if (HasInstalledHybridCLR())
+                throw new Exception($"安装本地il2cpp需要使用git从远程拉取仓库，请先安装git");
+            }
+
+            string workDir = SettingsUtil.HybridCLRDataDir;
+            //BashUtil.RecreateDir(workDir);
+
+            // clone hybridclr
+            string hybridclrRepoDir = $"{workDir}/hybridclr_repo";
+            {
+                BashUtil.RemoveDir(hybridclrRepoDir);
+                var ret = BashUtil.RunCommand(workDir, "git", new string[]
                 {
-                    Debug.Log("安装成功!!!");
+                "clone",
+                "--depth=1",
+                GetRepoUrl("hybridclr"),
+                hybridclrRepoDir,
+                });
+                //if (ret != 0)
+                //{
+                //    throw new Exception($"git clone 失败");
+                //}
+            }
+
+            // clone il2cpp_plus
+            string il2cppPlusRepoDir = $"{workDir}/il2cpp_plus_repo";
+            {
+                BashUtil.RemoveDir(il2cppPlusRepoDir);
+                var ret = BashUtil.RunCommand(workDir, "git", new string[]
+                {
+                "clone",
+                "--depth=1",
+                "-b",
+                il2cppBranch,
+                GetRepoUrl("il2cpp_plus"),
+                il2cppPlusRepoDir,
+                });
+                //if (ret != 0)
+                //{
+                //    throw new Exception($"git clone 失败");
+                //}
+            }
+
+            // create LocalIl2Cpp
+            string localIl2cppDataDir = $"{workDir}/LocalIl2CppData";
+            BashUtil.RecreateDir(localIl2cppDataDir);
+
+            // copy MonoBleedingEdge
+            BashUtil.CopyDir($"{Directory.GetParent(il2cppInstallPath)}/MonoBleedingEdge", $"{localIl2cppDataDir}/MonoBleedingEdge", true);
+
+            // copy il2cpp
+            BashUtil.CopyDir(Il2CppInstallDirectory, SettingsUtil.LocalIl2CppDir, true);
+
+            // replace libil2cpp
+            string dstLibil2cppDir = $"{SettingsUtil.LocalIl2CppDir}/libil2cpp";
+            BashUtil.CopyDir($"{il2cppPlusRepoDir}/libil2cpp", dstLibil2cppDir, true);
+            BashUtil.CopyDir($"{hybridclrRepoDir}/hybridclr", $"{dstLibil2cppDir}/hybridclr", true);
+
+            // clean Il2cppBuildCache
+            BashUtil.RemoveDir($"{SettingsUtil.ProjectDir}/Library/Il2cppBuildCache", true);
+
+            if (IsUnity2019(il2cppBranch))
+            {
+                string curVersionStr = GetCurVersionStr(il2cppInstallPath);
+                string srcIl2CppDll = GetUnityIl2CppDllModifiedPath(curVersionStr);
+                if (File.Exists(srcIl2CppDll))
+                {
+                    string dstIl2CppDll = GetUnityIl2CppDllInstallLocation();
+                    File.Copy(srcIl2CppDll, dstIl2CppDll, true);
+                    Debug.Log($"copy {srcIl2CppDll} => {dstIl2CppDll}");
                 }
+                else
+                {
+                    Debug.LogError($"未找到当前版本:{curVersionStr} 对应的改造过的 Unity.IL2CPP.dll，打包出的程序将会崩溃");
+                }
+            }
+            if (HasInstalledHybridCLR())
+            {
+                Debug.Log("安装成功！");
+            }
+            else
+            {
+                Debug.LogError("安装失败！");
             }
         }
     }

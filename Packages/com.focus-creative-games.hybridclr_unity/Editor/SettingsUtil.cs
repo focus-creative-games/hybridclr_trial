@@ -41,7 +41,7 @@ namespace HybridCLR.Editor
 
         public static string GetAssembliesPostIl2CppStripDir(BuildTarget target)
         {
-            return $"{SettingsUtil.AssembliesPostIl2CppStripDir}/{target}";
+            return $"{AssembliesPostIl2CppStripDir}/{target}";
         }
 
         /// <summary>

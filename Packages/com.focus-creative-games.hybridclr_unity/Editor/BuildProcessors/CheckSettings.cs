@@ -15,17 +15,28 @@ namespace HybridCLR.Editor.BuildProcessors
 
         public void OnPreprocessBuild(BuildReport report)
         {
+#if !UNITY_2020_1_OR_NEWER || !UNITY_IOS
             if (!SettingsUtil.Enable)
             {
-
-#if !UNITY_2020_1_OR_NEWER || !UNITY_IOS
                 string oldIl2cppPath = Environment.GetEnvironmentVariable("UNITY_IL2CPP_PATH");
                 if (!string.IsNullOrEmpty(oldIl2cppPath))
                 {
                     Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", "");
                     Debug.Log($"[BPCheckSettings] 清除 UNITY_IL2CPP_PATH, 旧值为:'{oldIl2cppPath}'");
                 }
+            }
+            else
+            {
+                string curIl2cppPath = Environment.GetEnvironmentVariable("UNITY_IL2CPP_PATH");
+                if (curIl2cppPath != SettingsUtil.LocalIl2CppDir)
+                {
+                    Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", SettingsUtil.LocalIl2CppDir);
+                    Debug.Log($"[BPCheckSettings] UNITY_IL2CPP_PATH 当前值为:'{curIl2cppPath}'，更新为:'{SettingsUtil.LocalIl2CppDir}'");
+                }
+            }
 #endif
+            if (!SettingsUtil.Enable)
+            {
                 return;
             }
             if (UnityEditor.PlayerSettings.gcIncremental)
@@ -34,15 +45,6 @@ namespace HybridCLR.Editor.BuildProcessors
                 UnityEditor.PlayerSettings.gcIncremental = false;
             }
 
-
-#if !UNITY_2020_1_OR_NEWER || !UNITY_IOS
-            string curIl2cppPath = Environment.GetEnvironmentVariable("UNITY_IL2CPP_PATH");
-            if (curIl2cppPath != SettingsUtil.LocalIl2CppDir)
-            {
-                Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", SettingsUtil.LocalIl2CppDir);
-                Debug.Log($"[BPCheckSettings] UNITY_IL2CPP_PATH 当前值为:'{curIl2cppPath}'，更新为:'{SettingsUtil.LocalIl2CppDir}'");
-            }
-#endif
         }
     }
 }
