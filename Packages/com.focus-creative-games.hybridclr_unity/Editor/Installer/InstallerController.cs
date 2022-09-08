@@ -276,10 +276,12 @@ namespace HybridCLR.Editor.Installer
 
         private void RunInitLocalIl2CppData(string il2cppBranch, string il2cppInstallPath)
         {
+#if UNITY_EDITOR_WIN
             if (!BashUtil.ExistProgram("git"))
             {
                 throw new Exception($"安装本地il2cpp需要使用git从远程拉取仓库，请先安装git");
             }
+#endif
 
             string workDir = SettingsUtil.HybridCLRDataDir;
             //BashUtil.RecreateDir(workDir);
