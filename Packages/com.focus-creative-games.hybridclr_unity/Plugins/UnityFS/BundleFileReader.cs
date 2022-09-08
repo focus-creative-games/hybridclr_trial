@@ -1,4 +1,4 @@
-﻿using K4os.Compression.LZ4;
+﻿using LZ4;
 using System;
 using System.IO;
 using System.Linq;
@@ -104,7 +104,7 @@ namespace UnityFS
                 case CompressionType.Lz4HC:
                     {
                         var uncompressedBytes = new byte[uncompressedSize];
-                        var numWrite = LZ4Codec.Decode(compressedBytes, uncompressedBytes);
+                        var numWrite = LZ4Codec.Decode(compressedBytes, 0, compressedBytes.Length, uncompressedBytes, 0, uncompressedBytes.Length, true);
                         if (numWrite != uncompressedSize)
                         {
                             throw new IOException($"Lz4 decompression error, write {numWrite} bytes but expected {uncompressedSize} bytes");

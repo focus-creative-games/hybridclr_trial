@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.IO;
 
 namespace UnityFS
@@ -22,17 +21,28 @@ namespace UnityFS
             set => BaseStream.Position = value;
         }
 
+        private unsafe void ReadBufferBigEndian(byte* dst, byte[] src, int size)
+        {
+            System.Diagnostics.Debug.Assert(BitConverter.IsLittleEndian);
+            for (int i = 0; i < size; i++)
+            {
+                dst[i] = src[size - i - 1];
+            }
+        }
+
         public override short ReadInt16()
         {
             return (short)ReadUInt16();
         }
 
-        public override ushort ReadUInt16()
+        public unsafe override ushort ReadUInt16()
         {
             if (Endian == EndianType.BigEndian)
             {
                 Read(buffer, 0, 2);
-                return BinaryPrimitives.ReadUInt16BigEndian(buffer);
+                ushort x = 0;
+                ReadBufferBigEndian((byte*)&x, buffer, 2);
+                return x;
             }
             return base.ReadUInt16();
         }
@@ -42,12 +52,14 @@ namespace UnityFS
             return (int)ReadUInt32();
         }
 
-        public override uint ReadUInt32()
+        public unsafe override uint ReadUInt32()
         {
             if (Endian == EndianType.BigEndian)
             {
                 Read(buffer, 0, 4);
-                return BinaryPrimitives.ReadUInt32BigEndian(buffer);
+                uint x = 0;
+                ReadBufferBigEndian((byte*)&x, buffer, 4);
+                return x;
             }
             return base.ReadUInt32();
         }
@@ -57,13 +69,15 @@ namespace UnityFS
             return (long)ReadUInt64();
         }
 
-        public override ulong ReadUInt64()
+        public unsafe override ulong ReadUInt64()
         {
             if (Endian == EndianType.BigEndian)
             {
                 Read(buffer, 0, 8);
 
-                return BinaryPrimitives.ReadUInt64BigEndian(buffer);
+                ulong x = 0;
+                ReadBufferBigEndian((byte*)&x, buffer, 8);
+                return x;
             }
             return base.ReadUInt64();
         }

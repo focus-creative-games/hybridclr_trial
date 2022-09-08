@@ -1,4 +1,4 @@
-﻿using K4os.Compression.LZ4;
+﻿using LZ4;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,7 +77,7 @@ namespace UnityFS
                 long curBlockSize = Math.Min(dataSize, blockByteSize);
                 dataSize -= curBlockSize;
 
-                int compressedSize = LZ4Codec.Encode(dataBytes, (int)(i * blockByteSize), (int)curBlockSize, tempCompressBlock, 0, tempCompressBlock.Length, LZ4Level.L08_HC);
+                int compressedSize = LZ4Codec.Encode(dataBytes, (int)(i * blockByteSize), (int)curBlockSize, tempCompressBlock, 0, tempCompressBlock.Length);
                 compressedBlockStream.Write(tempCompressBlock, 0, compressedSize);
                 _blocks.Add(new StorageBlock { flags = (StorageBlockFlags)(int)CompressionType.Lz4, compressedSize = (uint)compressedSize, uncompressedSize = (uint)curBlockSize });
                 //Debug.Log($"== block[{i}] uncompressedSize:{curBlockSize} compressedSize:{compressedSize}  totalblocksize:{compressedBlockStream.Length}");

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: HybridCLRGlobalSettings
   m_EditorClassIdentifier: 
   enable: 1
+  cloneFromGitee: 1
   BuildCacheDir: HybridCLRBuildCache
   hotfixAssemblyDefinitions: []
   hotfixAssemblies:

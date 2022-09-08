@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.IO;
 
 namespace UnityFS
@@ -29,11 +28,20 @@ namespace UnityFS
             Write((ushort)x);
         }
 
-        public override void Write(ushort x)
+        private unsafe void WriteBufferBigEndian(byte[] dst, byte* src, int size)
+        {
+            System.Diagnostics.Debug.Assert(BitConverter.IsLittleEndian);
+            for(int i = 0; i < size; i++)
+            {
+                dst[i] = src[size - i - 1];
+            }
+        }
+
+        public unsafe override void Write(ushort x)
         {
             if (Endian == EndianType.BigEndian)
             {
-                BinaryPrimitives.WriteUInt16BigEndian(buffer, x);
+                WriteBufferBigEndian(buffer, (byte*)&x, 2);
                 Write(buffer, 0, 2);
                 return;
             }
@@ -45,11 +53,11 @@ namespace UnityFS
             Write((uint)x);
         }
 
-        public override void Write(uint x)
+        public unsafe override void Write(uint x)
         {
             if (Endian == EndianType.BigEndian)
             {
-                BinaryPrimitives.WriteUInt32BigEndian(buffer, x);
+                WriteBufferBigEndian(buffer, (byte*)&x, 4);
                 Write(buffer, 0, 4);
                 return;
             }
@@ -61,11 +69,11 @@ namespace UnityFS
             Write((ulong)x);
         }
 
-        public override void Write(ulong x)
+        public unsafe override void Write(ulong x)
         {
             if (Endian == EndianType.BigEndian)
             {
-                BinaryPrimitives.WriteUInt64BigEndian(buffer, x);
+                WriteBufferBigEndian(buffer, (byte*)&x, 8);
                 Write(buffer, 0, 8);
                 return;
             }
