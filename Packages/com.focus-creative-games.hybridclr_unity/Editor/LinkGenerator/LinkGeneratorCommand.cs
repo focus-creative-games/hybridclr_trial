@@ -19,8 +19,12 @@ namespace HybridCLR.Editor.LinkGenerator
         public static void GenerateLinkXml()
         {
             var ls = SettingsUtil.LinkSettings;
-            
-            var allAssByNames = AppDomain.CurrentDomain.GetAssemblies().ToDictionary(ass => ass.GetName().Name);
+
+            var allAssByNames = new Dictionary<string, Assembly>();
+            foreach (var ass in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                allAssByNames[ass.GetName().Name] = ass;
+            }
 
             var hotfixAssembles = new List<Assembly>();
             foreach(var assName in SettingsUtil.HotUpdateAssemblies)
