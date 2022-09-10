@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using System.Text;
 
-namespace HybridCLR.Editor.GlobalManagers
+namespace UnityFS
 {
     public static class UnityBinUtils
     {

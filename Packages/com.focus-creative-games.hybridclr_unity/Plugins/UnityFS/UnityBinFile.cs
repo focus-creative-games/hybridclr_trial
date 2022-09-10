@@ -7,7 +7,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 
-namespace HybridCLR.Editor.GlobalManagers
+namespace UnityFS
 {
     /// <summary>
     /// Unity 生成的二进制文件(本代码不支持5.x之前的版本)
@@ -38,7 +38,7 @@ namespace HybridCLR.Editor.GlobalManagers
             }
         }
 
-        public void LoadFromFile(string path)
+        public void Load(string path)
         {
             LoadFromStream(new MemoryStream(File.ReadAllBytes(path)));
         }
@@ -114,7 +114,7 @@ namespace HybridCLR.Editor.GlobalManagers
             return ms.ToArray();
         }
 
-        public void RebuildAndFlushToFile(string newPath)
+        public void Save(string newPath)
         {
             byte[] patchedBytes = CreatePatchedBytes();
             File.WriteAllBytes(newPath, patchedBytes);

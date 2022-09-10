@@ -1,5 +1,4 @@
-﻿using HybridCLR.Editor.GlobalManagers;
-using HybridCLR.Editor.UnityBinFileReader;
+﻿using HybridCLR.Editor.UnityBinFileReader;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,10 +12,11 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.Il2Cpp;
 using UnityEditor.UnityLinker;
 using UnityEngine;
+using UnityFS;
 
 namespace HybridCLR.Editor.BuildProcessors
 {
-    public class PatchScriptAssembliesJson :
+    public class PatchScriptingAssemblyList :
 #if UNITY_ANDROID
         IPostGenerateGradleAndroidProject,
 #endif
@@ -25,12 +25,7 @@ namespace HybridCLR.Editor.BuildProcessors
         public int callbackOrder => 0;
 
 
-        [Serializable]
-        private class ScriptingAssemblies
-        {
-            public List<string> names;
-            public List<int> types;
-        }
+
 
         public void OnPostGenerateGradleAndroidProject(string path)
         {
@@ -61,13 +56,13 @@ namespace HybridCLR.Editor.BuildProcessors
 #if UNITY_2020_1_OR_NEWER
             AddHotFixAssembliesToScriptingAssembliesJson(path);
 #else
-            AddBackHotFixAssembliesToBinFile(path);
+            AddHotFixAssembliesToBinFile(path);
 #endif
         }
 
         private void AddHotFixAssembliesToScriptingAssembliesJson(string path)
         {
-            Debug.Log($"AddBackHotFixAssembliesToJson. path:{path}");
+            Debug.Log($"AddHotFixAssembliesToJson. path:{path}");
             /*
              * ScriptingAssemblies.json 文件中记录了所有的dll名称，此列表在游戏启动时自动加载，
              * 不在此列表中的dll在资源反序列化时无法被找到其类型
@@ -83,33 +78,23 @@ namespace HybridCLR.Editor.BuildProcessors
 
             foreach (string file in jsonFiles)
             {
-                string content = File.ReadAllText(file);
-                ScriptingAssemblies scriptingAssemblies = JsonUtility.FromJson<ScriptingAssemblies>(content);
-                foreach (string name in SettingsUtil.HotUpdateAssemblies)
-                {
-                    if (!scriptingAssemblies.names.Contains(name))
-                    {
-                        scriptingAssemblies.names.Add(name);
-                        scriptingAssemblies.types.Add(16); // user dll type
-                        Debug.Log($"[PatchScriptAssembliesJson] add hotfix assembly:{name} to {file}");
-                    }
-                }
-                content = JsonUtility.ToJson(scriptingAssemblies);
-
-                File.WriteAllText(file, content);
+                var patcher = new ScriptingAssembliesJsonPatcher();
+                patcher.Load(file);
+                patcher.AddScriptingAssemblies(SettingsUtil.HotUpdateAssemblies);
+                patcher.Save(file);
             }
         }
 
-        private void AddBackHotFixAssembliesToBinFile(string path)
+        private void AddHotFixAssembliesToBinFile(string path)
         {
 #if UNITY_ANDROID
-            AddBackHotFixAssembliesTodataunity3d(path);
+            AddHotFixAssembliesTodataunity3d(path);
 #else
-            AddBackHotFixAssembliesToGlobalgamemanagers(path);
+            AddHotFixAssembliesToGlobalgamemanagers(path);
 #endif
         }
 
-        private void AddBackHotFixAssembliesToGlobalgamemanagers(string path)
+        private void AddHotFixAssembliesToGlobalgamemanagers(string path)
         {
             string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(path), SettingsUtil.GlobalgamemanagersBinFile, SearchOption.AllDirectories);
 
@@ -122,14 +107,14 @@ namespace HybridCLR.Editor.BuildProcessors
             foreach (string binPath in binFiles)
             {
                 var binFile = new UnityBinFile();
-                binFile.LoadFromFile(binPath);
+                binFile.Load(binPath);
                 binFile.AddScriptingAssemblies(SettingsUtil.HotUpdateAssemblies);
-                binFile.RebuildAndFlushToFile(binPath);
+                binFile.Save(binPath);
                 Debug.Log($"[PatchScriptAssembliesJson] patch {binPath}");
             }
         }
 
-        private void AddBackHotFixAssembliesTodataunity3d(string path)
+        private void AddHotFixAssembliesTodataunity3d(string path)
         {
             string[] binFiles = Directory.GetFiles(Path.GetDirectoryName(path), SettingsUtil.Dataunity3dBinFile, SearchOption.AllDirectories);
 

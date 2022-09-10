@@ -44,6 +44,11 @@ namespace HybridCLR.Editor
             return $"{AssembliesPostIl2CppStripDir}/{target}";
         }
 
+        class AssemblyDefinitionData
+        {
+            public string name;
+        }
+
         /// <summary>
         /// 所有热更新dll列表。放到此列表中的dll在打包时OnFilterAssemblies回调中被过滤。
         /// </summary>

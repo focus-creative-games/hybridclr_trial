@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HybridCLR.Editor
+namespace HybridCLR.Editor.Meta
 {
     class AssemblyCollector
     {

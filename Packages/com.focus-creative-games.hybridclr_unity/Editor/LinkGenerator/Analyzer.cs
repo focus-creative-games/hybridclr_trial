@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using dnlib.DotNet;
+using HybridCLR.Editor.Meta;
 
 namespace HybridCLR.Editor.LinkGenerator
 {

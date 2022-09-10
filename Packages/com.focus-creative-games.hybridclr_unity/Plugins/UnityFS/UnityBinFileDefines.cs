@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using static HybridCLR.Editor.GlobalManagers.UnityBinUtils;
+using static UnityFS.UnityBinUtils;
 
-namespace HybridCLR.Editor.GlobalManagers
+namespace UnityFS
 {
     public struct FileHeader
     {

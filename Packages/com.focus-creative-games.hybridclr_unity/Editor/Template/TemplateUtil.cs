@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HybridCLR.Editor
+namespace HybridCLR.Editor.Template
 {
     public static class TemplateUtil
     {
