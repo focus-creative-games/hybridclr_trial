@@ -245,11 +245,19 @@ namespace HybridCLR.Editor.MethodBridge
                 {
                     continue;
                 }
-                //Debug.Log("prepare assembly:" + ass.FullName);
-                foreach (var type in ass.GetTypes())
+                try
                 {
-                    ScanType(type);
+                    foreach (var type in ass.GetTypes())
+                    {
+                        ScanType(type);
+                    }
                 }
+                catch (Exception e)
+                {
+                    Debug.LogError($"PrepareFromAssemblies. scan assembly:{ass.GetName().Name} error");
+                    Debug.LogException(e);
+                }
+                //Debug.Log("prepare assembly:" + ass.FullName);
             }
         }
 
