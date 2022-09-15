@@ -36,6 +36,8 @@ namespace HybridCLR.Editor.Installer
                 p.StartInfo.FileName = program;
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
                 string argsStr = string.Join(" ", args.Select(arg => "\"" + arg + "\""));
                 p.StartInfo.Arguments = argsStr;
                 UnityEngine.Debug.Log($"[BashUtil] run => {program} {argsStr}");
