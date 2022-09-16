@@ -38,20 +38,11 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 ## 体验热更新
 
-### 预备工作
+### 通用预备工作
 
 **===> 安装必须的Unity版本**
 
 根据你所使用的Unity年度版本，**还需要额外**安装2019.4.40、2020.3.33或者2021.3.1版本（必须包含il2cpp模块），不限 f1、f1c1之类后缀。
-
-**注意！**对于需要打iOS版本的开发者，由于HybridCLR需要裁减后的AOT dll，但Unity Editor未提供公开接口可以复制出target为iOS
-时的AOT dll，故必须使用修改后的UnityEditor.CoreModule.dll覆盖Unity自带的相应文件。
-
-具体操作为将 `HybridCLRData/ModifiedUnityAssemblies/2021.3.1/UnityEditor.CoreModule-{Win,Mac}.dll` 覆盖 `{Editor安装目录}/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule`，具体覆盖目录有可能因为操作系统或者Unity版本而有不同。
-
-这个 UnityEditor.CoreModule.dll 每个Unity小版本都不相同，我们目前暂时只提供了2021.3.1版本，如需其他版本请自己手动制作，详情请见 [修改UnityEditor.CoreModule.dll](https://focus-creative-games.github.io/hybridclr/modify_unity_dll/)
-
-**注意！** 我们修改了2019版本的il2cpp.exe工具，故Installer的安装过程多了一个额外步骤：将 `HybridCLRData/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll` 复制到 `HybridCLRData/LocalIl2CppData/il2cpp/build/deploy/net471/Unity.IL2CPP.dll`
 
 **再次提醒** 当前Unity版本必须安装了 il2cpp 组件。如果未安装，请自行在UnityHub中安装。新手自行google或百度。
 
@@ -60,6 +51,24 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 要求必须安装 `使用c++的游戏开发` 这个组件
 
 **===> 安装git**
+
+### Unity版本相关特殊操作
+
+**===> Unity 2021**
+
+对于使用Unity 2021版本（2019、2020不需要）打包iOS平台的开发者，由于HybridCLR需要裁减后的AOT dll，但Unity Editor未提供公开接口可以复制出target为iOS时的AOT dll，故必须使用修改后的UnityEditor.CoreModule.dll覆盖Unity自带的相应文件。
+
+具体操作为将 `HybridCLRData/ModifiedUnityAssemblies/2021.3.1/UnityEditor.CoreModule-{Win,Mac}.dll` 覆盖 `{Editor安装目录}/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule`，具体覆盖目录有可能因为操作系统或者Unity版本而有不同。
+
+**由于权限问题，该操作无法自动完成，需要你手动执行。**
+
+这个 UnityEditor.CoreModule.dll 每个Unity小版本都不相同，我们目前暂时只提供了2021.3.1版本，如需其他版本请自己手动制作，详情请见 [修改UnityEditor.CoreModule.dll](https://focus-creative-games.github.io/hybridclr/modify_unity_dll/)
+
+**===> Unity 2019**
+
+为了支持2019，需要修改il2cpp生成的源码，因此我们修改了2019版本的il2cpp.exe工具。故Installer的安装过程多了一个额外步骤：将 `HybridCLRData/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll` 复制到 `HybridCLRData/LocalIl2CppData/il2cpp/build/deploy/net471/Unity.IL2CPP.dll`
+
+**注意，该操作自动完成，不需要手动操作。**
 
 ### 配置
 
@@ -110,7 +119,6 @@ LinkGenerator配置，单例。trial项目已经创建。新项目请在 Unity E
 
 更新ab包：
   - 修改HotFix项目的PrintHello代码，比如改成打印 "hello,world"。
-  - 运行菜单命令 `HybridCLR/GenerateLinkXml` 更新 link.xml。在没有引用新的AOT类型的情况下可以跳过此操作。
   - 运行菜单 HybridCLR/BuildBundles/Win64，重新生成ab
   - 将StreamingAssets下的ab包复制到Release_Win64\HybridCLRTrial_Data\StreamingAssets。
   - 再将运行，屏幕上会打印"hello,world"。
