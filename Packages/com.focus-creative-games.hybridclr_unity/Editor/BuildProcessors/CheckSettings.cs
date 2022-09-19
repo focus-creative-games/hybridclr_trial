@@ -22,7 +22,7 @@ namespace HybridCLR.Editor.BuildProcessors
                 if (!string.IsNullOrEmpty(oldIl2cppPath))
                 {
                     Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", "");
-                    Debug.Log($"[BPCheckSettings] 清除 UNITY_IL2CPP_PATH, 旧值为:'{oldIl2cppPath}'");
+                    Debug.Log($"[CheckSettings] 清除 UNITY_IL2CPP_PATH, 旧值为:'{oldIl2cppPath}'");
                 }
             }
             else
@@ -31,7 +31,7 @@ namespace HybridCLR.Editor.BuildProcessors
                 if (curIl2cppPath != SettingsUtil.LocalIl2CppDir)
                 {
                     Environment.SetEnvironmentVariable("UNITY_IL2CPP_PATH", SettingsUtil.LocalIl2CppDir);
-                    Debug.Log($"[BPCheckSettings] UNITY_IL2CPP_PATH 当前值为:'{curIl2cppPath}'，更新为:'{SettingsUtil.LocalIl2CppDir}'");
+                    Debug.Log($"[CheckSettings] UNITY_IL2CPP_PATH 当前值为:'{curIl2cppPath}'，更新为:'{SettingsUtil.LocalIl2CppDir}'");
                 }
             }
 #endif
@@ -41,8 +41,20 @@ namespace HybridCLR.Editor.BuildProcessors
             }
             if (UnityEditor.PlayerSettings.gcIncremental)
             {
-                Debug.LogError($"[BPCheckSettings] HybridCLR不支持增量式GC，已经自动将该选项关闭");
+                Debug.LogError($"[CheckSettings] HybridCLR不支持增量式GC，已经自动将该选项关闭");
                 UnityEditor.PlayerSettings.gcIncremental = false;
+            }
+
+            var installer = new Installer.InstallerController();
+            if (!installer.HasInstalledHybridCLR())
+            {
+                throw new Exception($"你没有初始化HybridCLR，请通过菜单'HybridCLR/Installer'安装");
+            }
+
+            HybridCLRGlobalSettings gs = SettingsUtil.GlobalSettings;
+            if (((gs.hotfixAssemblies?.Length + gs.hotfixAssemblyDefinitions?.Length) ?? 0) == 0)
+            {
+                throw new Exception($"GlobalSettings中未配置热更新dll");
             }
 
         }

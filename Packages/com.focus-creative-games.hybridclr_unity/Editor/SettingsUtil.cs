@@ -98,9 +98,5 @@ namespace HybridCLR.Editor
         }
 
         public static HybridCLRGlobalSettings GlobalSettings => GetSingletonAssets<HybridCLRGlobalSettings>();
-
-        public static HybridCLRLinkSettings LinkSettings => GetSingletonAssets<HybridCLRLinkSettings>();
-
-        public static HybridCLRMethodBridgeSettings MethodBridgeSettings => GetSingletonAssets<HybridCLRMethodBridgeSettings>();
     }
 }

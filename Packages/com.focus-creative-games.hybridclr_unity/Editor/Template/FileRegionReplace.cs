@@ -23,7 +23,7 @@ namespace HybridCLR.Editor.Template
             _regionReplaceContents.Add(regionName, regionContent);
         }
 
-        public void Commit(string outputFile)
+        public string GenFinalString()
         {
             string originContent = _tplCode;
 
@@ -33,6 +33,12 @@ namespace HybridCLR.Editor.Template
             {
                 resultContent = TemplateUtil.ReplaceRegion(resultContent, c.Key, c.Value);
             }
+            return resultContent;
+        }
+
+        public void Commit(string outputFile)
+        {
+            string resultContent = GenFinalString();
             var utf8WithoutBOM = new System.Text.UTF8Encoding(false);
             File.WriteAllText(outputFile, resultContent, utf8WithoutBOM);
         }

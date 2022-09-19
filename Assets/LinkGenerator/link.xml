@@ -24,9 +24,6 @@
     <type fullname="System.String" preserve="all" />
     <type fullname="System.ValueType" preserve="all" />
   </assembly>
-  <assembly fullname="System">
-    <type fullname="System.Diagnostics.Stopwatch" preserve="all" />
-  </assembly>
   <assembly fullname="UnityEngine.AssetBundleModule">
     <type fullname="UnityEngine.AssetBundle" preserve="all" />
   </assembly>

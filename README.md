@@ -97,9 +97,7 @@ LinkGenerator配置，单例。trial项目已经创建。新项目请在 Unity E
 以Win64为例，其他平台同理。
 
 - 安装HybridCLR (安装HybridCLR的原理请看 [快速上手](https://focus-creative-games.github.io/hybridclr/start_up/) )
-
-  - 打开Unity工程时会自动安装HybridCLR，如果出现出现 `本地il2cpp目录:{localIl2cppDir} 不存在，未安装本地il2cpp。请在菜单 HybridCLR/Installer 中执行安装` 的错误，则：
-    - 点击菜单 `HybridCLR/Install`，弹出安装界面。
+    - 点击菜单 `HybridCLR/Installer...`，弹出安装界面。
     - 如果安装界面没有错误或者警告，则说明il2cpp路径设置正常，否则需要你手动选择正确的il2cpp目录
     - 点击 install 按钮完成安装
 - 打包主工程

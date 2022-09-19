@@ -57,7 +57,7 @@ namespace HybridCLR.Editor.BuildProcessors
 
         public static void CopyStripDlls(string srcStripDllPath, BuildTarget target)
         {
-            Debug.Log($"[BPCopyStrippedAOTAssemblies] CopyScripDlls. src:{srcStripDllPath} target:{target}");
+            Debug.Log($"[CopyStrippedAOTAssemblies] CopyScripDlls. src:{srcStripDllPath} target:{target}");
 
             var dstPath = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
 
@@ -66,7 +66,7 @@ namespace HybridCLR.Editor.BuildProcessors
             foreach (var fileFullPath in Directory.GetFiles(srcStripDllPath, "*.dll"))
             {
                 var file = Path.GetFileName(fileFullPath);
-                Debug.Log($"[BPCopyStrippedAOTAssemblies] copy strip dll {fileFullPath} ==> {dstPath}/{file}");
+                Debug.Log($"[CopyStrippedAOTAssemblies] copy strip dll {fileFullPath} ==> {dstPath}/{file}");
                 File.Copy($"{fileFullPath}", $"{dstPath}/{file}", true);
             }
         }

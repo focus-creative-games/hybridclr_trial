@@ -24,4 +24,8 @@ public class HybridCLRGlobalSettings : ScriptableObject
     public string hybridCLRDataDir = "HybridCLRData";
 
     public string strippedAssemblyDir = "AssembliesPostIl2CppStrip";
+
+    public string outputLinkFile = "LinkGenerator/link.xml";
+
+    public int pinvokeReverseWrapperCount = 10;
 }

@@ -23,7 +23,7 @@ namespace HybridCLR.Editor
             ScriptCompilationResult scriptCompilationResult = PlayerBuildInterface.CompilePlayerScripts(scriptCompilationSettings, buildDir);
             foreach (var ass in scriptCompilationResult.assemblies)
             {
-                Debug.LogFormat("compile assemblies:{1}/{0}", ass, buildDir);
+                //Debug.LogFormat("compile assemblies:{1}/{0}", ass, buildDir);
             }
         }
 

@@ -8,10 +8,6 @@ namespace HybridCLR.Editor.Template
 {
     public static class TemplateUtil
     {
-        public static string EscapeIntegerName(int i)
-        {
-            return i >= 0 ? i.ToString() : "minus" + (-i);
-        }
 
         public static string ReplaceRegion(string resultText, string region, string replaceContent)
         {
@@ -30,6 +26,10 @@ namespace HybridCLR.Editor.Template
             if (replaceStart == -1 || replaceEnd == -1)
             {
                 throw new Exception($"region:{region} not find");
+            }
+            if (resultText.Substring(replaceStart, replaceEnd - replaceStart) == replaceContent)
+            {
+                return resultText;
             }
             resultText = resultText.Substring(0, replaceStart) + "\n" + replaceContent + "\n" + resultText.Substring(replaceEnd);
             return resultText;

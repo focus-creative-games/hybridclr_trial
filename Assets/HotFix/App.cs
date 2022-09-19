@@ -28,9 +28,6 @@ public class App
         go.AddComponent<CreateByCode>();
 
         Debug.Log("=======看到此条日志代表你成功运行了示例项目的热更新代码=======");
-        var sw = new Stopwatch();
-        sw.Start();
-        sw.Stop();
         return 0;
     }
 

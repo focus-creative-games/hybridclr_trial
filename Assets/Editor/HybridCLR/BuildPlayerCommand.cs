@@ -1,4 +1,4 @@
-using HybridCLR.Editor.LinkGenerator;
+using HybridCLR.Editor.Commands;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +34,7 @@ namespace HybridCLR.Editor
             // Get filename.
             string outputPath = $"{SettingsUtil.ProjectDir}/Release-Win64";
 
-            var buildOptions = BuildOptions.None;
+            var buildOptions = BuildOptions.CompressWithLz4;
 
             string location = $"{outputPath}/HybridCLRTrial.exe";
 
@@ -81,7 +81,7 @@ namespace HybridCLR.Editor
 
             LinkGeneratorCommand.GenerateLinkXml();
 
-            var buildOptions = BuildOptions.None;
+            var buildOptions = BuildOptions.CompressWithLz4;
 
             string location = $"{outputPath}/HybridCLRTrial.exe";
 
@@ -125,7 +125,7 @@ namespace HybridCLR.Editor
             // Get filename.
             string outputPath = $"{SettingsUtil.ProjectDir}/Release-Android";
 
-            var buildOptions = BuildOptions.None;
+            var buildOptions = BuildOptions.CompressWithLz4;
 
             string location = outputPath + "/HybridCLRTrial.apk";
 

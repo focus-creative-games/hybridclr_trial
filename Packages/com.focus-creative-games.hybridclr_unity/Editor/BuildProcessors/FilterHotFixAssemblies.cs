@@ -37,7 +37,7 @@ namespace HybridCLR.Editor.BuildProcessors
                 {
                     throw new Exception($"热更新 assembly:{hotUpdateDll} 不存在，请检查拼写错误");
                 }
-                Debug.Log($"[BPFilterHotFixAssemblies] 过滤热更新assembly:{hotUpdateDll}");
+                Debug.Log($"[FilterHotFixAssemblies] 过滤热更新assembly:{hotUpdateDll}");
             }
             
             // 将热更dll从打包列表中移除
