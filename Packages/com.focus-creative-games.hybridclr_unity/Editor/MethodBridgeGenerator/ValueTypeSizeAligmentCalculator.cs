@@ -22,14 +22,18 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
 
 		private static bool IsIgnoreField(FieldDef field)
         {
-			var ignoreAttr = field.CustomAttributes.Where(a => a.AttributeType.Name == "IgnoreAttribute").FirstOrDefault();
+			var ignoreAttr = field.CustomAttributes.Where(a => a.AttributeType.FullName == "UnityEngine.Bindings.IgnoreAttribute").FirstOrDefault();
 			if (ignoreAttr == null)
             {
 				return false;
             }
-
-			var p = ignoreAttr.GetProperty("DoesNotContributeToSize").Value;
-			return (bool)p;
+			CANamedArgument arg = ignoreAttr.GetProperty("DoesNotContributeToSize");
+			if(arg != null && (bool)arg.Value)
+			{
+				//Debug.Log($"IgnoreField.DoesNotContributeToSize = true:{field}");
+				return true;
+			}
+			return false;
 		}
 
 		private (int Size, int Aligment) SizeAndAligmentOfStruct(TypeSig type)

@@ -189,7 +189,6 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
             {
                 return false;
             }
-            Debug.Log($"computHFAType:{type}");
             bool ok = ComputHFATypeInfo0(type, typeInfo);
             if (ok && typeInfo.Count >= 2 && typeInfo.Count <= 4)
             {
