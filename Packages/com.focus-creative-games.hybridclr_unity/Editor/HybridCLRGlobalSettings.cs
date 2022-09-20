@@ -23,7 +23,7 @@ public class HybridCLRGlobalSettings : ScriptableObject
     public string outputLinkFile = "LinkGenerator/link.xml";
 
     [Header("预留MonoPInvokeCallbackAttribute函数个数")]
-    public int pinvokeReverseWrapperCount = 10;
+    public int ReversePInvokeWrapperCount = 10;
 
     [Header("MethodBridge泛型搜索迭代次数")]
     public int maxMethodBridgeGenericIteration = 4;

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HybridCLR.Editor.PInvokeReverseWrap
+namespace HybridCLR.Editor.ReversePInvokeWrap
 {
-    internal class PInvokeReverseWrapGenerator
+    internal class ReversePInvokeWrapperGenerator
     {
         public void Generate(string template, int wrapperCount, string outputFile)
         {

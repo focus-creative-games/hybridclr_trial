@@ -84,13 +84,9 @@ HybridCLR全局配置，单例。 trial项目已经创建。新项目请在 Unit
 - HotFixAssmblyDefinitions。 以Assembly Definition形式存在的热更新模块。
 - Hotfix Dlls。 以dll形式存在的热更新模块
 
-**===> HybridCLRLinkSettings.asset**
+**===> HotUpdateAssemblyManifest.asset**
 
-LinkGenerator配置，单例。trial项目已经创建。新项目请在 Unity Editor的 Project 窗口右键 `HybridCLR/LinkSettings` 创建
-
-**===> HybridMethodBridgeSettings.asset**
-
-桥接函数生成相关配置，单例。 trail项目中已经创建。 新项目请在 Unity Editor的 Project 窗口右键 `HybridCLR/MethodBridgeSettings` 创建
+包含了需要补充元数据的AOT assembly列表。这个字段原来在 HybridCLRGlobalSettings 中。
 
 ### 安装及打包及热更新测试
 
@@ -121,9 +117,17 @@ LinkGenerator配置，单例。trial项目已经创建。新项目请在 Unity E
   - 将StreamingAssets下的ab包复制到Release_Win64\HybridCLRTrial_Data\StreamingAssets。
   - 再将运行，屏幕上会打印"hello,world"。
 
-### 其他
+### HybridCLR相关Editor菜单介绍
 
-- 菜单 `HybridCLR/GenerateLinkXml` 自动生成热更新代码所需的link.xml。
+- `Installer...` 打开 安装器
+- `GenerateLinkXml` 自动生成热更新代码所需的link.xml。
+- `GenerateMethodBridge` 生成桥接函数
+- `GenerateReversePInvokeWrapper` 生成 MonoPInvokeCallbackAttribute的预留桩函数
+- `CompileDll` 编译热更新dll
+- `BuildBundles` 构建用于热更资源和代码的ab包
+- `Build` 一键打包相关快捷命令
+
+### 其他
 
 剩下的体验之旅，比如各种c#特性，自己体验吧。
 
