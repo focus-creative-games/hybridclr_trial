@@ -43,7 +43,7 @@ namespace HybridCLR.Editor.Commands
                 }
             }
 
-            var analyzer = new Analyzer(new CombinedAssemblyResolver(new PathAssemblyResolver(SettingsUtil.GetHotFixDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget)), new UnityEditorAssemblyResolver()));
+            var analyzer = new Analyzer(MetaUtil.CreateBuildTargetAssemblyResolver(EditorUserBuildSettings.activeBuildTarget));
             var refTypes = analyzer.CollectRefs(hotfixAssembles);
 
             Debug.Log($"[LinkGeneratorCommand] hotfix assembly count:{hotfixAssembles.Count}, ref type count:{refTypes.Count} output:{Application.dataPath}/{ls.outputLinkFile}");

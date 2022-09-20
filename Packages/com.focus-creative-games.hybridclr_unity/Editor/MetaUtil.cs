@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IAssemblyResolver = HybridCLR.Editor.Meta.IAssemblyResolver;
 
 namespace HybridCLR.Editor
 {
@@ -79,5 +80,11 @@ namespace HybridCLR.Editor
             }
 			return typeSigs.Select(s => ToShareTypeSig(s)).ToList();
         }
+
+		public static IAssemblyResolver CreateBuildTargetAssemblyResolver(UnityEditor.BuildTarget target)
+        {
+			return new CombinedAssemblyResolver(new PathAssemblyResolver(
+				SettingsUtil.GetHotFixDllsOutputDirByTarget(target)), new UnityEditorAssemblyResolver());
+		}
     }
 }

@@ -18,6 +18,7 @@ namespace HybridCLR.Editor
 
         public static string AssetBundleSourceDataTempDir => $"{HybridCLRBuildCacheDir}/AssetBundleSourceData";
 
+        public static HotUpdateAssemblyManifest HotUpdateManifest => Resources.Load<HotUpdateAssemblyManifest>("HotUpdateAssemblyManifest");
 
         public static string GetAssetBundleOutputDirByTarget(BuildTarget target)
         {
@@ -61,9 +62,17 @@ namespace HybridCLR.Editor
             }
 
             string aotDllDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
-            foreach (var dll in SettingsUtil.AOTMetaAssemblies)
+
+
+            HotUpdateAssemblyManifest manifest = HotUpdateManifest;
+            if (manifest == null)
             {
-                string dllPath = $"{aotDllDir}/{dll}";
+                throw new Exception($"resource asset:{nameof(HotUpdateAssemblyManifest)} 配置不存在，请在Resources目录下创建");
+            }
+            List<string> AOTMetaAssemblies= (manifest.AOTMetadataDlls ?? Array.Empty<string>()).ToList();
+            foreach (var dll in AOTMetaAssemblies)
+            {
+                string dllPath = $"{aotDllDir}/{dll}.dll";
                 if (!File.Exists(dllPath))
                 {
                     Debug.LogError($"ab中添加AOT补充元数据dll:{dllPath} 时发生错误,文件不存在。裁剪后的AOT dll在BuildPlayer时才能生成，因此需要你先构建一次游戏App后再打包。");

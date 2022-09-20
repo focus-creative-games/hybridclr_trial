@@ -64,7 +64,7 @@ namespace HybridCLR.Editor.Meta
 
         private ModuleDefMD DoLoadModule(string dllPath)
         {
-            Debug.Log($"do load module:{dllPath}");
+            //Debug.Log($"do load module:{dllPath}");
             ModuleDefMD mod = ModuleDefMD.Load(dllPath, _modCtx);
             _asmResolver.AddToCache(mod);
             return mod;

@@ -69,9 +69,7 @@ namespace HybridCLR.Editor
             }
         }
 
-        public static List<string> AOTMetaAssemblies => (GlobalSettings.AOTMetadataDlls ?? Array.Empty<string>()).Select(dll => dll + ".dll").ToList();
-
-        private static T GetSingletonAssets<T>() where T : ScriptableObject, new()
+        public static T GetSingletonAssets<T>() where T : ScriptableObject, new()
         {
             string assetType = typeof(T).Name;
             string[] globalAssetPaths = AssetDatabase.FindAssets($"t:{assetType}");
@@ -96,42 +94,6 @@ namespace HybridCLR.Editor
             //Debug.Log($"find asset:{assPath}");
             return AssetDatabase.LoadAssetAtPath<T>(assPath);
         }
-
-        //public static List<string> GetCLRSystemDllSearchPath(UnityEditor.BuildTarget target)
-        //{
-        //    switch(target)
-        //    {
-        //        case BuildTarget.StandaloneWindows:
-        //        case BuildTarget.StandaloneWindows64:
-        //        {
-        //            return new List<string>
-        //            {
-        //                $"{EditorApplication.applicationContentsPath}/MonoBleedingEdge/lib/mono/unityaot-win32",
-        //                $"{EditorApplication.applicationContentsPath}/MonoBleedingEdge/lib/mono/unityaot-win32/Facades",
-        //            };
-        //        }
-        //        case BuildTarget.StandaloneOSX:
-        //        {
-        //            return new List<string>
-        //            {
-        //                $"{EditorApplication.applicationContentsPath}/MonoBleedingEdge/lib/mono/unityaot-macos",
-        //                $"{EditorApplication.applicationContentsPath}/MonoBleedingEdge/lib/mono/unityaot-macos/Facades",
-        //            };
-        //        }
-        //        case BuildTarget.StandaloneLinux64:
-        //        {
-        //            return new List<string>
-        //            {
-        //                $"{EditorApplication.applicationContentsPath}/MonoBleedingEdge/lib/mono/unityaot-linux",
-        //                $"{EditorApplication.applicationContentsPath}/MonoBleedingEdge/lib/mono/unityaot-linux/Facades",
-        //            };
-        //        }
-        //        case BuildTarget.Android:
-        //        {
-
-        //        }
-        //    }
-        //    }
 
         public static HybridCLRGlobalSettings GlobalSettings => GetSingletonAssets<HybridCLRGlobalSettings>();
     }

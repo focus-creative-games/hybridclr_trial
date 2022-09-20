@@ -198,7 +198,8 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
 
             List<string> lines = new List<string>(20_0000);
 
-            Debug.LogFormat("== managed2native method count:{0}", _managed2nativeMethodList.Count);
+            Debug.LogFormat("== managed2native:{0} native2managed:{1} adjustThunk:{2}",
+                _managed2nativeMethodList.Count, _native2managedMethodList.Count, _adjustThunkMethodList.Count);
 
             foreach(var method in _managed2nativeMethodList)
             {
@@ -207,16 +208,12 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
 
             _platformAdaptor.GenerateManaged2NativeStub(_managed2nativeMethodList, lines);
 
-            Debug.LogFormat("== native2managed method count:{0}", _native2managedMethodList.Count);
-
             foreach (var method in _native2managedMethodList)
             {
                 _platformAdaptor.GenerateNative2ManagedMethod(method, lines);
             }
 
             _platformAdaptor.GenerateNative2ManagedStub(_native2managedMethodList, lines);
-
-            Debug.LogFormat("== adjustThunk method count:{0}", _adjustThunkMethodList.Count);
 
             foreach (var method in _adjustThunkMethodList)
             {

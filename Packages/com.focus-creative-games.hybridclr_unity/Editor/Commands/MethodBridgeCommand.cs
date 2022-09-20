@@ -62,10 +62,15 @@ namespace HybridCLR.Editor.Commands
         [MenuItem("HybridCLR/GenerateMethodBridge", priority = 15)]
         public static void GenerateMethodBridge()
         {
+            // 此处理论会有点问题，打每个平台的时候，都得针对当前平台生成桥接函数
+            // 但影响不大，先这样吧
+            CompileDllCommand.CompileDllActiveBuildTarget();
+
+
             var analyzer = new Analyzer(new Analyzer.Options
             {
                 MaxIterationCount = 3,
-                Collector = new AssemblyReferenceDeepCollector(new UnityEditorAssemblyResolver(), SettingsUtil.HotUpdateAssemblies, false),
+                Collector = new AssemblyReferenceDeepCollector(MetaUtil.CreateBuildTargetAssemblyResolver(EditorUserBuildSettings.activeBuildTarget), SettingsUtil.HotUpdateAssemblies, false),
             });
 
             analyzer.Run();
