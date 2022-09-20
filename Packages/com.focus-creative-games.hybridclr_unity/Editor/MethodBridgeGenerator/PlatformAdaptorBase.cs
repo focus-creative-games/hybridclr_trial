@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using HybridCLR.Editor.Meta;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,6 +65,7 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
 
         public TypeInfo CreateTypeInfo(TypeSig type)
         {
+            type = type.RemovePinnedAndModifiers();
             if (type.IsByRef)
             {
                 return GetNativeIntTypeInfo();
@@ -130,32 +132,51 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
         private static bool ComputHFATypeInfo0(TypeSig type, HFATypeInfo typeInfo)
         {
             TypeDef typeDef = type.ToTypeDefOrRef().ResolveTypeDefThrow();
+
+            List<TypeSig> klassInst = type.ToGenericInstSig()?.GenericArguments?.ToList();
+            GenericArgumentContext ctx = klassInst != null ? new GenericArgumentContext(klassInst, null) : null;
+
             var fields = typeDef.Fields;// typeDef.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (FieldDef field in fields)
             {
-                TypeSig ftype = field.FieldType;
-                if (ftype.ElementType != ElementType.R4 && ftype.ElementType != ElementType.R8)
+                if (field.IsStatic)
                 {
-                    if (!ftype.IsPrimitive && ftype.IsValueType)
+                    continue;
+                }
+                TypeSig ftype = ctx != null ? MetaUtil.Inflate(field.FieldType, ctx) : field.FieldType;
+                switch(ftype.ElementType)
+                {
+                    case ElementType.R4:
+                    case ElementType.R8:
+                    {
+                        if (ftype == typeInfo.Type || typeInfo.Type == null)
+                        {
+                            typeInfo.Type = ftype;
+                            ++typeInfo.Count;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+                    case ElementType.ValueType:
                     {
                         if (!ComputHFATypeInfo0(ftype, typeInfo))
                         {
                             return false;
                         }
+                        break;
                     }
-                    else
+                    case ElementType.GenericInst:
                     {
-                        return false;
+                        if (!ftype.IsValueType || !ComputHFATypeInfo0(ftype, typeInfo))
+                        {
+                            return false;
+                        }
+                        break;
                     }
-                }
-                else if (ftype == typeInfo.Type || typeInfo.Type == null)
-                {
-                    typeInfo.Type = ftype;
-                    ++typeInfo.Count;
-                }
-                else
-                {
-                    return false;
+                    default: return false;
                 }
             }
             return typeInfo.Count <= 4;
@@ -168,6 +189,7 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
             {
                 return false;
             }
+            Debug.Log($"computHFAType:{type}");
             bool ok = ComputHFATypeInfo0(type, typeInfo);
             if (ok && typeInfo.Count >= 2 && typeInfo.Count <= 4)
             {

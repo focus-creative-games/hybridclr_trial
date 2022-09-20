@@ -59,7 +59,7 @@ namespace HybridCLR.Editor.Commands
             CleanIl2CppBuildCache();
         }
 
-        [MenuItem("HybridCLR/GenerateMethodBridge")]
+        [MenuItem("HybridCLR/GenerateMethodBridge", priority = 15)]
         public static void GenerateMethodBridge()
         {
             var analyzer = new Analyzer(new Analyzer.Options
