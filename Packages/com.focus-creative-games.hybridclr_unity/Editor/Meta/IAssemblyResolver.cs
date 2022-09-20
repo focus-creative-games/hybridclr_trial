@@ -8,6 +8,6 @@ namespace HybridCLR.Editor.Meta
 {
     public interface IAssemblyResolver
     {
-        string ResolveAssembly(string assemblyName);
+        string ResolveAssembly(string assemblyName, bool throwExIfNotFind);
     }
 }

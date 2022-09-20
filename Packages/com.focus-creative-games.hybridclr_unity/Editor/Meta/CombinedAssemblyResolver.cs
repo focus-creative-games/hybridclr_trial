@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace HybridCLR.Editor.Meta
 {
-    public class PathAssemblyResolver : IAssemblyResolver
+    public class CombinedAssemblyResolver : IAssemblyResolver
     {
-        private readonly string[] _searchPaths;
-        public PathAssemblyResolver(params string[] searchPaths)
+        private readonly IAssemblyResolver[] _resolvers;
+
+        public CombinedAssemblyResolver(params IAssemblyResolver[] resolvers)
         {
-            _searchPaths = searchPaths;
+            _resolvers = resolvers;
         }
 
         public string ResolveAssembly(string assemblyName, bool throwExIfNotFind)
         {
-            foreach(var path in _searchPaths)
+            foreach(var resolver in _resolvers)
             {
-                string assPath = Path.Combine(path, assemblyName + ".dll");
-                if (File.Exists(assPath))
+                var assembly = resolver.ResolveAssembly(assemblyName, false);
+                if (assembly != null)
                 {
-                    Debug.Log($"resolve {assemblyName} at {assPath}");
-                    return assPath;
+                    return assembly;
                 }
             }
             if (throwExIfNotFind)

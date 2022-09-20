@@ -6,19 +6,22 @@ using System.Text;
 using System.Threading.Tasks;
 using dnlib.DotNet;
 using HybridCLR.Editor.Meta;
+using IAssemblyResolver = HybridCLR.Editor.Meta.IAssemblyResolver;
 
 namespace HybridCLR.Editor.LinkGenerator
 {
     class Analyzer
     {
+        private readonly IAssemblyResolver _resolver;
 
-        public Analyzer()
+        public Analyzer(IAssemblyResolver resolver)
         {
+            _resolver = resolver;
         }
 
         public HashSet<TypeRef> CollectRefs(List<Assembly> rootAssemblies)
         {
-            var assCollector = new AssemblyCache(new UnityEditorAssemblyResolver());
+            var assCollector = new AssemblyCache(_resolver);
             var rootAssemblyName = new HashSet<string>();
             foreach(var ass in rootAssemblies)
             {

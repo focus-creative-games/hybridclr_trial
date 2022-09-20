@@ -8,9 +8,9 @@ using UnityEditor;
 using UnityEditor.Build.Player;
 using UnityEngine;
 
-namespace HybridCLR.Editor
+namespace HybridCLR.Editor.Commands
 {
-    internal class CompileDllCommand
+    public class CompileDllCommand
     {
         public static void CompileDll(string buildDir, BuildTarget target)
         {

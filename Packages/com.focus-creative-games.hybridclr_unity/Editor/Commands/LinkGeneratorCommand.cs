@@ -1,4 +1,5 @@
 ﻿using HybridCLR.Editor.LinkGenerator;
+using HybridCLR.Editor.Meta;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,8 @@ namespace HybridCLR.Editor.Commands
         [MenuItem("HybridCLR/GenerateLinkXml", priority = 10)]
         public static void GenerateLinkXml()
         {
+            CompileDllCommand.CompileDllActiveBuildTarget();
+
             var ls = SettingsUtil.GlobalSettings;
 
             var allAssByNames = new Dictionary<string, Assembly>();
@@ -40,7 +43,7 @@ namespace HybridCLR.Editor.Commands
                 }
             }
 
-            var analyzer = new Analyzer();
+            var analyzer = new Analyzer(new CombinedAssemblyResolver(new PathAssemblyResolver(SettingsUtil.GetHotFixDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget)), new UnityEditorAssemblyResolver()));
             var refTypes = analyzer.CollectRefs(hotfixAssembles);
 
             Debug.Log($"[LinkGeneratorCommand] hotfix assembly count:{hotfixAssembles.Count}, ref type count:{refTypes.Count} output:{Application.dataPath}/{ls.outputLinkFile}");

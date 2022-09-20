@@ -33,7 +33,7 @@ namespace HybridCLR.Editor.Meta
             {
                 return mod;
             }
-            mod = DoLoadModule(_assemblyPathResolver.ResolveAssembly(moduleName));
+            mod = DoLoadModule(_assemblyPathResolver.ResolveAssembly(moduleName, true));
             LoadedModules.Add(moduleName, mod);
 
             foreach (var refAsm in mod.GetAssemblyRefs())

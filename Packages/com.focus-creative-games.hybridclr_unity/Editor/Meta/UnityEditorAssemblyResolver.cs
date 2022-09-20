@@ -9,7 +9,7 @@ namespace HybridCLR.Editor.Meta
 {
     public class UnityEditorAssemblyResolver : IAssemblyResolver
     {
-        public string ResolveAssembly(string assemblyName)
+        public string ResolveAssembly(string assemblyName, bool throwExIfNotFind)
         {
             var refAss = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == assemblyName);
             if (refAss != null)
