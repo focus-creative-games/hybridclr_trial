@@ -113,7 +113,7 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
             // 后续迭代中将只遍历MethodSpec
             foreach(var ass in _assemblyCollector.LoadedModules.Values)
             {
-                Debug.Log($"module:{ass.Name}");
+                //Debug.Log($"module:{ass.Name}");
             }
             foreach (var ass in _assemblyCollector.LoadedModules.Values)
             {

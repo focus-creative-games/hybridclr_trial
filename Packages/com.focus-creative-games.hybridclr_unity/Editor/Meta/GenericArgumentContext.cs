@@ -86,7 +86,7 @@ namespace HybridCLR.Editor.Meta
                     var vas = (ValueArraySig)typeSig;
                     return new ValueArraySig(Resolve(vas.Next), vas.Size);
                 }
-                default: throw new NotSupportedException(typeSig.ElementType.ToString());
+                default: return typeSig;
 			}
         }
 
