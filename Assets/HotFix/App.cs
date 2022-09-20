@@ -58,5 +58,28 @@ public class App
     }
 
 
+    private static void TestRefAOTGenericTypeAndMethods()
+    {
+        new Dictionary<int, List<string>>();
+        var o = (object)new ValueTuple<int, float, string>();
+        Array.Empty<Vector2>();
 
+        var g1 = new GenericType<float>();
+        g1.Foo<ulong>();
+        var g2 = new GenericType<double>();
+        g2.Foo<ushort>();
+    }
+}
+
+public class GenericType<T>
+{
+    public void Show()
+    {
+        new Queue<T>();
+    }
+
+    public void Foo<U>()
+    {
+        new Dictionary<Vector3, U>();
+    }
 }

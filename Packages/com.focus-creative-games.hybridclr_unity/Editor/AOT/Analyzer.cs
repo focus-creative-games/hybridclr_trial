@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HybridCLR.Editor.MethodBridgeGenerator
+namespace HybridCLR.Editor.AOT
 {
 
     public class Analyzer
@@ -20,10 +20,8 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
         }
 
         private readonly int _maxInterationCount;
-        private readonly AssemblyReferenceDeepCollector _assemblyCollector;
 
-        private readonly List<TypeDef> _typeDefs = new List<TypeDef>();
-        private readonly List<MethodDef> _notGenericMethods = new List<MethodDef>();
+        private readonly AssemblyReferenceDeepCollector _assemblyCollector;
 
         private readonly HashSet<GenericClass> _genericTypes = new HashSet<GenericClass>();
         private readonly HashSet<GenericMethod> _genericMethods = new HashSet<GenericMethod>();
@@ -31,42 +29,68 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
         private List<GenericMethod> _processingMethods = new List<GenericMethod>();
         private List<GenericMethod> _newMethods = new List<GenericMethod>();
 
-        public IReadOnlyList<TypeDef> TypeDefs => _typeDefs;
-
-        public IReadOnlyList<MethodDef> NotGenericMethods => _notGenericMethods;
-
         public IReadOnlyCollection<GenericClass> GenericTypes => _genericTypes;
 
         public IReadOnlyCollection<GenericMethod> GenericMethods => _genericMethods;
 
-
         private readonly MethodReferenceAnalyzer _methodReferenceAnalyzer;
+
+        private readonly HashSet<string> _hotUpdateAssemblyFiles;
 
         public Analyzer(Options options)
         {
-            _maxInterationCount = options.MaxIterationCount;
             _assemblyCollector = options.Collector;
+            _maxInterationCount = options.MaxIterationCount;
             _methodReferenceAnalyzer = new MethodReferenceAnalyzer(this.OnNewMethod);
+            _hotUpdateAssemblyFiles = new HashSet<string>(options.Collector.GetRootAssemblyNames().Select(assName => assName + ".dll"));
         }
 
         private void TryAddAndWalkGenericType(GenericClass gc)
         {
+            if (gc == null)
+            {
+                Debug.Log($"ignore type:{gc.Type}");
+                return;
+            }
             gc = gc.ToGenericShare();
-            if (_genericTypes.Add(gc))
+            if (_genericTypes.Add(gc) && NeedWalk(gc.Type))
             {
                 WalkType(gc);
             }
         }
 
+        private bool NeedWalk(TypeDef type)
+        {
+            return _hotUpdateAssemblyFiles.Contains(type.Module.Name);
+        }
+
         private void OnNewMethod(GenericMethod method)
         {
-            if (_genericMethods.Add(method))
+            if(method == null)
+            {
+                Debug.Log($"ignore method:{method.Method}");
+                return;
+            }
+            if (_genericMethods.Add(method) && NeedWalk(method.Method.DeclaringType))
             {
                 _newMethods.Add(method);
             }
             if (method.KlassInst != null)
             {
                 TryAddAndWalkGenericType(new GenericClass(method.Method.DeclaringType, method.KlassInst));
+            }
+        }
+
+        private void TryAddMethodNotWalkType(GenericMethod method)
+        {
+            if (method == null)
+            {
+                Debug.Log($"ignore method:{method.Method}");
+                return;
+            }
+            if (_genericMethods.Add(method) && NeedWalk(method.Method.DeclaringType))
+            {
+                _newMethods.Add(method);
             }
         }
 
@@ -88,17 +112,12 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                 }
                 var gm = new GenericMethod(method, gc.KlassInst, null).ToGenericShare();
                 //Debug.Log($"add method:{gm.Method} {gm.KlassInst}");
-                
-                if (_genericMethods.Add(gm))
-                {
-                    _newMethods.Add(gm);
-                }
+                TryAddMethodNotWalkType(gm);
             }
         }
 
         private void WalkType(TypeDef typeDef)
         {
-            _typeDefs.Add(typeDef);
             if (typeDef.HasGenericParameters)
             {
                 return;
@@ -109,21 +128,13 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                 GenericClass gc = GenericClass.ResolveClass((TypeSpec)baseType, null);
                 TryAddAndWalkGenericType(gc);
             }
-            foreach (var method in typeDef.Methods)
-            {
-                if (method.HasGenericParameters)
-                {
-                    continue;
-                }
-                _notGenericMethods.Add(method);
-            }
         }
 
         private void Prepare()
         {
             // 将所有非泛型函数全部加入函数列表，同时立马walk这些method。
             // 后续迭代中将只遍历MethodSpec
-            foreach (var ass in _assemblyCollector.GetLoadedModulesExcludeRootAssemblies())
+            foreach (var ass in _assemblyCollector.GetLoadedModulesOfRootAssemblies())
             {
                 foreach (TypeDef typeDef in ass.GetTypes())
                 {
@@ -136,37 +147,22 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                     if (!ts.ContainsGenericParameter)
                     {
                         var cs = GenericClass.ResolveClass(ts, null)?.ToGenericShare();
-                        if (cs != null)
-                        {
-                            TryAddAndWalkGenericType(cs);
-                        }
+                        TryAddAndWalkGenericType(cs);
                     }
                 }
 
                 for (uint rid = 1, n = ass.Metadata.TablesStream.MethodSpecTable.Rows; rid <= n; rid++)
                 {
                     var ms = ass.ResolveMethodSpec(rid);
-                    if(ms.DeclaringType.ContainsGenericParameter || ms.GenericInstMethodSig.ContainsGenericParameter)
+                    if (ms.DeclaringType.ContainsGenericParameter || ms.GenericInstMethodSig.ContainsGenericParameter)
                     {
                         continue;
                     }
                     var gm = GenericMethod.ResolveMethod(ms, null)?.ToGenericShare();
-                    if (gm == null)
-                    {
-                        continue;
-                    }
-
-                    if (_genericMethods.Add(gm))
-                    {
-                        _newMethods.Add(gm);
-                    }
-                    //if (gm.KlassInst != null)
-                    //{
-                    //    TryAddAndWalkGenericType(new GenericClass(gm.Method.DeclaringType, gm.KlassInst));
-                    //}
+                    TryAddMethodNotWalkType(gm);
                 }
             }
-            Debug.Log($"PostPrepare allMethods:{_notGenericMethods.Count} newMethods:{_newMethods.Count}");
+            Debug.Log($"PostPrepare genericTypes:{_genericTypes.Count} genericMethods:{_genericMethods.Count} newMethods:{_newMethods.Count}");
         }
 
         private void RecursiveCollect()
@@ -182,7 +178,7 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                 {
                     _methodReferenceAnalyzer.WalkMethod(method.Method, method.KlassInst, method.MethodInst);
                 }
-                Debug.Log($"iteration:[{i}] allMethods:{_notGenericMethods.Count} genericClass:{_genericTypes.Count} genericMethods:{_genericMethods.Count} newMethods:{_newMethods.Count}");
+                Debug.Log($"iteration:[{i}] genericClass:{_genericTypes.Count} genericMethods:{_genericMethods.Count} newMethods:{_newMethods.Count}");
             }
         }
 

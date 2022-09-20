@@ -19,7 +19,22 @@ namespace HybridCLR.Editor.Meta
 
         public Dictionary<string, ModuleDefMD> LoadedModules { get; } = new Dictionary<string, ModuleDefMD>();
 
-        public AssemblyReferenceDeepCollector(IAssemblyResolver assemblyResolver, List<string> rootAssemblies, bool includeRootAssembly)
+        public IReadOnlyList<string> GetRootAssemblyNames()
+        {
+            return _rootAssemblies;
+        }
+
+        public List<ModuleDefMD> GetLoadedModulesExcludeRootAssemblies()
+        {
+            return LoadedModules.Where(e => !_rootAssemblies.Contains(e.Key)).Select(e => e.Value).ToList();
+        }
+
+        public List<ModuleDefMD> GetLoadedModulesOfRootAssemblies()
+        {
+            return _rootAssemblies.Select(ass => LoadedModules[ass]).ToList();
+        }
+
+        public AssemblyReferenceDeepCollector(IAssemblyResolver assemblyResolver, List<string> rootAssemblies)
         {
             _assemblyPathResolver = assemblyResolver;
             _rootAssemblies = rootAssemblies;
@@ -27,21 +42,14 @@ namespace HybridCLR.Editor.Meta
             _asmResolver = (AssemblyResolver)_modCtx.AssemblyResolver;
             _asmResolver.EnableTypeDefCache = true;
             _asmResolver.UseGAC = false;
-            LoadAllAssembiles(includeRootAssembly);
+            LoadAllAssembiles();
         }
 
-        private void LoadAllAssembiles(bool includeRootAssembly)
+        private void LoadAllAssembiles()
         {
             foreach (var asm in _rootAssemblies)
             {
                 LoadModule(asm);
-            }
-            if (!includeRootAssembly)
-            {
-                foreach(var mod in _rootAssemblies)
-                {
-                    LoadedModules.Remove(mod);
-                }
             }
         }
 

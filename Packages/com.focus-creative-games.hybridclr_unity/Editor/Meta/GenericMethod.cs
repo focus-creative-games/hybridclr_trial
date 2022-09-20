@@ -1,7 +1,9 @@
 ﻿using dnlib.DotNet;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace HybridCLR.Editor.MethodBridgeGenerator
+namespace HybridCLR.Editor.Meta
 {
     public class GenericMethod
     {
@@ -52,5 +54,40 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
             }
             return hash;
         }
+
+        public static GenericMethod ResolveMethod(IMethod method, GenericArgumentContext ctx)
+        {
+            //Debug.Log($"== resolve method:{method}");
+            TypeDef typeDef = null;
+            List<TypeSig> klassInst = null;
+            List<TypeSig> methodInst = null;
+
+            MethodDef methodDef = null;
+
+
+            var decalringType = method.DeclaringType;
+            typeDef = decalringType.ResolveTypeDef();
+            if (typeDef == null)
+            {
+                throw new Exception($"{decalringType}");
+            }
+            GenericInstSig gis = decalringType.TryGetGenericInstSig();
+            if (gis != null)
+            {
+                klassInst = ctx != null ? gis.GenericArguments.Select(ga => MetaUtil.Inflate(ga, ctx)).ToList() : gis.GenericArguments.ToList();
+            }
+            methodDef = method.ResolveMethodDef();
+            if (methodDef == null)
+            {
+                return null;
+            }
+            if (method is MethodSpec methodSpec)
+            {
+                methodInst = ctx != null ? methodSpec.GenericInstMethodSig.GenericArguments.Select(ga => MetaUtil.Inflate(ga, ctx)).ToList()
+                    : methodSpec.GenericInstMethodSig.GenericArguments.ToList();
+            }
+            return new GenericMethod(methodDef, klassInst, methodInst);
+        }
+
     }
 }

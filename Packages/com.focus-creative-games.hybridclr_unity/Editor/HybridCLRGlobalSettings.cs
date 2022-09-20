@@ -7,33 +7,39 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "HybridCLRGlobalSettings", menuName = "HybridCLR/GlobalSettings")]
 public class HybridCLRGlobalSettings : ScriptableObject
 {
-    [Header("¿ªÆôHybridCLR²å¼ş")]
+    [Header("å¼€å¯HybridCLRæ’ä»¶")]
     public bool enable = true;
 
-    [Header("´Ógitee clone²å¼ş´úÂë")]
-    public bool cloneFromGitee = true; // false Ôò´ÓgithubÉÏÀ­È¡
+    [Header("ä»gitee cloneæ’ä»¶ä»£ç ")]
+    public bool cloneFromGitee = true; // false åˆ™ä»githubä¸Šæ‹‰å–
 
-    [Header("ÈÈ¸üĞÂAssembly Definition Modules")]
+    [Header("çƒ­æ›´æ–°Assembly Definition Modules")]
     public AssemblyDefinitionAsset[] hotUpdateAssemblyDefinitions;
 
-    [Header("ÈÈ¸üĞÂdlls")]
+    [Header("çƒ­æ›´æ–°dlls")]
     public string[] hotUpdateAssemblies;
 
-    [Header("×Ô¶¯É¨ÃèÉú³ÉµÄlink.xmlÂ·¾¶")]
-    public string outputLinkFile = "LinkGenerator/link.xml";
+    [Header("è‡ªåŠ¨æ‰«æç”Ÿæˆçš„link.xmlè·¯å¾„")]
+    public string outputLinkFile = "HybridCLR/link.xml";
 
-    [Header("Ô¤ÁôMonoPInvokeCallbackAttributeº¯Êı¸öÊı")]
+    [Header("è‡ªåŠ¨æ‰«æç”Ÿæˆçš„AOTGenericReferences.csè·¯å¾„")]
+    public string outputAOTGenericReferenceFile = "Main/AOTGenericReferences.cs";
+
+    [Header("AOTæ³›å‹å®ä¾‹åŒ–æœç´¢è¿­ä»£æ¬¡æ•°")]
+    public int maxGenericReferenceIteration = 4;
+
+    [Header("é¢„ç•™MonoPInvokeCallbackAttributeå‡½æ•°ä¸ªæ•°")]
     public int ReversePInvokeWrapperCount = 10;
 
-    [Header("MethodBridge·ºĞÍËÑË÷µü´ú´ÎÊı")]
+    [Header("MethodBridgeæ³›å‹æœç´¢è¿­ä»£æ¬¡æ•°")]
     public int maxMethodBridgeGenericIteration = 4;
 
-    [Header("ÈÈ¸üĞÂdllÊä³öÄ¿Â¼£¨Ïà¶ÔHybridCLRDataÄ¿Â¼£©")]
+    [Header("çƒ­æ›´æ–°dllè¾“å‡ºç›®å½•ï¼ˆç›¸å¯¹HybridCLRDataç›®å½•ï¼‰")]
     public string hotUpdateDllOutputDir = "HotUpdateDlls";
 
-    [Header("HybridCLRDataÄ¿Â¼£¨Ïà¶Ô¹¤³ÌÄ¿Â¼£©")]
+    [Header("HybridCLRDataç›®å½•ï¼ˆç›¸å¯¹å·¥ç¨‹ç›®å½•ï¼‰")]
     public string hybridCLRDataDir = "HybridCLRData";
 
-    [Header("²Ã¼ôºóµÄAOT assemblyÊä³öÄ¿Â¼")]
+    [Header("è£å‰ªåçš„AOT assemblyè¾“å‡ºç›®å½•")]
     public string strippedAssemblyDir = "AssembliesPostIl2CppStrip";
 }

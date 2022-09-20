@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HybridCLR.Editor.MethodBridgeGenerator
+namespace HybridCLR.Editor.Meta
 {
     public class GenericClass
     {
@@ -46,6 +46,18 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                 hash = HashUtil.CombineHash(hash, HashUtil.ComputHash(KlassInst));
             }
             return hash;
+        }
+
+        public static GenericClass ResolveClass(TypeSpec type, GenericArgumentContext ctx)
+        {
+            var sig = type.TypeSig.ToGenericInstSig();
+            if (sig == null)
+            {
+                return null;
+            }
+            TypeDef def = type.ResolveTypeDef();
+            var klassInst = ctx != null ? sig.GenericArguments.Select(ga => MetaUtil.Inflate(ga, ctx)).ToList() : sig.GenericArguments.ToList();
+            return new GenericClass(def, klassInst);
         }
     }
 }
