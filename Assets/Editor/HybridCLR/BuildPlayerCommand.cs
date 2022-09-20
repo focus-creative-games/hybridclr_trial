@@ -38,7 +38,7 @@ namespace HybridCLR.Editor
 
             string location = $"{outputPath}/HybridCLRTrial.exe";
 
-            LinkGeneratorCommand.GenerateLinkXml();
+            PrebuildCommand.GenerateAll();
             Debug.Log("====> Build App");
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
             {
@@ -79,7 +79,7 @@ namespace HybridCLR.Editor
             // Get filename.
             string outputPath = $"{SettingsUtil.ProjectDir}/Release-Win32";
 
-            LinkGeneratorCommand.GenerateLinkXml();
+            PrebuildCommand.GenerateAll();
 
             var buildOptions = BuildOptions.CompressWithLz4;
 
@@ -129,7 +129,7 @@ namespace HybridCLR.Editor
 
             string location = outputPath + "/HybridCLRTrial.apk";
 
-            LinkGeneratorCommand.GenerateLinkXml();
+            PrebuildCommand.GenerateAll();
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
             {

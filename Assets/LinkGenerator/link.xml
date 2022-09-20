@@ -5,15 +5,13 @@
     <type fullname="HybridCLR.RuntimeApi" preserve="all" />
   </assembly>
   <assembly fullname="Main">
+    <type fullname="HotUpdateAssemblyManifest" preserve="all" />
     <type fullname="LoadDll" preserve="all" />
   </assembly>
   <assembly fullname="mscorlib">
     <type fullname="System.Byte" preserve="all" />
-    <type fullname="System.Collections.Generic.List`1" preserve="all" />
-    <type fullname="System.Collections.Generic.List`1/Enumerator" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute/DebuggingModes" preserve="all" />
-    <type fullname="System.IDisposable" preserve="all" />
     <type fullname="System.IntPtr" preserve="all" />
     <type fullname="System.Object" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.CompilationRelaxationsAttribute" preserve="all" />
@@ -31,6 +29,7 @@
     <type fullname="UnityEngine.Debug" preserve="all" />
     <type fullname="UnityEngine.GameObject" preserve="all" />
     <type fullname="UnityEngine.MonoBehaviour" preserve="all" />
+    <type fullname="UnityEngine.Resources" preserve="all" />
     <type fullname="UnityEngine.TextAsset" preserve="all" />
   </assembly>
 </linker>

@@ -25,7 +25,7 @@ namespace HybridCLR.Editor.Commands
             var generator = new ReversePInvokeWrapperGenerator();
             generator.Generate(wrapperTemplateStr, wrapperCount,ReversePInvokeWrapperStubFile);
             Debug.Log($"GenerateReversePInvokeWrapper. wraperCount:{wrapperCount} output:{ReversePInvokeWrapperStubFile}");
-            MethodBridgeCommand.CleanIl2CppBuildCache();
+            MethodBridgeGeneratorCommand.CleanIl2CppBuildCache();
         }
     }
 }

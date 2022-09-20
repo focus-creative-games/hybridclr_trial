@@ -17,7 +17,7 @@ public class App
 {
     public static int Main()
     {
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
         LoadMetadataForAOTAssembly();
 #endif
 
@@ -46,7 +46,8 @@ public class App
         AssetBundle dllAB = LoadDll.AssemblyAssetBundle;
         foreach (var aotDllName in aotDllList)
         {
-            byte[] dllBytes = dllAB.LoadAsset<TextAsset>(aotDllName + ".dll").bytes;
+            Debug.Log($"{aotDllName}");
+            byte[] dllBytes = dllAB.LoadAsset<TextAsset>(aotDllName).bytes;
             fixed (byte* ptr = dllBytes)
             {
                 // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
