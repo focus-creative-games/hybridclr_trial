@@ -17,7 +17,7 @@ public class App
 {
     public static int Main()
     {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
         LoadMetadataForAOTAssembly();
 #endif
 
