@@ -52,7 +52,7 @@ namespace HybridCLR.Editor
             List<string> notSceneAssets = new List<string>();
 
             string hotfixDllSrcDir = SettingsUtil.GetHotFixDllsOutputDirByTarget(target);
-            foreach (var dll in SettingsUtil.HotUpdateAssemblies)
+            foreach (var dll in SettingsUtil.HotUpdateAssemblyFiles)
             {
                 string dllPath = $"{hotfixDllSrcDir}/{dll}";
                 string dllBytesPath = $"{tempDir}/{dll}.bytes";

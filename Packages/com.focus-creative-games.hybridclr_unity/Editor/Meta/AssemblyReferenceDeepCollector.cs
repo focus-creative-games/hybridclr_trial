@@ -34,7 +34,7 @@ namespace HybridCLR.Editor.Meta
         {
             foreach (var asm in _rootAssemblies)
             {
-                LoadModule(asm.Substring(0, asm.LastIndexOf(".dll")));
+                LoadModule(asm);
             }
             if (!includeRootAssembly)
             {

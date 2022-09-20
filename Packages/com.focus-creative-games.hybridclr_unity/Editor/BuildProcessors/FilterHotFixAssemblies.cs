@@ -18,11 +18,11 @@ namespace HybridCLR.Editor.BuildProcessors
 
         public string[] OnFilterAssemblies(BuildOptions buildOptions, string[] assemblies)
         {
-            List<string> allHotUpdateDllNames = SettingsUtil.HotUpdateAssemblies;
+            List<string> allHotUpdateDllFiles = SettingsUtil.HotUpdateAssemblyFiles;
 
             // 检查是否重复填写
             var hotUpdateDllSet = new HashSet<string>();
-            foreach(var hotUpdateDll in allHotUpdateDllNames)
+            foreach(var hotUpdateDll in allHotUpdateDllFiles)
             {
                 if (!hotUpdateDllSet.Add(hotUpdateDll))
                 {
@@ -31,7 +31,7 @@ namespace HybridCLR.Editor.BuildProcessors
             }
 
             // 检查是否填写了正确的dll名称
-            foreach (var hotUpdateDll in SettingsUtil.HotUpdateAssemblies)
+            foreach (var hotUpdateDll in allHotUpdateDllFiles)
             {
                 if (assemblies.All(ass => !ass.EndsWith(hotUpdateDll)))
                 {
@@ -41,7 +41,7 @@ namespace HybridCLR.Editor.BuildProcessors
             }
             
             // 将热更dll从打包列表中移除
-            return assemblies.Where(ass => SettingsUtil.HotUpdateAssemblies.All(dll => !ass.EndsWith(dll, StringComparison.OrdinalIgnoreCase))).ToArray();
+            return assemblies.Where(ass => allHotUpdateDllFiles.All(dll => !ass.EndsWith(dll, StringComparison.OrdinalIgnoreCase))).ToArray();
         }
     }
 }

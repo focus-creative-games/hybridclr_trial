@@ -14,10 +14,10 @@ public class HybridCLRGlobalSettings : ScriptableObject
     public bool cloneFromGitee = true; // false 则从github上拉取
 
     [Header("热更新Assembly Definition Modules")]
-    public AssemblyDefinitionAsset[] hotfixAssemblyDefinitions;
+    public AssemblyDefinitionAsset[] hotUpdateAssemblyDefinitions;
 
     [Header("热更新dlls")]
-    public string[] hotfixAssemblies;
+    public string[] hotUpdateAssemblies;
 
     [Header("自动扫描生成的link.xml路径")]
     public string outputLinkFile = "LinkGenerator/link.xml";
@@ -29,7 +29,7 @@ public class HybridCLRGlobalSettings : ScriptableObject
     public int maxMethodBridgeGenericIteration = 4;
 
     [Header("热更新dll输出目录（相对HybridCLRData目录）")]
-    public string hotfixDllOutputDir = "HotFixDlls";
+    public string hotUpdateDllOutputDir = "HotUpdateDlls";
 
     [Header("HybridCLRData目录（相对工程目录）")]
     public string hybridCLRDataDir = "HybridCLRData";

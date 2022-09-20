@@ -30,10 +30,9 @@ namespace HybridCLR.Editor.Commands
             }
 
             var hotfixAssembles = new List<Assembly>();
-            foreach(var assName in SettingsUtil.HotUpdateAssemblies)
+            foreach(var assName in SettingsUtil.HotUpdateAssemblyNames)
             {
-                string assNameWithoutExt = Path.GetFileNameWithoutExtension(assName);
-                if (allAssByNames.TryGetValue(assNameWithoutExt, out var ass))
+                if (allAssByNames.TryGetValue(assName, out var ass))
                 {
                     hotfixAssembles.Add(ass);
                 }

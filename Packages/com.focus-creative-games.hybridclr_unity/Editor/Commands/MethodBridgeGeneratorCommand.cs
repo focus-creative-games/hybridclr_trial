@@ -69,8 +69,8 @@ namespace HybridCLR.Editor.Commands
 
             var analyzer = new Analyzer(new Analyzer.Options
             {
-                MaxIterationCount = 3,
-                Collector = new AssemblyReferenceDeepCollector(MetaUtil.CreateBuildTargetAssemblyResolver(EditorUserBuildSettings.activeBuildTarget), SettingsUtil.HotUpdateAssemblies, false),
+                MaxIterationCount = Math.Min(20, SettingsUtil.GlobalSettings.maxMethodBridgeGenericIteration),
+                Collector = new AssemblyReferenceDeepCollector(MetaUtil.CreateBuildTargetAssemblyResolver(EditorUserBuildSettings.activeBuildTarget), SettingsUtil.HotUpdateAssemblyNames, false),
             });
 
             analyzer.Run();

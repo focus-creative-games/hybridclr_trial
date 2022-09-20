@@ -52,7 +52,7 @@ namespace HybridCLR.Editor.BuildProcessors
             }
 
             HybridCLRGlobalSettings gs = SettingsUtil.GlobalSettings;
-            if (((gs.hotfixAssemblies?.Length + gs.hotfixAssemblyDefinitions?.Length) ?? 0) == 0)
+            if (((gs.hotUpdateAssemblies?.Length + gs.hotUpdateAssemblyDefinitions?.Length) ?? 0) == 0)
             {
                 throw new Exception($"GlobalSettings中未配置热更新dll");
             }

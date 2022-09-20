@@ -14,14 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enable: 1
   cloneFromGitee: 1
-  BuildCacheDir: HybridCLRBuildCache
-  hotfixAssemblyDefinitions: []
-  hotfixAssemblies:
+  hotUpdateAssemblyDefinitions: []
+  hotUpdateAssemblies:
   - Assembly-CSharp
-  AOTMetadataDlls:
-  - mscorlib
-  - System
-  - System.Core
-  hotfixDllOutputDir: HotFixDlls
+  outputLinkFile: LinkGenerator/link.xml
+  ReversePInvokeWrapperCount: 10
+  maxMethodBridgeGenericIteration: 4
+  hotUpdateDllOutputDir: HotFixDlls
   hybridCLRDataDir: HybridCLRData
   strippedAssemblyDir: AssembliesPostIl2CppStrip

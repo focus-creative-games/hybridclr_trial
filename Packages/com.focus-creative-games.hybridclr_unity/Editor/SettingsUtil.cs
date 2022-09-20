@@ -22,7 +22,7 @@ namespace HybridCLR.Editor
 
         public static string Dataunity3dBinFile { get; } = "data.unity3d";
 
-        public static string HotFixDllsOutputDir => $"{HybridCLRDataDir}/{GlobalSettings.hotfixDllOutputDir}";
+        public static string HotFixDllsOutputDir => $"{HybridCLRDataDir}/{GlobalSettings.hotUpdateDllOutputDir}";
 
         public static string HybridCLRDataDir => $"{ProjectDir}/{GlobalSettings.hybridCLRDataDir}";
 
@@ -52,22 +52,24 @@ namespace HybridCLR.Editor
         /// <summary>
         /// 所有热更新dll列表。放到此列表中的dll在打包时OnFilterAssemblies回调中被过滤。
         /// </summary>
-        public static List<string> HotUpdateAssemblies
+        public static List<string> HotUpdateAssemblyNames
         {
             get
             {
                 var gs = GlobalSettings;
-                var hotfixAssNames = (gs.hotfixAssemblyDefinitions ?? Array.Empty<AssemblyDefinitionAsset>()).Select(ad => JsonUtility.FromJson<AssemblyDefinitionData>(ad.text));
+                var hotfixAssNames = (gs.hotUpdateAssemblyDefinitions ?? Array.Empty<AssemblyDefinitionAsset>()).Select(ad => JsonUtility.FromJson<AssemblyDefinitionData>(ad.text));
 
                 var hotfixAssembles = new List<string>();
                 foreach (var assName in hotfixAssNames)
                 {
                     hotfixAssembles.Add(assName.name);
                 }
-                hotfixAssembles.AddRange(gs.hotfixAssemblies ?? Array.Empty<string>());
-                return hotfixAssembles.Select(dll => dll + ".dll").ToList();
+                hotfixAssembles.AddRange(gs.hotUpdateAssemblies ?? Array.Empty<string>());
+                return hotfixAssembles.ToList();
             }
         }
+
+        public static List<string> HotUpdateAssemblyFiles => HotUpdateAssemblyNames.Select(dll => dll + ".dll").ToList();
 
         public static T GetSingletonAssets<T>() where T : ScriptableObject, new()
         {
