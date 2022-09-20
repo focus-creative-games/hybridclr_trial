@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 1261ed9361c6095458bd3fd4026d83ba, type: 3}
   m_Name: HotUpdateAssemblyManifest
   m_EditorClassIdentifier: Main::HotUpdateAssemblyManifest
   AOTMetadataDlls:
