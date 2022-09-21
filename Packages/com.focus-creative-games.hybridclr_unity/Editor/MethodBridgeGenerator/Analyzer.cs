@@ -22,6 +22,8 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
         private readonly int _maxInterationCount;
         private readonly AssemblyReferenceDeepCollector _assemblyCollector;
 
+        private readonly object _lock = new object();
+
         private readonly List<TypeDef> _typeDefs = new List<TypeDef>();
         private readonly List<MethodDef> _notGenericMethods = new List<MethodDef>();
 
@@ -51,22 +53,28 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
 
         private void TryAddAndWalkGenericType(GenericClass gc)
         {
-            gc = gc.ToGenericShare();
-            if (_genericTypes.Add(gc))
+            lock(_lock)
             {
-                WalkType(gc);
+                gc = gc.ToGenericShare();
+                if (_genericTypes.Add(gc))
+                {
+                    WalkType(gc);
+                }
             }
         }
 
         private void OnNewMethod(GenericMethod method)
         {
-            if (_genericMethods.Add(method))
+            lock(_lock)
             {
-                _newMethods.Add(method);
-            }
-            if (method.KlassInst != null)
-            {
-                TryAddAndWalkGenericType(new GenericClass(method.Method.DeclaringType, method.KlassInst));
+                if (_genericMethods.Add(method))
+                {
+                    _newMethods.Add(method);
+                }
+                if (method.KlassInst != null)
+                {
+                    TryAddAndWalkGenericType(new GenericClass(method.Method.DeclaringType, method.KlassInst));
+                }
             }
         }
 
@@ -181,10 +189,10 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                 _newMethods = temp;
                 _newMethods.Clear();
 
-                foreach (var method in _processingMethods)
+                Task.WhenAll(_processingMethods.Select(method => Task.Run(() =>
                 {
                     _methodReferenceAnalyzer.WalkMethod(method.Method, method.KlassInst, method.MethodInst);
-                }
+                })));
                 Debug.Log($"iteration:[{i}] allMethods:{_notGenericMethods.Count} genericClass:{_genericTypes.Count} genericMethods:{_genericMethods.Count} newMethods:{_newMethods.Count}");
             }
         }

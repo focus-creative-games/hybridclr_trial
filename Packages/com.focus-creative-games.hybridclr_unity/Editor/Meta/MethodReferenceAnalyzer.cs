@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace HybridCLR.Editor.Meta
     {
         private readonly Action<GenericMethod> _onNewMethod;
 
-        private readonly Dictionary<MethodDef, List<IMethod>> _methodEffectInsts = new Dictionary<MethodDef, List<IMethod>>();
+        private readonly ConcurrentDictionary<MethodDef, List<IMethod>> _methodEffectInsts = new ConcurrentDictionary<MethodDef, List<IMethod>>();
 
         public MethodReferenceAnalyzer(Action<GenericMethod> onNewMethod)
         {
@@ -80,7 +81,7 @@ namespace HybridCLR.Editor.Meta
                     }
                 }
             }
-            _methodEffectInsts.Add(method, effectInsts);
+            _methodEffectInsts.TryAdd(method, effectInsts);
         }
     }
 }
