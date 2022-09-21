@@ -262,9 +262,9 @@ namespace HybridCLR.Editor.Installer
         private string GetUnityIl2CppDllModifiedPath(string curVersionStr)
         {
 #if UNITY_EDITOR_WIN
-            return $"{SettingsUtil.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Win.dll";
+            return $"{SettingsUtil.ProjectDir}/{SettingsUtil.HybridCLRDataPathInPackage}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Win.dll.bytes";
 #else
-            return $"{SettingsUtil.HybridCLRDataDir}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Mac.dll";
+            return $"{SettingsUtil.ProjectDir}/{SettingsUtil.HybridCLRDataPathInPackage}/ModifiedUnityAssemblies/{curVersionStr}/Unity.IL2CPP-Mac.dll.bytes";
 #endif
         }
 
@@ -286,6 +286,10 @@ namespace HybridCLR.Editor.Installer
             string workDir = SettingsUtil.HybridCLRDataDir;
             Directory.CreateDirectory(workDir);
             //BashUtil.RecreateDir(workDir);
+
+            string buildiOSDir = $"{workDir}/iOSBuild";
+            BashUtil.RemoveDir(buildiOSDir);
+            BashUtil.CopyDir($"{SettingsUtil.HybridCLRDataPathInPackage}/iOSBuild", buildiOSDir, true);
 
             // clone hybridclr
             string hybridclrRepoDir = $"{workDir}/hybridclr_repo";

@@ -20,7 +20,7 @@ namespace HybridCLR.Editor.Commands
         public static void GenerateReversePInvokeWrapper()
         {
             string ReversePInvokeWrapperStubFile = $"{SettingsUtil.LocalIl2CppDir}/libil2cpp/hybridclr/metadata/ReversePInvokeMethodStub.cpp";
-            string wrapperTemplateStr = Resources.Load<TextAsset>($"Templates/ReversePInvokeMethodStub.cpp").text;
+            string wrapperTemplateStr = AssetDatabase.LoadAssetAtPath<TextAsset>($"{SettingsUtil.TemplatePathInPackage}/ReversePInvokeMethodStub.cpp.txt").text;
             int wrapperCount = SettingsUtil.GlobalSettings.ReversePInvokeWrapperCount;
             var generator = new ReversePInvokeWrapperGenerator();
             generator.Generate(wrapperTemplateStr, wrapperCount,ReversePInvokeWrapperStubFile);

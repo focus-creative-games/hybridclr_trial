@@ -14,6 +14,12 @@ namespace HybridCLR.Editor
     {
         public static bool Enable => GlobalSettings.enable;
 
+        public static string PackageName { get; } = "com.focus-creative-games.hybridclr_unity";
+
+        public static string HybridCLRDataPathInPackage => $"Packages/{PackageName}/Data";
+
+        public static string TemplatePathInPackage => $"{HybridCLRDataPathInPackage}/Templates";
+
         public static string ProjectDir { get; } = Directory.GetParent(Application.dataPath).ToString();
 
         public static string ScriptingAssembliesJsonFile { get; } = "ScriptingAssemblies.json";

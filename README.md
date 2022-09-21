@@ -81,8 +81,8 @@ HybridCLR全局配置，单例。 trial项目已经创建。新项目请在 Unit
 关键参数介绍：
 
 - Enable。 是否开启HybridCLR。
-- HotFixAssmblyDefinitions。 以Assembly Definition形式存在的热更新模块。
-- Hotfix Dlls。 以dll形式存在的热更新模块
+- HotUpdateAssmblyDefinitions。 以Assembly Definition形式存在的热更新模块。不能与下面的Hotfix Dlls重复指定模块。
+- HotUpdate Dlls。 以dll形式存在的热更新模块。不能与HotUpdateAssmblyDefinitions重复指定模块。
 
 **===> HotUpdateAssemblyManifest.asset**
 
@@ -122,7 +122,9 @@ HybridCLR全局配置，单例。 trial项目已经创建。新项目请在 Unit
 - `Installer...` 打开 安装器
 - `GenerateLinkXml` 自动生成热更新代码所需的link.xml。
 - `GenerateMethodBridge` 生成桥接函数
+- `GenerateAOTGenericReference` 生成热更新模块中用到的AOT泛型实例化
 - `GenerateReversePInvokeWrapper` 生成 MonoPInvokeCallbackAttribute的预留桩函数
+- `GenerateAll` 生成以上所有 GenerateXXX
 - `CompileDll` 编译热更新dll
 - `BuildBundles` 构建用于热更资源和代码的ab包
 - `Build` 一键打包相关快捷命令
