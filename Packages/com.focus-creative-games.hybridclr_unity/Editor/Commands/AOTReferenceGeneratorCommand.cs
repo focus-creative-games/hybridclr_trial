@@ -16,9 +16,17 @@ namespace HybridCLR.Editor.Commands
         [MenuItem("HybridCLR/GenerateAOTGenericReference", priority = 18)]
         public static void GenerateAOTGenericReference()
         {
+            GenerateAOTGenericReference(true);
+        }
+
+        public static void GenerateAOTGenericReference(bool compileDll)
+        {
             // 此处理论会有点问题，打每个平台的时候，都得针对当前平台生成桥接函数
             // 但影响不大，先这样吧
-            CompileDllCommand.CompileDllActiveBuildTarget();
+            if (compileDll)
+            {
+                CompileDllCommand.CompileDllActiveBuildTarget();
+            }
 
             var gs = SettingsUtil.GlobalSettings;
 

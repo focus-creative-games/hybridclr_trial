@@ -14,7 +14,7 @@ namespace HybridCLR.Editor
     {
         public static bool Enable => GlobalSettings.enable;
 
-        public static string ProjectDir => Directory.GetParent(Application.dataPath).ToString();
+        public static string ProjectDir { get; } = Directory.GetParent(Application.dataPath).ToString();
 
         public static string ScriptingAssembliesJsonFile { get; } = "ScriptingAssemblies.json";
 

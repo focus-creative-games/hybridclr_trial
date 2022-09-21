@@ -41,13 +41,12 @@ namespace HybridCLR.Editor.Commands
             return Resources.Load<TextAsset>($"Templates/MethodBridge_{tplFile}.cpp").text;
         }
 
-        private static void GenerateMethodBridgeCppFile(Analyzer analyzer, PlatformABI platform, string fileName)
+        private static void GenerateMethodBridgeCppFile(Analyzer analyzer, PlatformABI platform, string templateCode, string outputFile)
         {
-            string outputFile = $"{SettingsUtil.MethodBridgeCppDir}/{fileName}.cpp";
             var g = new Generator(new Generator.Options()
             {
                 CallConvention = platform,
-                TemplateCode = GetTemplateCode(platform),
+                TemplateCode = templateCode,
                 OutputFile = outputFile,
                 GenericMethods = analyzer.GenericMethods,
                 NotGenericMethods = analyzer.NotGenericMethods,
@@ -62,11 +61,17 @@ namespace HybridCLR.Editor.Commands
         [MenuItem("HybridCLR/GenerateMethodBridge", priority = 15)]
         public static void GenerateMethodBridge()
         {
+            GenerateMethodBridge(true);
+        }
+
+        public static void GenerateMethodBridge(bool compileDll)
+        {
             // 此处理论会有点问题，打每个平台的时候，都得针对当前平台生成桥接函数
             // 但影响不大，先这样吧
-            CompileDllCommand.CompileDllActiveBuildTarget();
-
-
+            if (compileDll)
+            {
+                CompileDllCommand.CompileDllActiveBuildTarget();
+            }
             var analyzer = new Analyzer(new Analyzer.Options
             {
                 MaxIterationCount = Math.Min(20, SettingsUtil.GlobalSettings.maxMethodBridgeGenericIteration),
@@ -75,9 +80,24 @@ namespace HybridCLR.Editor.Commands
 
             analyzer.Run();
 
-            GenerateMethodBridgeCppFile(analyzer, PlatformABI.Arm64, "MethodBridge_Arm64");
-            GenerateMethodBridgeCppFile(analyzer, PlatformABI.Universal64, "MethodBridge_Universal64");
-            GenerateMethodBridgeCppFile(analyzer, PlatformABI.Universal32, "MethodBridge_Universal32");
+            var generateJobs = new List<(PlatformABI, string)>()
+            {
+                (PlatformABI.Arm64, "MethodBridge_Arm64"),
+                (PlatformABI.Universal64, "MethodBridge_Universal64"),
+                (PlatformABI.Universal32, "MethodBridge_Universal32"),
+            };
+
+            var tasks = new List<Task>();
+            foreach (var (platform, stubFile) in generateJobs)
+            {
+                string templateCode = GetTemplateCode(platform);
+                string outputFile = $"{SettingsUtil.MethodBridgeCppDir}/{stubFile}.cpp";
+                tasks.Add(Task.Run(() =>
+                {
+                    GenerateMethodBridgeCppFile(analyzer, platform, templateCode, outputFile);
+                }));
+            }
+            Task.WaitAll(tasks.ToArray());
         }
     }
 }

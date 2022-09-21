@@ -19,7 +19,15 @@ namespace HybridCLR.Editor.Commands
         [MenuItem("HybridCLR/GenerateLinkXml", priority = 10)]
         public static void GenerateLinkXml()
         {
-            CompileDllCommand.CompileDllActiveBuildTarget();
+            GenerateLinkXml(true);
+        }
+
+        public static void GenerateLinkXml(bool compileDll)
+        {
+            if (compileDll)
+            {
+                CompileDllCommand.CompileDllActiveBuildTarget();
+            }
 
             var ls = SettingsUtil.GlobalSettings;
 
