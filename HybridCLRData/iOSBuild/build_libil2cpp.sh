@@ -8,7 +8,7 @@ rm -rf build
 mkdir build
 cd build
 cmake ..
-make -j4
+make -j24
 
 if [ -f "libil2cpp.a" ]
 then

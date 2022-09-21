@@ -141,10 +141,13 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
             var m2nMethod = CreateMethodBridgeSig(method, false, returnType, parameters);
             AddManaged2NativeMethod(m2nMethod);
 
-            if (method.IsVirtual && method.DeclaringType.IsInterface)
+            if (method.IsVirtual)
             {
+                if (method.DeclaringType.IsInterface)
+                {
+                    AddAdjustThunkMethod(m2nMethod);
+                }
                 //var adjustThunkMethod = CreateMethodBridgeSig(method, true, returnType, parameters);
-                AddAdjustThunkMethod(m2nMethod);
                 AddNative2ManagedMethod(m2nMethod);
             }
             if (method.Name == "Invoke" && method.DeclaringType.IsDelegate)

@@ -82,7 +82,7 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
             }
             foreach (var method in gc.Type.Methods)
             {
-                if (method.HasGenericParameters || !method.HasBody || method.Body.Instructions == null)
+                if (method.HasGenericParameters)
                 {
                     continue;
                 }
@@ -91,7 +91,10 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
                 
                 if (_genericMethods.Add(gm))
                 {
-                    _newMethods.Add(gm);
+                    if (method.HasBody && method.Body.Instructions != null)
+                    {
+                        _newMethods.Add(gm);
+                    }
                 }
             }
         }
