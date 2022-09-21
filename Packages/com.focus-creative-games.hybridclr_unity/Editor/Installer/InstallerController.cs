@@ -284,6 +284,7 @@ namespace HybridCLR.Editor.Installer
 #endif
 
             string workDir = SettingsUtil.HybridCLRDataDir;
+            Directory.CreateDirectory(workDir);
             //BashUtil.RecreateDir(workDir);
 
             // clone hybridclr
@@ -323,11 +324,11 @@ namespace HybridCLR.Editor.Installer
             }
 
             // create LocalIl2Cpp
-            string localIl2cppDataDir = $"{workDir}/LocalIl2CppData";
-            BashUtil.RecreateDir(localIl2cppDataDir);
+            string localUnityDataDir = SettingsUtil.LocalUnityDataDir;
+            BashUtil.RecreateDir(localUnityDataDir);
 
             // copy MonoBleedingEdge
-            BashUtil.CopyDir($"{Directory.GetParent(il2cppInstallPath)}/MonoBleedingEdge", $"{localIl2cppDataDir}/MonoBleedingEdge", true);
+            BashUtil.CopyDir($"{Directory.GetParent(il2cppInstallPath)}/MonoBleedingEdge", $"{localUnityDataDir}/MonoBleedingEdge", true);
 
             // copy il2cpp
             BashUtil.CopyDir(Il2CppInstallDirectory, SettingsUtil.LocalIl2CppDir, true);

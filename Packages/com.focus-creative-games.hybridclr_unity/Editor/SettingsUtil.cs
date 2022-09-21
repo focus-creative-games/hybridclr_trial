@@ -28,7 +28,9 @@ namespace HybridCLR.Editor
 
         public static string AssembliesPostIl2CppStripDir => $"{HybridCLRDataDir}/{GlobalSettings.strippedAssemblyDir}";
 
-        public static string LocalIl2CppDir => $"{HybridCLRDataDir}/LocalIl2CppData/il2cpp";
+        public static string LocalUnityDataDir => $"{HybridCLRDataDir}/LocalIl2CppData-{Application.platform}";
+
+        public static string LocalIl2CppDir => $"{LocalUnityDataDir}/il2cpp";
 
         public static string MethodBridgeCppDir => $"{LocalIl2CppDir}/libil2cpp/hybridclr/interpreter";
 

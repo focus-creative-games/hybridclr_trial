@@ -30,6 +30,7 @@
 /Build-Android-2021.3.1
 /Release
 /HybridCLRData/LocalIl2CppData/
+/HybridCLRData/LocalIl2CppData-*/
 /HybridCLRData/il2cpp_plus_repo/
 /HybridCLRData/hybridclr_repo/
 /HybridCLRData/HotFixDlls/

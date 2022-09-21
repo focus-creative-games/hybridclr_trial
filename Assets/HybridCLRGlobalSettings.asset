@@ -18,6 +18,8 @@ MonoBehaviour:
   hotUpdateAssemblies:
   - Assembly-CSharp
   outputLinkFile: LinkGenerator/link.xml
+  outputAOTGenericReferenceFile: Main/AOTGenericReferences.cs
+  maxGenericReferenceIteration: 4
   ReversePInvokeWrapperCount: 10
   maxMethodBridgeGenericIteration: 4
   hotUpdateDllOutputDir: HotFixDlls
