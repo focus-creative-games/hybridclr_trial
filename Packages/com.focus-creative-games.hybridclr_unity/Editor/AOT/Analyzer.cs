@@ -49,7 +49,6 @@ namespace HybridCLR.Editor.AOT
         {
             if (gc == null)
             {
-                Debug.Log($"ignore type:{gc.Type}");
                 return;
             }
             gc = gc.ToGenericShare();
@@ -68,7 +67,6 @@ namespace HybridCLR.Editor.AOT
         {
             if(method == null)
             {
-                Debug.Log($"ignore method:{method.Method}");
                 return;
             }
             if (_genericMethods.Add(method) && NeedWalk(method.Method.DeclaringType))
@@ -85,7 +83,6 @@ namespace HybridCLR.Editor.AOT
         {
             if (method == null)
             {
-                Debug.Log($"ignore method:{method.Method}");
                 return;
             }
             if (_genericMethods.Add(method) && NeedWalk(method.Method.DeclaringType))
