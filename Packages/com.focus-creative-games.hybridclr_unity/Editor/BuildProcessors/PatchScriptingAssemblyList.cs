@@ -46,6 +46,11 @@ namespace HybridCLR.Editor.BuildProcessors
 
         private void PathScriptingAssembilesFile(string path)
         {
+            if (!SettingsUtil.Enable)
+            {
+                Debug.Log($"[PatchScriptingAssemblyList] disabled");
+                return;
+            }
             Debug.Log($"[PatchScriptingAssemblyList]. path:{path}");
             if (!Directory.Exists(path))
             {

@@ -18,6 +18,11 @@ namespace HybridCLR.Editor.BuildProcessors
 
         public string[] OnFilterAssemblies(BuildOptions buildOptions, string[] assemblies)
         {
+            if (!SettingsUtil.Enable)
+            {
+                Debug.Log($"[FilterHotFixAssemblies] disabled");
+                return assemblies;
+            }
             List<string> allHotUpdateDllFiles = SettingsUtil.HotUpdateAssemblyFiles;
 
             // 检查是否重复填写
