@@ -15,6 +15,8 @@ namespace HybridCLR.Editor.MethodBridgeGenerator
 
         public override bool IsArch32 => false;
 
+        public override bool IsSupportHFA => true;
+
         protected override TypeInfo OptimizeSigType(TypeInfo type, bool returnType)
         {
             if (type.PorType > ParamOrReturnType.STRUCTURE_ALIGN1 && type.PorType <= ParamOrReturnType.STRUCTURE_ALIGN8)
