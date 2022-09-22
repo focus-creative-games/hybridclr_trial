@@ -66,11 +66,18 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 **===> Unity 2019**
 
-为了支持2019，需要修改il2cpp生成的源码，因此我们修改了2019版本的il2cpp.exe工具。故Installer的安装过程多了一个额外步骤：将 `HybridCLRData/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll` 复制到 `HybridCLRData/LocalIl2CppData/il2cpp/build/deploy/net471/Unity.IL2CPP.dll`
+为了支持2019，需要修改il2cpp生成的源码，因此我们修改了2019版本的il2cpp.exe工具。故Installer的安装过程多了一个额外步骤：将 `{package}/Data/ModifiedUnityAssemblies/2019.4.40/Unity.IL2CPP.dll` 复制到 `{package}/Data/LocalIl2CppData/il2cpp/build/deploy/net471/Unity.IL2CPP.dll`
 
 **注意，该操作自动完成，不需要手动操作。**
 
 ### 配置
+
+**===> 确保[com.focus-creative-games.hybridclr_unity](https://github.com/focus-creative-games/hybridclr_unity) package已经正确安装**
+
+为了使用HybridCLR，需要安装hybridclr_unity插件。 不熟悉从url安装package的请看 [install from git](https://docs.unity3d.com/Manual/upm-ui-giturl.html)。
+
+由于网络原因，在unity中可能无法安装成功。你可以先把 [com.focus-creative-games.hybridclr_unity](https://github.com/focus-creative-games/hybridclr_unity) clone或者下载到本地，然后再 [install from disk](https://docs.unity3d.com/Manual/upm-ui-local.html)
+
 
 目前需要几个配置文件
 
