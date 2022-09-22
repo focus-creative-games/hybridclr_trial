@@ -1,10 +1,11 @@
 {
   "dependencies": {
     "com.focus-creative-games.hybridclr_unity": {
-      "version": "file:com.focus-creative-games.hybridclr_unity",
+      "version": "https://github.com/focus-creative-games/hybridclr_unity.git",
       "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
+      "source": "git",
+      "dependencies": {},
+      "hash": "a52ab358b3c3e97b0d4e283ef461285b5b04f760"
     },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
