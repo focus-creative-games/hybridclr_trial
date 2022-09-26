@@ -13,10 +13,9 @@ namespace HybridCLR.Editor
         {
             Directory.CreateDirectory(outputDir);
 
-            foreach(var ab in new string[] {"common"})
+            foreach(var srcFile in Directory.GetFiles(Application.streamingAssetsPath))
             {
-                string srcFile = $"{Application.streamingAssetsPath}/{ab}";
-                string dstFile = $"{outputDir}/{Path.GetFileName(ab)}";
+                string dstFile = $"{outputDir}/{Path.GetFileName(srcFile)}";
                 File.Copy(srcFile, dstFile, true);
             }
         }
@@ -57,7 +56,7 @@ namespace HybridCLR.Editor
             }
 
             Debug.Log("====> Build AssetBundle");
-            AssetBundleBuildCommand.BuildAssetBundleByTarget(target);
+            AssetBundleBuildCommand.BuildAssetBundleByTarget(target, true);
             Debug.Log("====> 复制 AssetBundle");
             CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
 
@@ -103,7 +102,7 @@ namespace HybridCLR.Editor
             }
 
             Debug.Log("====> Build AssetBundle");
-            AssetBundleBuildCommand.BuildAssetBundleByTarget(target);
+            AssetBundleBuildCommand.BuildAssetBundleByTarget(target, true);
             Debug.Log("====> 复制 AssetBundle");
             CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
 
@@ -143,7 +142,7 @@ namespace HybridCLR.Editor
             Debug.Log("====> 第1次 Build App(为了生成补充AOT元数据dll)");
             BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("====> Build AssetBundle");
-            AssetBundleBuildCommand.BuildAssetBundleByTarget(target);
+            AssetBundleBuildCommand.BuildAssetBundleByTarget(target, true);
 
             Debug.Log("====> 第2次打包");
             BuildPipeline.BuildPlayer(buildPlayerOptions);

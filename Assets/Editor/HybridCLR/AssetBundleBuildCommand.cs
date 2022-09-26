@@ -42,59 +42,80 @@ namespace HybridCLR.Editor
         /// <param name="tempDir"></param>
         /// <param name="outputDir"></param>
         /// <param name="target"></param>
-        private static void BuildAssetBundles(string tempDir, string outputDir, BuildTarget target)
+        private static void BuildAssetBundles(string tempDir, string outputDir, BuildTarget target, bool buildAot)
         {
             Directory.CreateDirectory(tempDir);
             Directory.CreateDirectory(outputDir);
             CompileDllCommand.CompileDll(target);
 
-
-            List<string> notSceneAssets = new List<string>();
-
-            string hotfixDllSrcDir = SettingsUtil.GetHotFixDllsOutputDirByTarget(target);
-            foreach (var dll in SettingsUtil.HotUpdateAssemblyFiles)
-            {
-                string dllPath = $"{hotfixDllSrcDir}/{dll}";
-                string dllBytesPath = $"{tempDir}/{dll}.bytes";
-                File.Copy(dllPath, dllBytesPath, true);
-                notSceneAssets.Add(dllBytesPath);
-                Debug.Log($"[BuildAssetBundles] copy hotfix dll {dllPath} -> {dllBytesPath}");
-            }
-
-            string aotDllDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
-
-
-            HotUpdateAssemblyManifest manifest = HotUpdateManifest;
-            if (manifest == null)
-            {
-                throw new Exception($"resource asset:{nameof(HotUpdateAssemblyManifest)} 配置不存在，请在Resources目录下创建");
-            }
-            List<string> AOTMetaAssemblies= (manifest.AOTMetadataDlls ?? Array.Empty<string>()).ToList();
-            foreach (var dll in AOTMetaAssemblies)
-            {
-                string dllPath = $"{aotDllDir}/{dll}.dll";
-                if (!File.Exists(dllPath))
-                {
-                    Debug.LogError($"ab中添加AOT补充元数据dll:{dllPath} 时发生错误,文件不存在。裁剪后的AOT dll在BuildPlayer时才能生成，因此需要你先构建一次游戏App后再打包。");
-                    continue;
-                }
-                string dllBytesPath = $"{tempDir}/{dll}.bytes";
-                File.Copy(dllPath, dllBytesPath, true);
-                notSceneAssets.Add(dllBytesPath);
-                Debug.Log($"[BuildAssetBundles] copy AOT dll {dllPath} -> {dllBytesPath}");
-            }
-
-            string testPrefab = $"{Application.dataPath}/Prefabs/HotUpdatePrefab.prefab";
-            notSceneAssets.Add(testPrefab);
-            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
             List<AssetBundleBuild> abs = new List<AssetBundleBuild>();
-            AssetBundleBuild notSceneAb = new AssetBundleBuild
+
+            if (buildAot)
             {
-                assetBundleName = "common",
-                assetNames = notSceneAssets.Select(s => ToRelativeAssetPath(s)).ToArray(),
-            };
-            abs.Add(notSceneAb);
+                var aotDllAssets = new List<string>();
+                string aotDllDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
+
+                HotUpdateAssemblyManifest manifest = HotUpdateManifest;
+                if (manifest == null)
+                {
+                    throw new Exception($"resource asset:{nameof(HotUpdateAssemblyManifest)} 配置不存在，请在Resources目录下创建");
+                }
+                List<string> AOTMetaAssemblies = (manifest.AOTMetadataDlls ?? Array.Empty<string>()).ToList();
+                foreach (var dll in AOTMetaAssemblies)
+                {
+                    string dllPath = $"{aotDllDir}/{dll}.dll";
+                    if (!File.Exists(dllPath))
+                    {
+                        Debug.LogError($"ab中添加AOT补充元数据dll:{dllPath} 时发生错误,文件不存在。裁剪后的AOT dll在BuildPlayer时才能生成，因此需要你先构建一次游戏App后再打包。");
+                        continue;
+                    }
+                    string dllBytesPath = $"{tempDir}/{dll}.bytes";
+                    File.Copy(dllPath, dllBytesPath, true);
+                    aotDllAssets.Add(dllBytesPath);
+                    Debug.Log($"[BuildAssetBundles] copy AOT dll {dllPath} -> {dllBytesPath}");
+                }
+
+                abs.Add(new AssetBundleBuild
+                {
+                    assetBundleName = "aotdlls",
+                    assetNames = aotDllAssets.Select(s => ToRelativeAssetPath(s)).ToArray(),
+                });
+            }
+
+
+            {
+                var hotUpdateDllAssets = new List<string>();
+
+                string hotfixDllSrcDir = SettingsUtil.GetHotFixDllsOutputDirByTarget(target);
+                foreach (var dll in SettingsUtil.HotUpdateAssemblyFiles)
+                {
+                    string dllPath = $"{hotfixDllSrcDir}/{dll}";
+                    string dllBytesPath = $"{tempDir}/{dll}.bytes";
+                    File.Copy(dllPath, dllBytesPath, true);
+                    hotUpdateDllAssets.Add(dllBytesPath);
+                    Debug.Log($"[BuildAssetBundles] copy hotfix dll {dllPath} -> {dllBytesPath}");
+                }
+
+                abs.Add(new AssetBundleBuild
+                {
+                    assetBundleName = "hotupdatedlls",
+                    assetNames = hotUpdateDllAssets.Select(s => ToRelativeAssetPath(s)).ToArray(),
+                });
+            }
+
+
+            {
+                var prefabAssets = new List<string>();
+                string testPrefab = $"{Application.dataPath}/Prefabs/HotUpdatePrefab.prefab";
+                prefabAssets.Add(testPrefab);
+                AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                abs.Add(new AssetBundleBuild
+                {
+                    assetBundleName = "prefabs",
+                    assetNames = prefabAssets.Select(s => ToRelativeAssetPath(s)).ToArray(),
+                });
+            }
+
 
             UnityEditor.BuildPipeline.BuildAssetBundles(outputDir, abs.ToArray(), BuildAssetBundleOptions.None, target);
 
@@ -110,43 +131,24 @@ namespace HybridCLR.Editor
             }
         }
 
-        public static void BuildAssetBundleByTarget(BuildTarget target)
+        public static void BuildAssetBundleByTarget(BuildTarget target, bool buildAot)
         {
-            BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
+            BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target, buildAot);
         }
 
-        [MenuItem("HybridCLR/BuildBundles/ActiveBuildTarget")]
+        [MenuItem("HybridCLR/BuildBundles/BuildAll_ActiveBuildTarget")]
         public static void BuildSceneAssetBundleActiveBuildTarget()
         {
-            BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget);
+            BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget, true);
         }
 
-        [MenuItem("HybridCLR/BuildBundles/Win64")]
-        public static void BuildSceneAssetBundleWin64()
+
+        [MenuItem("HybridCLR/BuildBundles/Update(ExcludeAOTAssemblies)_ActiveBuildTarget")]
+        public static void BuildSceneAssetBundleActiveBuildTargetExcludeAOT()
         {
-            var target = BuildTarget.StandaloneWindows64;
-            BuildAssetBundleByTarget(target);
+            BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget, false);
         }
 
-        [MenuItem("HybridCLR/BuildBundles/Win32")]
-        public static void BuildSceneAssetBundleWin32()
-        {
-            var target = BuildTarget.StandaloneWindows;
-            BuildAssetBundleByTarget(target);
-        }
 
-        [MenuItem("HybridCLR/BuildBundles/Android")]
-        public static void BuildSceneAssetBundleAndroid()
-        {
-            var target = BuildTarget.Android;
-            BuildAssetBundleByTarget(target);
-        }
-
-        [MenuItem("HybridCLR/BuildBundles/IOS")]
-        public static void BuildSceneAssetBundleIOS()
-        {
-            var target = BuildTarget.iOS;
-            BuildAssetBundleByTarget(target);
-        }
     }
 }

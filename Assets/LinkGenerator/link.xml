@@ -5,7 +5,6 @@
     <type fullname="HybridCLR.RuntimeApi" preserve="all" />
   </assembly>
   <assembly fullname="Main">
-    <type fullname="HotUpdateAssemblyManifest" preserve="all" />
     <type fullname="LoadDll" preserve="all" />
   </assembly>
   <assembly fullname="mscorlib">
@@ -35,7 +34,6 @@
     <type fullname="UnityEngine.Debug" preserve="all" />
     <type fullname="UnityEngine.GameObject" preserve="all" />
     <type fullname="UnityEngine.MonoBehaviour" preserve="all" />
-    <type fullname="UnityEngine.Resources" preserve="all" />
     <type fullname="UnityEngine.TextAsset" preserve="all" />
     <type fullname="UnityEngine.Vector2" preserve="all" />
     <type fullname="UnityEngine.Vector3" preserve="all" />

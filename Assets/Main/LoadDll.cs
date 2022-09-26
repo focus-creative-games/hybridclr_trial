@@ -34,7 +34,9 @@ public class LoadDll : MonoBehaviour
     {
         var abs = new string[]
         {
-            "common",
+            "aotdlls",
+            "hotupdatedlls",
+            "prefabs",
         };
         foreach (var ab in abs)
         {
@@ -75,19 +77,20 @@ public class LoadDll : MonoBehaviour
 
     private System.Reflection.Assembly gameAss;
 
-    public static AssetBundle AssemblyAssetBundle { get; private set; }
+    public static AssetBundle HotUpdateDllsAssetBundle { get; private set; }
 
     private void LoadGameDll()
     {
-        AssetBundle dllAB = AssemblyAssetBundle = AssetBundle.LoadFromMemory(GetAbBytes("common"));
+        AssetBundle hotUpdateDllAb = HotUpdateDllsAssetBundle = AssetBundle.LoadFromMemory(GetAbBytes("hotupdatedlls"));
 #if !UNITY_EDITOR
-        TextAsset dllBytes = dllAB.LoadAsset<TextAsset>("Assembly-CSharp.dll.bytes");
+        TextAsset dllBytes = hotUpdateDllAb.LoadAsset<TextAsset>("Assembly-CSharp.dll.bytes");
         gameAss = System.Reflection.Assembly.Load(dllBytes.bytes);
 #else
         gameAss = AppDomain.CurrentDomain.GetAssemblies().First(assembly => assembly.GetName().Name == "Assembly-CSharp");
 #endif
 
-        GameObject testPrefab = GameObject.Instantiate(dllAB.LoadAsset<UnityEngine.GameObject>("HotUpdatePrefab.prefab"));
+        AssetBundle prefabAb = AssetBundle.LoadFromMemory(GetAbBytes("prefabs"));
+        GameObject testPrefab = GameObject.Instantiate(prefabAb.LoadAsset<UnityEngine.GameObject>("HotUpdatePrefab.prefab"));
     }
 
     public void RunMain()

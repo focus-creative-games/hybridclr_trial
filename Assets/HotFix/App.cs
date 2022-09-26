@@ -41,12 +41,9 @@ public class App
         /// 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
         /// 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
         /// 
-        string[] aotDllList = Resources.Load<HotUpdateAssemblyManifest>("HotUpdateAssemblyManifest").AOTMetadataDlls;
-
-        AssetBundle dllAB = LoadDll.AssemblyAssetBundle;
-        foreach (var aotDllName in aotDllList)
+        AssetBundle dllAB = AssetBundle.LoadFromMemory(LoadDll.GetAbBytes("aotdlls"));
+        foreach (var aotDllName in dllAB.GetAllAssetNames())
         {
-            Debug.Log($"{aotDllName}");
             byte[] dllBytes = dllAB.LoadAsset<TextAsset>(aotDllName).bytes;
             fixed (byte* ptr = dllBytes)
             {
