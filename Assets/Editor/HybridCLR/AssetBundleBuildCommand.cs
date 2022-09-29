@@ -18,7 +18,12 @@ namespace HybridCLR.Editor
 
         public static string AssetBundleSourceDataTempDir => $"{HybridCLRBuildCacheDir}/AssetBundleSourceData";
 
-        public static AOTAssemblyManifest HotUpdateManifest => SettingsUtil.GetSingletonAssets<AOTAssemblyManifest>();
+        public static List<string> AOTMetaAssemblyNames { get; } = new List<string>()
+        {
+            "mscorlib",
+            "System",
+            "System.Core",
+        };
 
         public static string GetAssetBundleOutputDirByTarget(BuildTarget target)
         {
@@ -55,13 +60,7 @@ namespace HybridCLR.Editor
                 var aotDllAssets = new List<string>();
                 string aotDllDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
 
-                AOTAssemblyManifest manifest = HotUpdateManifest;
-                if (manifest == null)
-                {
-                    throw new Exception($"resource asset:{nameof(AOTAssemblyManifest)} 配置不存在，请在Resources目录下创建");
-                }
-                List<string> AOTMetaAssemblies = (manifest.AOTMetadataDlls ?? Array.Empty<string>()).ToList();
-                foreach (var dll in AOTMetaAssemblies)
+                foreach (var dll in AOTMetaAssemblyNames)
                 {
                     string dllPath = $"{aotDllDir}/{dll}.dll";
                     if (!File.Exists(dllPath))

@@ -71,37 +71,15 @@ public class LoadDll : MonoBehaviour
 
     void StartGame()
     {
-        LoadGameDll();
-        RunMain();
-    }
-
-    private System.Reflection.Assembly gameAss;
-
-    public static AssetBundle HotUpdateDllsAssetBundle { get; private set; }
-
-    private void LoadGameDll()
-    {
-        AssetBundle hotUpdateDllAb = HotUpdateDllsAssetBundle = AssetBundle.LoadFromMemory(GetAbBytes("hotupdatedlls"));
+        AssetBundle hotUpdateDllAb = AssetBundle.LoadFromMemory(GetAbBytes("hotupdatedlls"));
 #if !UNITY_EDITOR
         TextAsset dllBytes = hotUpdateDllAb.LoadAsset<TextAsset>("Assembly-CSharp.dll.bytes");
-        gameAss = System.Reflection.Assembly.Load(dllBytes.bytes);
+        var gameAss = System.Reflection.Assembly.Load(dllBytes.bytes);
 #else
-        gameAss = AppDomain.CurrentDomain.GetAssemblies().First(assembly => assembly.GetName().Name == "Assembly-CSharp");
+        var gameAss = AppDomain.CurrentDomain.GetAssemblies().First(assembly => assembly.GetName().Name == "Assembly-CSharp");
 #endif
 
         AssetBundle prefabAb = AssetBundle.LoadFromMemory(GetAbBytes("prefabs"));
-        GameObject testPrefab = GameObject.Instantiate(prefabAb.LoadAsset<UnityEngine.GameObject>("HotUpdatePrefab.prefab"));
-    }
-
-    public void RunMain()
-    {
-        if (gameAss == null)
-        {
-            UnityEngine.Debug.LogError("dll未加载");
-            return;
-        }
-        var appType = gameAss.GetType("App");
-        var mainMethod = appType.GetMethod("Main");
-        mainMethod.Invoke(null, null);
+        GameObject testPrefab = Instantiate(prefabAb.LoadAsset<GameObject>("HotUpdatePrefab.prefab"));
     }
 }

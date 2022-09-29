@@ -46,9 +46,12 @@ HybridCLR为c++实现，只有打包后才可使用。日常开发在编辑器�
 
 **再次提醒** 当前Unity版本必须安装了 il2cpp 组件。如果未安装，请自行在UnityHub中安装。新手自行google或百度。
 
-**===> 安装 visual studio**
+**===> 安装相关IDE及SDK**
 
-要求必须安装 `使用c++的游戏开发` 这个组件
+根据平台选择相应IDE：
+
+- Win 安装visual studio，必须包含 `使用c++的游戏开发` 这个组件
+- macOS 安装xcode，要求最低版本为13
 
 **===> 安装git**
 
@@ -127,11 +130,11 @@ HybridCLR全局配置，单例。 trial项目已经创建。新项目请在 Unit
 ### HybridCLR相关Editor菜单介绍
 
 - `Installer...` 打开 安装器
-- `GenerateLinkXml` 自动生成热更新代码所需的link.xml。
-- `GenerateMethodBridge` 生成桥接函数
-- `GenerateAOTGenericReference` 生成热更新模块中用到的AOT泛型实例化
-- `GenerateReversePInvokeWrapper` 生成 MonoPInvokeCallbackAttribute的预留桩函数
-- `GenerateAll` 生成以上所有 GenerateXXX
+- `Generate/LinkXml` 自动生成热更新代码所需的link.xml。
+- `Generate/MethodBridge` 生成桥接函数
+- `Generate/AOTGenericReference` 生成热更新模块中用到的AOT泛型实例化
+- `Generate/ReversePInvokeWrapper` 生成 MonoPInvokeCallbackAttribute的预留桩函数
+- `Generate/All` 生成以上所有 GenerateXXX
 - `CompileDll` 编译热更新dll
 - `BuildBundles` 构建用于热更资源和代码的ab包
 - `Build` 一键打包相关快捷命令
