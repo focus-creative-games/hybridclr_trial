@@ -85,7 +85,7 @@ namespace HybridCLR.Editor
             {
                 var hotUpdateDllAssets = new List<string>();
 
-                string hotfixDllSrcDir = SettingsUtil.GetHotFixDllsOutputDirByTarget(target);
+                string hotfixDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);
                 foreach (var dll in SettingsUtil.HotUpdateAssemblyFiles)
                 {
                     string dllPath = $"{hotfixDllSrcDir}/{dll}";
