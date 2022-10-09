@@ -18,10 +18,11 @@
 
 ## 安装
 
-参考[安装文档](https://focus-creative-games.github.io/hybridclr/install/)进行安装。注意，由于trial项目已经包含了 HybridCLRGlobalSetttings.asset配置并且正确设置，你不用修改这个文件中配置。
+参考[安装文档](https://focus-creative-games.github.io/hybridclr/install/)进行安装。
 
 
 ### HybridCLR相关Editor菜单介绍
+- `HybridCLR/Settings` 打开HybridCLR相关设置
 - `HybridCLR/BuildBundles` 构建用于热更资源和代码的ab包
 - `HybridCLR/Build` 一键打包相关快捷命令
 - 其他菜单介绍请参见 [hybridclr_unity package](https://focus-creative-games.github.io/hybridclr/hybridclr_unity/)
