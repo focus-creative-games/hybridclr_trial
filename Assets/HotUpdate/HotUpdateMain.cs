@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HotifxMain : MonoBehaviour
+public class HotUpdateMain : MonoBehaviour
 {
 
     public string text;
