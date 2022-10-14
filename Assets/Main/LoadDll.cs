@@ -13,9 +13,9 @@ public class LoadDll : MonoBehaviour
 
     public static List<string> AOTMetaAssemblyNames { get; } = new List<string>()
     {
-        "mscorlib",
-        "System",
-        "System.Core",
+        "mscorlib.dll",
+        "System.dll",
+        "System.Core.dll",
     };
 
     void Start()
@@ -45,8 +45,8 @@ public class LoadDll : MonoBehaviour
         var assets = new List<string>
         {
             "prefabs",
-            "HotUpdateAssemblies/Assembly-CSharp.dll",
-        }.Concat(AOTMetaAssemblyNames.Select(n => $"AOTAssemblies/{n}.dll")).ToList();
+            "Assembly-CSharp.dll",
+        }.Concat(AOTMetaAssemblyNames);
 
         foreach (var asset in assets)
         {
@@ -84,7 +84,7 @@ public class LoadDll : MonoBehaviour
         LoadMetadataForAOTAssemblies();
 
 #if !UNITY_EDITOR
-        var gameAss = System.Reflection.Assembly.Load(GetAssetData("HotUpdateAssemblies/Assembly-CSharp.dll"));
+        var gameAss = System.Reflection.Assembly.Load(GetAssetData("Assembly-CSharp.dll"));
 #else
         var gameAss = AppDomain.CurrentDomain.GetAssemblies().First(assembly => assembly.GetName().Name == "Assembly-CSharp");
 #endif
@@ -109,7 +109,7 @@ public class LoadDll : MonoBehaviour
         /// 
         foreach (var aotDllName in AOTMetaAssemblyNames)
         {
-            byte[] dllBytes = GetAssetData($"AOTAssemblies/{aotDllName}.dll");
+            byte[] dllBytes = GetAssetData(aotDllName);
             // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
             LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes);
             Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. ret:{err}");

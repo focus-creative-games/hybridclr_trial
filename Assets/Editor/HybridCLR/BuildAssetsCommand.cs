@@ -98,17 +98,17 @@ namespace HybridCLR.Editor
         {
             var target = EditorUserBuildSettings.activeBuildTarget;
             string aotAssembliesSrcDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
-            string aotAssembliesDstDir = $"{Application.streamingAssetsPath}/AOTAssemblies";
+            string aotAssembliesDstDir = Application.streamingAssetsPath;
 
             foreach (var dll in LoadDll.AOTMetaAssemblyNames)
             {
-                string srcDllPath = $"{aotAssembliesSrcDir}/{dll}.dll";
+                string srcDllPath = $"{aotAssembliesSrcDir}/{dll}";
                 if (!File.Exists(srcDllPath))
                 {
                     Debug.LogError($"ab中添加AOT补充元数据dll:{srcDllPath} 时发生错误,文件不存在。裁剪后的AOT dll在BuildPlayer时才能生成，因此需要你先构建一次游戏App后再打包。");
                     continue;
                 }
-                string dllBytesPath = $"{aotAssembliesDstDir}/{dll}.dll";
+                string dllBytesPath = $"{aotAssembliesDstDir}/{dll}";
                 File.Copy(srcDllPath, dllBytesPath, true);
                 Debug.Log($"[CopyAOTAssembliesToStreamingAssets] copy AOT dll {srcDllPath} -> {dllBytesPath}");
             }
@@ -119,7 +119,7 @@ namespace HybridCLR.Editor
             var target = EditorUserBuildSettings.activeBuildTarget;
 
             string hotfixDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);
-            string hotfixAssembliesDstDir = $"{Application.streamingAssetsPath}/HotUpdateAssemblies";
+            string hotfixAssembliesDstDir = Application.streamingAssetsPath;
             foreach (var dll in SettingsUtil.HotUpdateAssemblyFiles)
             {
                 string dllPath = $"{hotfixDllSrcDir}/{dll}";
@@ -132,7 +132,7 @@ namespace HybridCLR.Editor
         public static void CopyAssetBundlesToStreamingAssets()
         {
             var target = EditorUserBuildSettings.activeBuildTarget;
-            string streamingAssetPathDst = $"{Application.streamingAssetsPath}";
+            string streamingAssetPathDst = Application.streamingAssetsPath;
             Directory.CreateDirectory(streamingAssetPathDst);
             string outputDir = GetAssetBundleOutputDirByTarget(target);
             var abs = new string[] { "prefabs" };
