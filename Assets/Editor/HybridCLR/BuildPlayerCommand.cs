@@ -1,4 +1,5 @@
 using HybridCLR.Editor.Commands;
+using HybridCLR.Editor.Installer;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ namespace HybridCLR.Editor
 {
     public class BuildPlayerCommand
     {
-        public static void CopyAssetBundles(string outputDir)
+        public static void CopyAssets(string outputDir)
         {
             Directory.CreateDirectory(outputDir);
 
@@ -55,11 +56,9 @@ namespace HybridCLR.Editor
                 return;
             }
 
-            Debug.Log("====> Build AssetBundle");
-            AssetBundleBuildCommand.BuildAssetBundleByTarget(target, true);
-            Debug.Log("====> 复制 AssetBundle");
-            CopyAssetBundles($"{outputPath}/HybridCLRTrial_Data/StreamingAssets");
-
+            Debug.Log("====> 复制热更新资源和代码");
+            BuildAssetsCommand.BuildAndCopyABAOTHotUpdateDlls();
+            BashUtil.CopyDir(Application.streamingAssetsPath, $"{outputPath}/HybridCLRTrial_Data/StreamingAssets", true);
 #if UNITY_EDITOR
             Application.OpenURL($"file:///{location}");
 #endif
