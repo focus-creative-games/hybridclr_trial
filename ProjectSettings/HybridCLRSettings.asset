@@ -18,8 +18,10 @@ MonoBehaviour:
   hotUpdateAssemblyDefinitions: []
   hotUpdateAssemblies:
   - Assembly-CSharp
+  preserveHotUpdateAssemblies: []
+  patchAOTAssemblies: []
+  collectAssetReferenceTypes: 0
   outputLinkFile: HybridCLRData/Generated/link.xml
   outputAOTGenericReferenceFile: HybridCLRData/Generated/AOTGenericReferences.cs
   maxGenericReferenceIteration: 4
-  ReversePInvokeWrapperCount: 10
   maxMethodBridgeGenericIteration: 4
