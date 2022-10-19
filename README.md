@@ -18,7 +18,11 @@
 
 ## 安装
 
-参考[安装文档](https://focus-creative-games.github.io/hybridclr/install/)进行安装。
+本项目已经使用openupm安装了 `com.focus-creative-games.hybridclr_unity` 包。
+
+使用前请先升级package到最新版本。
+
+更详细的文档可以参考[安装文档](https://focus-creative-games.github.io/hybridclr/install/)。
 
 
 ### HybridCLR相关Editor菜单介绍
