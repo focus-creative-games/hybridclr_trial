@@ -27,7 +27,6 @@
 
 ### HybridCLR相关Editor菜单介绍
 - `HybridCLR/Settings` 打开HybridCLR相关设置
-- `HybridCLR/BuildBundles` 构建用于热更资源和代码的ab包
 - `HybridCLR/Build` 一键打包相关快捷命令
 - 其他菜单介绍请参见 [hybridclr_unity package](https://focus-creative-games.github.io/hybridclr/hybridclr_unity/)
 
@@ -44,15 +43,15 @@
 如果是其他平台：
 - 运行菜单 `HybridCLR/Generate/All` 一键执行必要的生成操作
 - Build Settings里打包游戏
-- 运行菜单 `HybridCLR/BuildBundles/ActiveBuildTarget` 打包ab文件
-- 将`Assets/StreamingAssets`下的ab包复制到你刚才打包的游戏的StreamingAssets目录
+- 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 打包热更新资源及dll
+- 将`Assets/StreamingAssets`下的所有文件复制到你刚才打包的游戏的StreamingAssets目录
 - 运行刚刚打包成功的游戏
 
 ### 热更新测试
 
 - 修改`Assets/HotFix/HotfixMain.cs`的代码，比如添加打印 "hello,world"。
-- 运行菜单 `HybridCLR/BuildBundles/ActiveBuildTarget` 重新生成ab
-- 将`Assets/StreamingAssets`下的ab包复制到你刚才打包的游戏的StreamingAssets目录
+- 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 重新打包热更新资源及dll
+- 将`Assets/StreamingAssets`下的所有文件复制到你刚才打包的游戏的StreamingAssets目录
 - 再将运行，屏幕上会打印"hello,world"。
 
 
