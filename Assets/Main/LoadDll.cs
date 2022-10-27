@@ -37,6 +37,10 @@ public class LoadDll : MonoBehaviour
         {
             path = "file://" + path;
         }
+        if (path.EndsWith(".dll"))
+        {
+            path += ".bytes";
+        }
         return path;
     }
 
