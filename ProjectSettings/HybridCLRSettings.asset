@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enable: 1
   useGlobalIl2cpp: 0
-  cloneFromGitee: 1
+  cloneHomeURL: https://gitee.com/focus-creative-games
   hotUpdateAssemblyDefinitions: []
   hotUpdateAssemblies:
   - Assembly-CSharp

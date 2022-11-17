@@ -18,14 +18,13 @@
 
 ## 安装
 
-本项目已经使用openupm安装了 `com.focus-creative-games.hybridclr_unity` 包。
-
-使用前请先升级package到最新版本。
+本项目已经安装了 `com.focus-creative-games.hybridclr_unity` 包。
 
 更详细的文档可以参考[安装文档](https://focus-creative-games.github.io/hybridclr/install/)。
 
 
 ### HybridCLR相关Editor菜单介绍
+
 - `HybridCLR/Settings` 打开HybridCLR相关设置
 - `HybridCLR/Build` 一键打包相关快捷命令
 - 其他菜单介绍请参见 [hybridclr_unity package](https://focus-creative-games.github.io/hybridclr/hybridclr_unity/)
@@ -44,7 +43,7 @@
 - 运行菜单 `HybridCLR/Generate/All` 一键执行必要的生成操作
 - Build Settings里打包游戏
 - 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 打包热更新资源及dll
-- 将`Assets/StreamingAssets`下的所有文件复制到你刚才打包的游戏的StreamingAssets目录
+- 将`Assets/StreamingAssets`下的所有文件复制到你刚才打包的游戏的StreamingAssets目录(如果是直接打android apk包，则再次Build即可)
 - 运行刚刚打包成功的游戏
 
 ### 热更新测试
