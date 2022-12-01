@@ -50,7 +50,7 @@
 
 ### 热更新测试
 
-- 修改`Assets/HotFix/HotfixMain.cs`的代码，比如添加打印 "hello,world"。
+- 修改`Assets/HotUpdate/HotUpdateMain.cs`的代码，比如添加打印 "hello,world"。
 - 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 重新打包热更新资源及dll
 - 将`Assets/StreamingAssets`下的所有文件复制到你刚才打包的游戏的StreamingAssets目录
 - 再将运行，屏幕上会打印"hello,world"。
