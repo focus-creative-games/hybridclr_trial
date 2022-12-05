@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "com.focus-creative-games.hybridclr_unity": {
-      "version": "https://gitee.com/focus-creative-games/hybridclr_unity.git#1.0",
+      "version": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "f36da3529aca92b0faa343d1000d1b91fab7936d"
+      "hash": "abc70a7ffc52c795dc3f8fe32c7151d05c2c49c2"
     },
     "com.sharelib.logviewer": {
       "version": "file:Unity-Logs-Viewer",
