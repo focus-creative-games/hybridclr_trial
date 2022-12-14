@@ -5,7 +5,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "419c3a98f644417505aba867e5e95190a4eb9942"
+      "hash": "947b15e7d9cd6906f3b29aeb314229b534efe385"
     },
     "com.sharelib.logviewer": {
       "version": "file:Unity-Logs-Viewer",

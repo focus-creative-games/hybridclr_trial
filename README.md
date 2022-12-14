@@ -32,6 +32,12 @@
 
 ## 体验热更新
 
+### 预备工作
+
+- 运行菜单 `HybridCLR/Installer...` 中安装hybridclr+il2cpp_plus代码到本地
+- 运行菜单 `HybridCLR/Generate/LinkXml`
+- 在 PlayerSetting 中 Build一次项目以生成AOT dll，因为桥接函数依赖这些文件
+
 ### 打包
 
 如果是Win平台，已经提供提供了快捷的菜单命令：
