@@ -72,19 +72,17 @@ namespace HybridCLR.Editor
         [MenuItem("HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets")]
         public static void BuildAndCopyABAOTHotUpdateDlls()
         {
-            BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget);
-            CopyAssetBundlesToStreamingAssets();
-            CompileDllCommand.CompileDllActiveBuildTarget();
-            CopyAOTAssembliesToStreamingAssets();
-            CopyHotUpdateAssembliesToStreamingAssets();
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            BuildAssetBundleByTarget(target);
+            CompileDllCommand.CompileDll(target);
+            CopyABAOTHotUpdateDlls(target);
         }
 
-        //[MenuItem("HybridCLR/Build/Copy_AB_AOT_HotUpdateDlls")]
-        public static void Copy_AB_AOT_HotUpdateDlls()
+        public static void CopyABAOTHotUpdateDlls(BuildTarget target)
         {
+            CopyAssetBundlesToStreamingAssets(target);
             CopyAOTAssembliesToStreamingAssets();
             CopyHotUpdateAssembliesToStreamingAssets();
-            CopyAssetBundlesToStreamingAssets();
         }
 
 
@@ -129,9 +127,8 @@ namespace HybridCLR.Editor
             }
         }
 
-        public static void CopyAssetBundlesToStreamingAssets()
+        public static void CopyAssetBundlesToStreamingAssets(BuildTarget target)
         {
-            var target = EditorUserBuildSettings.activeBuildTarget;
             string streamingAssetPathDst = Application.streamingAssetsPath;
             Directory.CreateDirectory(streamingAssetPathDst);
             string outputDir = GetAssetBundleOutputDirByTarget(target);

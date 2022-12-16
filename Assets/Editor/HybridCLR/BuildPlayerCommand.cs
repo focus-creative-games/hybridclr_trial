@@ -38,6 +38,7 @@ namespace HybridCLR.Editor
 
             string location = $"{outputPath}/HybridCLRTrial.exe";
 
+            BuildAssetsCommand.BuildAssetBundleByTarget(target);
             PrebuildCommand.GenerateAll();
             Debug.Log("====> Build App");
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
