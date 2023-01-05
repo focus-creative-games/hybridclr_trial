@@ -16,13 +16,6 @@
   - Main AOT主包模块，对应常规项目的主项目，资源更新模块
   - 剩下代码在默认的全局Assembly-Csharp.dll中，均为热更新脚本
 
-## 安装
-
-本项目已经安装了 `com.focus-creative-games.hybridclr_unity` 包。
-
-更详细的文档可以参考[安装文档](https://focus-creative-games.github.io/hybridclr/install/)。
-
-
 ### HybridCLR相关Editor菜单介绍
 
 - `HybridCLR/Settings` 打开HybridCLR相关设置
@@ -34,9 +27,8 @@
 
 ### 预备工作
 
+- 参照 [安装HybridCLR](https://focus-creative-games.github.io/hybridclr/install/) 完成必要的安装操作
 - 运行菜单 `HybridCLR/Installer...` 中安装hybridclr+il2cpp_plus代码到本地
-- 运行菜单 `HybridCLR/Generate/LinkXml`
-- 在 PlayerSetting 中 Build一次项目以生成AOT dll，因为桥接函数依赖这些文件
 
 ### 打包
 
@@ -49,9 +41,8 @@
 
 如果是其他平台：
 - 运行菜单 `HybridCLR/Generate/All` 一键执行必要的生成操作
-- Build Settings里打包游戏
 - 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 打包热更新资源及dll
-- 将`Assets/StreamingAssets`下的所有文件复制到你刚才打包的游戏的StreamingAssets目录(如果是直接打android apk包，则再次Build即可)
+- Build Settings里打包游戏
 - 运行刚刚打包成功的游戏
 
 ### 热更新测试
