@@ -28,7 +28,6 @@
 ### 预备工作
 
 - 参照 [安装HybridCLR](https://focus-creative-games.github.io/hybridclr/install/) 完成必要的安装操作
-- 运行菜单 `HybridCLR/Installer...` 中安装hybridclr+il2cpp_plus代码到本地
 
 ### 打包
 
