@@ -23,10 +23,10 @@ MonoBehaviour:
   hotUpdateDllCompileOutputRootDir: HybridCLRData/HotUpdateDlls
   externalHotUpdateAssembliyDirs: []
   strippedAOTDllOutputRootDir: HybridCLRData/AssembliesPostIl2CppStrip
-  patchAOTAssemblies: []
-  differentialHybridAssemblies: []
-  differentialHybridOptionOutputDir: Assets/StreamingAssets
-  collectAssetReferenceTypes: 0
+  patchAOTAssemblies:
+  - mscorlib
+  - System
+  - System.Core
   outputLinkFile: HybridCLRData/Generated/link.xml
   outputAOTGenericReferenceFile: HybridCLRData/Generated/AOTGenericReferences.cs
   maxGenericReferenceIteration: 4
