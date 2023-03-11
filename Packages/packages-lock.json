@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "com.focus-creative-games.hybridclr_unity": {
-      "version": "https://gitee.com/focus-creative-games/hybridclr_unity.git#v2.0.5",
+      "version": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "a9ca9fc6131b81cd3d4c48adcd871434475539c1"
+      "hash": "bbb43c3185e4596a6b56160ecd4442c4d3630a46"
     },
     "com.gwiazdorrr.betterstreamingassets": {
       "version": "file:com.gwiazdorrr.betterstreamingassets",
@@ -27,7 +27,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.13",
+      "version": "3.0.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -36,7 +36,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.14",
+      "version": "2.0.17",
       "depth": 0,
       "source": "registry",
       "dependencies": {
