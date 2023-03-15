@@ -37,6 +37,7 @@
 注意，如果你使用最新版本的vs，有可能遇到 遇到 `xxxx\il2cpp\libil2cpp\utils\Il2CppHashMap.h(71): error C2039: 'hash_compare': is not a member of 'stdext'` 编译错误。这是.net 7发布后最新版本vs改动打破了一些向后兼容性引起。详细解决办法请查看[常见错误](https://focus-creative-games.github.io/hybridclr/common_errors/)。
 
 如果是其他平台：
+- 如果是WebGL平台，由于示例中使用的BetterStreamingAssets不支持WebGL，所以请将LoadDll中加载资源代码换成WebRequest。其他平台无需修改。
 - 运行菜单 `HybridCLR/Generate/All` 一键执行必要的生成操作
 - 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 打包热更新资源及dll
 - Build Settings里打包游戏
