@@ -21,8 +21,25 @@ namespace HybridCLR.Editor
             }
         }
 
+        public static void InstallFromRepo()
+        {
+            var ic = new InstallerController();
+            ic.InstallDefaultHybridCLR();
+        }
+
+        public static void InstallBuildWin64()
+        {
+            InstallFromRepo();
+            Build_Win64(true);
+        }
+
         [MenuItem("HybridCLR/Build/Win64")]
         public static void Build_Win64()
+        {
+            Build_Win64(false);
+        }
+
+        public static void Build_Win64(bool existWhenCompleted)
         {
             BuildTarget target = BuildTarget.StandaloneWindows64;
             BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
@@ -53,15 +70,16 @@ namespace HybridCLR.Editor
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
                 Debug.LogError("打包失败");
+                if (existWhenCompleted)
+                {
+                    EditorApplication.Exit(1);
+                }
                 return;
             }
 
             Debug.Log("====> 复制热更新资源和代码");
             BuildAssetsCommand.BuildAndCopyABAOTHotUpdateDlls();
             BashUtil.CopyDir(Application.streamingAssetsPath, $"{outputPath}/HybridCLRTrial_Data/StreamingAssets", true);
-#if UNITY_EDITOR
-            Application.OpenURL($"file:///{location}");
-#endif
         }
     }
 }
