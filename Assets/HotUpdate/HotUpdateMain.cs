@@ -19,12 +19,16 @@ public class HotUpdateMain : MonoBehaviour
 
         Debug.Log($"[{GetType().FullName}] =======看到此条日志代表你成功运行了示例项目的热更新代码=======");
 #if UNITY_STANDALONE_WIN
-        File.WriteAllText(Directory.GetCurrentDirectory() + "/run.log", "ok", System.Text.Encoding.UTF8);
-#endif
-        Task.Run(async () =>
+        File.WriteAllText("run.log", "ok", System.Text.Encoding.UTF8);
+        if (File.Exists("autoexit"))
         {
-            await Task.Delay(5000);
-            Application.Quit(0);
-        });
+            Debug.Log("==== 本程序将于5秒后自动退出 ====");
+            Task.Run(async () =>
+            {
+                await Task.Delay(5000);
+                Application.Quit(0);
+            });
+        }
+#endif
     }
 }
