@@ -20,12 +20,24 @@
 - 其他菜单介绍请参见 [hybridclr_unity package](https://focus-creative-games.github.io/hybridclr/hybridclr_unity/)
 
 
+
+
+
 ## 体验热更新
 
 ### 预备工作
 
 - 安装适当的Unity版本，2019.4.x、2020.3.x、2021.3.x系列都可以，新手**强烈推荐**使用`2020.3.26+`或`2021.3.0+` 版本
 - 参照 [安装HybridCLR](https://focus-creative-games.github.io/hybridclr/install/) 完成必要的安装操作
+
+### Editor中预览(可选)
+
+**如果你不用在Editor预览，可以跳过本节内容，直接执行`打包`小节中操作。**
+
+ 在Editor中运行前必须执行以下操作，否则会出错。
+
+- 运行菜单 `HybridCLR/Generate/All` 一键执行必要的生成操作
+- 运行菜单 `HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets` 复制热更新资源及dll到StreamingAssets目录
 
 ### 打包
 

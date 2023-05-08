@@ -3,32 +3,20 @@
   <assembly fullname="mscorlib">
     <type fullname="System.Diagnostics.DebuggableAttribute" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute/DebuggingModes" preserve="all" />
-    <type fullname="System.Diagnostics.DebuggerHiddenAttribute" preserve="all" />
-    <type fullname="System.Exception" preserve="all" />
-    <type fullname="System.Func`1" preserve="all" />
-    <type fullname="System.IO.File" preserve="all" />
     <type fullname="System.Object" preserve="all" />
-    <type fullname="System.Runtime.CompilerServices.AsyncStateMachineAttribute" preserve="all" />
-    <type fullname="System.Runtime.CompilerServices.AsyncTaskMethodBuilder" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.CompilationRelaxationsAttribute" preserve="all" />
-    <type fullname="System.Runtime.CompilerServices.CompilerGeneratedAttribute" preserve="all" />
-    <type fullname="System.Runtime.CompilerServices.IAsyncStateMachine" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.RuntimeCompatibilityAttribute" preserve="all" />
-    <type fullname="System.Runtime.CompilerServices.TaskAwaiter" preserve="all" />
-    <type fullname="System.Security.Permissions.SecurityAction" preserve="all" />
-    <type fullname="System.Security.Permissions.SecurityPermissionAttribute" preserve="all" />
-    <type fullname="System.Security.UnverifiableCodeAttribute" preserve="all" />
-    <type fullname="System.String" preserve="all" />
-    <type fullname="System.Text.Encoding" preserve="all" />
-    <type fullname="System.Threading.Tasks.Task" preserve="all" />
-    <type fullname="System.Type" preserve="all" />
-    <type fullname="System.ValueType" preserve="all" />
   </assembly>
   <assembly fullname="UnityEngine.CoreModule">
-    <type fullname="UnityEngine.Application" preserve="all" />
+    <type fullname="UnityEngine.Color" preserve="all" />
     <type fullname="UnityEngine.Component" preserve="all" />
     <type fullname="UnityEngine.Debug" preserve="all" />
     <type fullname="UnityEngine.GameObject" preserve="all" />
+    <type fullname="UnityEngine.Material" preserve="all" />
+    <type fullname="UnityEngine.MeshRenderer" preserve="all" />
     <type fullname="UnityEngine.MonoBehaviour" preserve="all" />
+    <type fullname="UnityEngine.Renderer" preserve="all" />
+    <type fullname="UnityEngine.Transform" preserve="all" />
+    <type fullname="UnityEngine.Vector3" preserve="all" />
   </assembly>
 </linker>

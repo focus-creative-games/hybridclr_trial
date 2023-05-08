@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -13,25 +15,40 @@ public class LoadDll : MonoBehaviour
 
     void Start()
     {
-        // 使用BetterStreamingAssets插件，即使在Android平台也可以直接读取StreamingAssets下内容，简化演示。
-        BetterStreamingAssets.Initialize();
         StartGame();
     }
 
+    public static byte[] ReadBytesFromStreamingAssets(string file)
+    {
+        // Android平台不支持直接读取StreamingAssets下文件，请自行修改实现
+        return File.ReadAllBytes($"{Application.streamingAssetsPath}/{file}");
+    }
+
+    Assembly _ass;
 
     void StartGame()
     {
         LoadMetadataForAOTAssemblies();
-
 #if !UNITY_EDITOR
-        System.Reflection.Assembly.Load(BetterStreamingAssets.ReadAllBytes("Assembly-CSharp.dll.bytes"));
+        Assembly.Load(ReadBytesFromStreamingAssets("HotUpdate.dll.bytes"));
 #endif
+        var demos = new Demos();
+        demos.Run();
 
-        AssetBundle prefabAb = AssetBundle.LoadFromMemory(BetterStreamingAssets.ReadAllBytes("prefabs"));
-        GameObject testPrefab = Instantiate(prefabAb.LoadAsset<GameObject>("HotUpdatePrefab.prefab"));
+#if UNITY_STANDALONE_WIN
+        // 以下代码只为了方便自动化测试，与演示无关
+        File.WriteAllText("run.log", "ok", System.Text.Encoding.UTF8);
+        if (File.Exists("autoexit"))
+        {
+            Debug.Log("==== 本程序将于3秒后自动退出 ====");
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                Application.Quit(0);
+            });
+        }
+#endif
     }
-
-
 
     /// <summary>
     /// 为aot assembly加载原始metadata， 这个代码放aot或者热更新都行。
@@ -51,7 +68,7 @@ public class LoadDll : MonoBehaviour
         HomologousImageMode mode = HomologousImageMode.SuperSet;
         foreach (var aotDllName in aotMetaAssemblyFiles)
         {
-            byte[] dllBytes = BetterStreamingAssets.ReadAllBytes(aotDllName + ".bytes");
+            byte[] dllBytes = ReadBytesFromStreamingAssets(aotDllName + ".bytes");
             // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
             LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, mode);
             Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");

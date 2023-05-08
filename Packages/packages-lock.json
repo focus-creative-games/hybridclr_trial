@@ -7,18 +7,6 @@
       "dependencies": {},
       "hash": "3702411ac82129c1683c788d5f695628ad9c1966"
     },
-    "com.gwiazdorrr.betterstreamingassets": {
-      "version": "file:com.gwiazdorrr.betterstreamingassets",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "com.sharelib.logviewer": {
-      "version": "file:Unity-Logs-Viewer",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
       "depth": 1,
