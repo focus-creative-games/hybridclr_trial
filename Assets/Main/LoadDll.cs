@@ -24,18 +24,23 @@ public class LoadDll : MonoBehaviour
         return File.ReadAllBytes($"{Application.streamingAssetsPath}/{file}");
     }
 
-    Assembly _ass;
+    private static Assembly _hotUpdateAss;
 
     void StartGame()
     {
         LoadMetadataForAOTAssemblies();
 #if !UNITY_EDITOR
-        Assembly.Load(ReadBytesFromStreamingAssets("HotUpdate.dll.bytes"));
+        _hotUpdateAss = Assembly.Load(ReadBytesFromStreamingAssets("HotUpdate.dll.bytes"));
+#else
+        _hotUpdateAss = System.AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == "HotUpdate");
 #endif
-        var demos = new Demos();
-        demos.Run();
+        Type entryType = _hotUpdateAss.GetType("Entry");
+        entryType.GetMethod("Start").Invoke(null, null);
 
-#if UNITY_STANDALONE_WIN
+        Run_ReflectionInvoke();
+        Run_CreateComponentByInstantiatePrefab();
+
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         // 以下代码只为了方便自动化测试，与演示无关
         File.WriteAllText("run.log", "ok", System.Text.Encoding.UTF8);
         if (File.Exists("autoexit"))
@@ -48,6 +53,21 @@ public class LoadDll : MonoBehaviour
             });
         }
 #endif
+    }
+
+    private static void Run_ReflectionInvoke()
+    {
+        // 反射调用热更新代码
+        Type type = _hotUpdateAss.GetType("ReflectionInvoke");
+        type.GetMethod("Run").Invoke(null, null);
+    }
+
+    private static void Run_CreateComponentByInstantiatePrefab()
+    {
+        // 通过实例化assetbundle中的资源，还原资源上的热更新脚本
+        AssetBundle ab = AssetBundle.LoadFromMemory(LoadDll.ReadBytesFromStreamingAssets("prefabs"));
+        GameObject cube = ab.LoadAsset<GameObject>("Cube");
+        GameObject.Instantiate(cube);
     }
 
     /// <summary>

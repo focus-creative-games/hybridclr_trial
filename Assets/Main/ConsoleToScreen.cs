@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConsoleToSceen : MonoBehaviour
+public class ConsoleToScreen : MonoBehaviour
 {
     const int maxLines = 50;
     const int maxLineLength = 120;
