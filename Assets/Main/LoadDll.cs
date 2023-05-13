@@ -37,8 +37,7 @@ public class LoadDll : MonoBehaviour
         Type entryType = _hotUpdateAss.GetType("Entry");
         entryType.GetMethod("Start").Invoke(null, null);
 
-        Run_ReflectionInvoke();
-        Run_CreateComponentByInstantiatePrefab();
+        Run_InstantiateComponentByAsset();
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         // 以下代码只为了方便自动化测试，与演示无关
@@ -55,14 +54,7 @@ public class LoadDll : MonoBehaviour
 #endif
     }
 
-    private static void Run_ReflectionInvoke()
-    {
-        // 反射调用热更新代码
-        Type type = _hotUpdateAss.GetType("ReflectionInvoke");
-        type.GetMethod("Run").Invoke(null, null);
-    }
-
-    private static void Run_CreateComponentByInstantiatePrefab()
+    private static void Run_InstantiateComponentByAsset()
     {
         // 通过实例化assetbundle中的资源，还原资源上的热更新脚本
         AssetBundle ab = AssetBundle.LoadFromMemory(LoadDll.ReadBytesFromStreamingAssets("prefabs"));

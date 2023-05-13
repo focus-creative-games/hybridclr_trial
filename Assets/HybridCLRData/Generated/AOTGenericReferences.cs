@@ -16,6 +16,5 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 	public void RefMethods()
 	{
 		// object UnityEngine.GameObject.AddComponent<object>()
-		// object UnityEngine.GameObject.GetComponent<object>()
 	}
 }

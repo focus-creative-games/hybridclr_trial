@@ -10,15 +10,16 @@ public static class Entry
 {
     public static void Start()
     {
-        Run_CreateComponentByCode();
+        Debug.Log("[Entry::Start] 看到这个日志表示你成功运行了热更新代码");
+        Run_InstantiateByAddComponent();
         Run_AOTGeneric();
     }
 
-    private static void Run_CreateComponentByCode()
+    private static void Run_InstantiateByAddComponent()
     {
         // 代码中动态挂载脚本
-        GameObject cube = GameObject.Find("Cube");
-        cube.AddComponent<Rotate>();
+        GameObject cube = new GameObject("");
+        cube.AddComponent<InstantiateByAddComponent>();
     }
 
 
