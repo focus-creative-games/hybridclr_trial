@@ -12,8 +12,8 @@
 
 ## 文档
 
-- [文档](https://hybridclr.doc.code-philosophy.com/#/)
-- [快速上手](https://hybridclr.doc.code-philosophy.com/#/beginner/quickstart)
+- [文档](https://hybridclr.doc.code-philosophy.com/)
+- [快速上手](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)
 
 ## 目录介绍
 
@@ -32,8 +32,8 @@
 
 ### 预备工作
 
-- 安装适当的Unity版本，2019.4.x、2020.3.x、2021.3.x系列都可以，新手**强烈推荐**使用`2020.3.26+`或`2021.3.0+` 版本
-- 打开`HybridCLR/Installer...`菜单，点击安装按钮完成安装。如有疑问，可参考 [快速上手](https://hybridclr.doc.code-philosophy.com/#/beginner/quickstart)
+- 安装适当的Unity版本，2019.4.x、2020.3.x、2021.3.x、2022.3.x系列都可以
+- 打开`HybridCLR/Installer...`菜单，点击安装按钮完成安装。如有疑问，可参考 [快速上手](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)
 
 ### Editor中预览(可选)
 
