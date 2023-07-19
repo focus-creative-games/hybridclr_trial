@@ -12,19 +12,96 @@ using UnityEngine.Networking;
 public class LoadDll : MonoBehaviour
 {
 
-
     void Start()
     {
-        StartGame();
+        StartCoroutine(DownLoadAssets(this.StartGame));
     }
 
-    public static byte[] ReadBytesFromStreamingAssets(string file)
+    #region download assets
+
+    private static Dictionary<string, byte[]> s_assetDatas = new Dictionary<string, byte[]>();
+
+    public static byte[] ReadBytesFromStreamingAssets(string dllName)
     {
-        // Android平台不支持直接读取StreamingAssets下文件，请自行修改实现
-        return File.ReadAllBytes($"{Application.streamingAssetsPath}/{file}");
+        return s_assetDatas[dllName];
     }
+
+    private string GetWebRequestPath(string asset)
+    {
+        var path = $"{Application.streamingAssetsPath}/{asset}";
+        if (!path.Contains("://"))
+        {
+            path = "file://" + path;
+        }
+        return path;
+    }
+    private static List<string> AOTMetaAssemblyFiles { get; } = new List<string>()
+    {
+        "mscorlib.dll.bytes",
+        "System.dll.bytes",
+        "System.Core.dll.bytes",
+    };
+
+    IEnumerator DownLoadAssets(Action onDownloadComplete)
+    {
+        var assets = new List<string>
+        {
+            "prefabs",
+            "HotUpdate.dll.bytes",
+        }.Concat(AOTMetaAssemblyFiles);
+
+        foreach (var asset in assets)
+        {
+            string dllPath = GetWebRequestPath(asset);
+            Debug.Log($"start download asset:{dllPath}");
+            UnityWebRequest www = UnityWebRequest.Get(dllPath);
+            yield return www.SendWebRequest();
+
+#if UNITY_2020_1_OR_NEWER
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+#else
+            if (www.isHttpError || www.isNetworkError)
+            {
+                Debug.Log(www.error);
+            }
+#endif
+            else
+            {
+                // Or retrieve results as binary data
+                byte[] assetData = www.downloadHandler.data;
+                Debug.Log($"dll:{asset}  size:{assetData.Length}");
+                s_assetDatas[asset] = assetData;
+            }
+        }
+
+        onDownloadComplete();
+    }
+
+    #endregion
 
     private static Assembly _hotUpdateAss;
+
+    /// <summary>
+    /// 为aot assembly加载原始metadata， 这个代码放aot或者热更新都行。
+    /// 一旦加载后，如果AOT泛型函数对应native实现不存在，则自动替换为解释模式执行
+    /// </summary>
+    private static void LoadMetadataForAOTAssemblies()
+    {
+        /// 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
+        /// 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
+        /// 
+        HomologousImageMode mode = HomologousImageMode.SuperSet;
+        foreach (var aotDllName in AOTMetaAssemblyFiles)
+        {
+            byte[] dllBytes = ReadBytesFromStreamingAssets(aotDllName);
+            // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
+            LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, mode);
+            Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");
+        }
+    }
 
     void StartGame()
     {
@@ -38,20 +115,6 @@ public class LoadDll : MonoBehaviour
         entryType.GetMethod("Start").Invoke(null, null);
 
         Run_InstantiateComponentByAsset();
-
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        // 以下代码只为了方便自动化测试，与演示无关
-        File.WriteAllText("run.log", "ok", System.Text.Encoding.UTF8);
-        if (File.Exists("autoexit"))
-        {
-            Debug.Log("==== 本程序将于3秒后自动退出 ====");
-            Task.Run(async () =>
-            {
-                await Task.Delay(3000);
-                Application.Quit(0);
-            });
-        }
-#endif
     }
 
     private static void Run_InstantiateComponentByAsset()
@@ -60,30 +123,5 @@ public class LoadDll : MonoBehaviour
         AssetBundle ab = AssetBundle.LoadFromMemory(LoadDll.ReadBytesFromStreamingAssets("prefabs"));
         GameObject cube = ab.LoadAsset<GameObject>("Cube");
         GameObject.Instantiate(cube);
-    }
-
-    /// <summary>
-    /// 为aot assembly加载原始metadata， 这个代码放aot或者热更新都行。
-    /// 一旦加载后，如果AOT泛型函数对应native实现不存在，则自动替换为解释模式执行
-    /// </summary>
-    private static void LoadMetadataForAOTAssemblies()
-    {
-        List<string> aotMetaAssemblyFiles = new List<string>()
-        {
-            "mscorlib.dll",
-            "System.dll",
-            "System.Core.dll",
-        };
-        /// 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
-        /// 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
-        /// 
-        HomologousImageMode mode = HomologousImageMode.SuperSet;
-        foreach (var aotDllName in aotMetaAssemblyFiles)
-        {
-            byte[] dllBytes = ReadBytesFromStreamingAssets(aotDllName + ".bytes");
-            // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
-            LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, mode);
-            Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");
-        }
     }
 }

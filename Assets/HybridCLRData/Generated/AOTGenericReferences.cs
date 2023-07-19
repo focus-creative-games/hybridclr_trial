@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 public class AOTGenericReferences : UnityEngine.MonoBehaviour
 {
 
 	// {{ AOT assemblies
-	// UnityEngine.CoreModule.dll
-	// mscorlib.dll
+	public static readonly IReadOnlyList<string> PatchedAOTAssemblyList = new List<string>
+	{
+		"UnityEngine.CoreModule.dll",
+		"mscorlib.dll",
+	};
 	// }}
 
 	// {{ constraint implement type
