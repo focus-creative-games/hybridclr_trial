@@ -76,6 +76,7 @@ namespace HybridCLR.Editor
             BuildAssetBundleByTarget(target);
             CompileDllCommand.CompileDll(target);
             CopyABAOTHotUpdateDlls(target);
+            AssetDatabase.Refresh();
         }
 
         public static void CopyABAOTHotUpdateDlls(BuildTarget target)
