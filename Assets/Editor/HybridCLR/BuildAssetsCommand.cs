@@ -69,7 +69,7 @@ namespace HybridCLR.Editor
             BuildAssetBundles(GetAssetBundleTempDirByTarget(target), GetAssetBundleOutputDirByTarget(target), target);
         }
 
-        [MenuItem("HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets")]
+        [MenuItem("Build/BuildAssetsAndCopyToStreamingAssets")]
         public static void BuildAndCopyABAOTHotUpdateDlls()
         {
             BuildTarget target = EditorUserBuildSettings.activeBuildTarget;

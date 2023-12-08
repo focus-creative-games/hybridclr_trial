@@ -33,7 +33,7 @@ namespace HybridCLR.Editor
             Build_Win64(true);
         }
 
-        [MenuItem("HybridCLR/Build/Win64")]
+        [MenuItem("Build/Win64")]
         public static void Build_Win64()
         {
             Build_Win64(false);
