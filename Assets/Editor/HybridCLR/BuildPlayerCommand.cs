@@ -39,7 +39,7 @@ namespace HybridCLR.Editor
             Build_Win64(false);
         }
 
-        public static void Build_Win64(bool existWhenCompleted)
+        public static void Build_Win64(bool exitWhenCompleted)
         {
             BuildTarget target = BuildTarget.StandaloneWindows64;
             BuildTarget activeTarget = EditorUserBuildSettings.activeBuildTarget;
@@ -70,7 +70,7 @@ namespace HybridCLR.Editor
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
                 Debug.LogError("打包失败");
-                if (existWhenCompleted)
+                if (exitWhenCompleted)
                 {
                     EditorApplication.Exit(1);
                 }
