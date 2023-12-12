@@ -55,6 +55,9 @@ namespace HybridCLR.Editor
 
             string location = $"{outputPath}/HybridCLRTrial.exe";
 
+            string oldBuildLocation = EditorUserBuildSettings.GetBuildLocation(target);
+            EditorUserBuildSettings.SetBuildLocation(target, location);
+
             PrebuildCommand.GenerateAll();
             Debug.Log("====> Build App");
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
@@ -67,6 +70,9 @@ namespace HybridCLR.Editor
             };
 
             var report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+
+            EditorUserBuildSettings.SetBuildLocation(target, oldBuildLocation);
+
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
                 Debug.LogError("打包失败");
