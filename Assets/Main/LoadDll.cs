@@ -11,78 +11,32 @@ using UnityEngine.Networking;
 
 public class LoadDll : MonoBehaviour
 {
+    public static LoadDll Instance { get; private set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
 
     void Start()
     {
-        StartCoroutine(DownLoadAssets(this.StartGame));
+        this.StartGame();
     }
-
-    #region download assets
-
-    private static Dictionary<string, byte[]> s_assetDatas = new Dictionary<string, byte[]>();
 
     public static byte[] ReadBytesFromStreamingAssets(string dllName)
     {
-        return s_assetDatas[dllName];
+        return File.ReadAllBytes($"{Application.streamingAssetsPath}/{dllName}");
     }
 
-    private string GetWebRequestPath(string asset)
-    {
-        var path = $"{Application.streamingAssetsPath}/{asset}";
-        if (!path.Contains("://"))
-        {
-            path = "file://" + path;
-        }
-        return path;
-    }
+    private static Assembly _hotUpdateAss;
+
     private static List<string> AOTMetaAssemblyFiles { get; } = new List<string>()
     {
         "mscorlib.dll.bytes",
         "System.dll.bytes",
         "System.Core.dll.bytes",
     };
-
-    IEnumerator DownLoadAssets(Action onDownloadComplete)
-    {
-        var assets = new List<string>
-        {
-            "prefabs",
-            "HotUpdate.dll.bytes",
-        }.Concat(AOTMetaAssemblyFiles);
-
-        foreach (var asset in assets)
-        {
-            string dllPath = GetWebRequestPath(asset);
-            Debug.Log($"start download asset:{dllPath}");
-            UnityWebRequest www = UnityWebRequest.Get(dllPath);
-            yield return www.SendWebRequest();
-
-#if UNITY_2020_1_OR_NEWER
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-            }
-#else
-            if (www.isHttpError || www.isNetworkError)
-            {
-                Debug.Log(www.error);
-            }
-#endif
-            else
-            {
-                // Or retrieve results as binary data
-                byte[] assetData = www.downloadHandler.data;
-                Debug.Log($"dll:{asset}  size:{assetData.Length}");
-                s_assetDatas[asset] = assetData;
-            }
-        }
-
-        onDownloadComplete();
-    }
-
-    #endregion
-
-    private static Assembly _hotUpdateAss;
 
     /// <summary>
     /// 为aot assembly加载原始metadata， 这个代码放aot或者热更新都行。
@@ -105,7 +59,10 @@ public class LoadDll : MonoBehaviour
 
     void StartGame()
     {
-        LoadMetadataForAOTAssemblies();
+        if (!RuntimeApi.IsFullGenericSharingEnabled())
+        {
+            LoadMetadataForAOTAssemblies();
+        }
 #if !UNITY_EDITOR
         _hotUpdateAss = Assembly.Load(ReadBytesFromStreamingAssets("HotUpdate.dll.bytes"));
 #else
@@ -113,15 +70,5 @@ public class LoadDll : MonoBehaviour
 #endif
         Type entryType = _hotUpdateAss.GetType("Entry");
         entryType.GetMethod("Start").Invoke(null, null);
-
-        Run_InstantiateComponentByAsset();
-    }
-
-    private static void Run_InstantiateComponentByAsset()
-    {
-        // 通过实例化assetbundle中的资源，还原资源上的热更新脚本
-        AssetBundle ab = AssetBundle.LoadFromMemory(LoadDll.ReadBytesFromStreamingAssets("prefabs"));
-        GameObject cube = ab.LoadAsset<GameObject>("Cube");
-        GameObject.Instantiate(cube);
     }
 }

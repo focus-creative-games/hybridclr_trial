@@ -1,0 +1,24 @@
+{
+    "versions": [
+    {
+        "unity_version":"2019",
+        "hybridclr" : { "branch":"4.4.7"},
+        "il2cpp_plus": { "branch":"2019-hotreload-4.4.7"}
+    },
+    {
+        "unity_version":"2020",
+        "hybridclr" : { "branch":"4.4.7"},
+        "il2cpp_plus": { "branch":"2020-hotreload-4.4.7"}
+    },
+    {
+        "unity_version":"2021",
+        "hybridclr" : { "branch":"4.4.7"},
+        "il2cpp_plus": { "branch":"2021-hotreload-4.4.7"}
+    },
+    {
+        "unity_version":"2022",
+        "hybridclr" : { "branch":"4.4.7"},
+        "il2cpp_plus": { "branch":"2022-hotreload-4.4.7"}
+    }
+    ]
+}
