@@ -105,7 +105,10 @@ public class LoadDll : MonoBehaviour
 
     void StartGame()
     {
-        LoadMetadataForAOTAssemblies();
+        if (!RuntimeApi.IsFullGenericSharingEnabled())
+        {
+            LoadMetadataForAOTAssemblies();
+        }
 #if !UNITY_EDITOR
         _hotUpdateAss = Assembly.Load(ReadBytesFromStreamingAssets("HotUpdate.dll.bytes"));
 #else

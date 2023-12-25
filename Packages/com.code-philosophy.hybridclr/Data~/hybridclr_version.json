@@ -1,0 +1,24 @@
+{
+    "versions": [
+    {
+        "unity_version":"2019",
+        "hybridclr" : { "branch":"pro-4.3.6"},
+        "il2cpp_plus": { "branch":"2019-pro-4.3.6"}
+    },
+    {
+        "unity_version":"2020",
+        "hybridclr" : { "branch":"pro-4.3.6"},
+        "il2cpp_plus": { "branch":"2020-pro-4.3.6"}
+    },
+    {
+        "unity_version":"2021",
+        "hybridclr" : { "branch":"pro-4.3.6"},
+        "il2cpp_plus": { "branch":"2021-pro-4.3.6"}
+    },
+    {
+        "unity_version":"2022",
+        "hybridclr" : { "branch":"pro-4.3.6"},
+        "il2cpp_plus": { "branch":"2022-pro-4.3.6"}
+    }
+    ]
+}
