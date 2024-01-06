@@ -13,12 +13,30 @@ namespace HybridCLR.Editor
     public static class SettingsUtil
     {
         public static bool Enable
-        { 
+        {
             get => HybridCLRSettings.Instance.enable;
-            set 
+            set
             {
                 HybridCLRSettings.Instance.enable = value;
                 HybridCLRSettings.Save();
+            }
+        }
+        
+        public static string UnityIl2CppDllPath
+        {
+            get
+            {
+#if UNITY_2019
+#if UNITY_EDITOR_WIN
+                return $"{LocalIl2CppDir}/build/deploy/net471/Unity.IL2CPP.dll";
+#else
+            return $"{LocalIl2CppDir}/build/deploy/il2cppcore/Unity.IL2CPP.dll";
+#endif
+#elif UNITY_2020
+                return $"{LocalIl2CppDir}/build/deploy/netcoreapp3.1/Unity.IL2CPP.dll";
+#else
+                    return $"{LocalIl2CppDir}/build/deploy/Unity.IL2CPP.dll";
+#endif
             }
         }
 
@@ -88,6 +106,8 @@ namespace HybridCLR.Editor
         public static List<string> HotUpdateAssemblyFilesExcludePreserved => HotUpdateAssemblyNamesExcludePreserved.Select(dll => dll + ".dll").ToList();
 
 
+        public static List<string> HotUpdateAndDHEAssemblyNamesExcludePreserved => HotUpdateAssemblyNamesExcludePreserved.Concat(HybridCLRSettings.Instance.differentialHybridAssemblies ?? Array.Empty<string>()).ToList();
+
         public static List<string> HotUpdateAssemblyNamesIncludePreserved
         {
             get
@@ -110,7 +130,11 @@ namespace HybridCLR.Editor
             }
         }
 
+        public static List<string> DifferentialHybridAssemblyNames => HybridCLRSettings.Instance.differentialHybridAssemblies.ToList();
+
         public static List<string> HotUpdateAssemblyFilesIncludePreserved => HotUpdateAssemblyNamesIncludePreserved.Select(ass => ass + ".dll").ToList();
+
+        public static List<string> HotUpdateAndDHEAssemblyNamesIncludePreserved => HotUpdateAssemblyNamesIncludePreserved.Concat(HybridCLRSettings.Instance.differentialHybridAssemblies ?? Array.Empty<string>()).ToList();
 
         public static List<string> AOTAssemblyNames => HybridCLRSettings.Instance.patchAOTAssemblies.ToList();
 

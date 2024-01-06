@@ -1,7 +1,9 @@
 ﻿using HybridCLR.Editor.Settings;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
@@ -15,6 +17,29 @@ namespace HybridCLR.Editor.BuildProcessors
     internal class CheckSettings : IPreprocessBuildWithReport
     {
         public int callbackOrder => 0;
+
+        
+        private static bool ContainsByteSeq(byte[] bytes, byte[] searchBytes)
+        {
+            for (int i = 0, end = bytes.Length - searchBytes.Length; i < end; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < searchBytes.Length; j++)
+                {
+                    if (bytes[i + j] != searchBytes[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         public void OnPreprocessBuild(BuildReport report)
         {
@@ -67,6 +92,9 @@ namespace HybridCLR.Editor.BuildProcessors
                 Debug.LogWarning("[CheckSettings] No hot update modules configured in HybridCLRSettings");
             }
 
+            string dheAssemblyEnvStr = string.Join(",", gs.differentialHybridAssemblies ?? Array.Empty<string>());
+            Debug.Log($"[CheckSettings] DHE_ASSEMBLIES:{dheAssemblyEnvStr}");
+            Environment.SetEnvironmentVariable("DHE_ASSEMBLIES", dheAssemblyEnvStr);
         }
     }
 }

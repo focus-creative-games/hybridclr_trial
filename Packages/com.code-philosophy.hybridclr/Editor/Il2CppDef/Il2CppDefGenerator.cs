@@ -1,4 +1,6 @@
 ﻿using HybridCLR.Editor.ABI;
+using HybridCLR.Editor.DHE;
+using HybridCLR.Editor.Settings;
 using HybridCLR.Editor.Template;
 using System;
 using System.Collections.Generic;
@@ -37,6 +39,7 @@ namespace HybridCLR.Editor.Il2CppDef
         {
             GenerateIl2CppConfig();
             GeneratePlaceHolderAssemblies();
+            GenerateDHEAssemblies();
         }
 
         private void GenerateIl2CppConfig()
@@ -81,6 +84,18 @@ namespace HybridCLR.Editor.Il2CppDef
 
             frr.Commit(_options.OutputFile2);
             Debug.Log($"[HybridCLR.Editor.Il2CppDef.Generator] output:{_options.OutputFile2}");
+        }
+
+        private void GenerateDHEAssemblies()
+        {
+            var options = new AssemblyListGenerator.Options()
+            {
+                DifferentialHybridAssembyList = (HybridCLRSettings.Instance.differentialHybridAssemblies ?? Array.Empty<string>()).ToList(),
+                OutputFile = $"{SettingsUtil.LocalIl2CppDir}/libil2cpp/hybridclr/generated/AssemblyManifest.cpp",
+            };
+
+            var g = new AssemblyListGenerator(options);
+            g.Generate();
         }
     }
 }

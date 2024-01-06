@@ -30,7 +30,7 @@ namespace HybridCLR.Editor.Commands
             Directory.Delete(il2cppBuildCachePath, true);
         }
 
-        private static void GenerateMethodBridgeCppFile(Analyzer analyzer, string outputFile)
+        private static void GenerateMethodBridgeCppFile(Analyzer analyzer, List<string> dheAssNames, string outputFile)
         {
             string templateCode = File.ReadAllText(outputFile, Encoding.UTF8);
             var g = new Generator(new Generator.Options()
@@ -38,6 +38,7 @@ namespace HybridCLR.Editor.Commands
                 TemplateCode = templateCode,
                 OutputFile = outputFile,
                 GenericMethods = analyzer.GenericMethods,
+                DHEAssemblyNames = dheAssNames,
             });
 
             g.PrepareMethods();
@@ -55,14 +56,16 @@ namespace HybridCLR.Editor.Commands
         public static void GenerateMethodBridge(BuildTarget target)
         {
             string aotDllDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
+            List<string> dheAssNames = SettingsUtil.DifferentialHybridAssemblyNames;
             List<string> aotAssemblyNames = Directory.Exists(aotDllDir) ?
                 Directory.GetFiles(aotDllDir, "*.dll", SearchOption.TopDirectoryOnly).Select(Path.GetFileNameWithoutExtension).ToList()
                 : new List<string>();
+            List<string> aotAndDheAssemblies = aotAssemblyNames.Concat(dheAssNames).ToList();
             if (aotAssemblyNames.Count == 0)
             {
                 throw new Exception($"no aot assembly found. please run `HybridCLR/Generate/All` or `HybridCLR/Generate/AotDlls` to generate aot dlls before runing `HybridCLR/Generate/MethodBridge`");
             }
-            using (AssemblyReferenceDeepCollector collector = new AssemblyReferenceDeepCollector(MetaUtil.CreateAOTAssemblyResolver(target), aotAssemblyNames))
+            using (AssemblyReferenceDeepCollector collector = new AssemblyReferenceDeepCollector(MetaUtil.CreateAOTAssemblyResolver(target), aotAndDheAssemblies))
             {
                 var analyzer = new Analyzer(new Analyzer.Options
                 {
@@ -72,7 +75,7 @@ namespace HybridCLR.Editor.Commands
 
                 analyzer.Run();
                 string outputFile = $"{SettingsUtil.GeneratedCppDir}/MethodBridge.cpp";
-                GenerateMethodBridgeCppFile(analyzer, outputFile);
+                GenerateMethodBridgeCppFile(analyzer, dheAssNames, outputFile);
             }
 
             CleanIl2CppBuildCache();

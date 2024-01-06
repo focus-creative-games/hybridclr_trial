@@ -14,15 +14,9 @@ namespace HybridCLR.Editor.Commands
 {
     public static class StripAOTDllCommand
     {
-        [MenuItem("HybridCLR/Generate/AOTDlls", priority = 105)]
-        public static void GenerateStripedAOTDlls()
-        {
-            GenerateStripedAOTDlls(EditorUserBuildSettings.activeBuildTarget);
-        }
-
         static BuildOptions GetBuildPlayerOptions(BuildTarget buildTarget)
         {
-            BuildOptions options = BuildOptions.None;
+            BuildOptions options = BuildOptions.BuildScriptsOnly;
             bool development = EditorUserBuildSettings.development;
             if (development)
             {
@@ -84,10 +78,6 @@ namespace HybridCLR.Editor.Commands
             bool oldBuildScriptsOnly = EditorUserBuildSettings.buildScriptsOnly;
             EditorUserBuildSettings.buildScriptsOnly = true;
 
-            string location = GetLocationPathName(outputPath, target);
-            string oldBuildLocation = EditorUserBuildSettings.GetBuildLocation(target);
-            EditorUserBuildSettings.SetBuildLocation(target, location);
-
             switch (target)
             {
                 case BuildTarget.StandaloneWindows:
@@ -117,7 +107,7 @@ namespace HybridCLR.Editor.Commands
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions()
             {
                 scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
-                locationPathName = location,
+                locationPathName = GetLocationPathName(outputPath, target),
                 options = buildOptions,
                 target = target,
                 targetGroup = BuildPipeline.GetBuildTargetGroup(target),
@@ -126,8 +116,6 @@ namespace HybridCLR.Editor.Commands
             var report = BuildPipeline.BuildPlayer(buildPlayerOptions);
 
             EditorUserBuildSettings.buildScriptsOnly = oldBuildScriptsOnly;
-            EditorUserBuildSettings.SetBuildLocation(target, oldBuildLocation);
-
             switch (target)
             {
                 case BuildTarget.StandaloneWindows:

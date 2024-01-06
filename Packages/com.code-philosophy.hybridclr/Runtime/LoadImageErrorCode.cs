@@ -10,6 +10,9 @@ namespace HybridCLR
 		HOMOLOGOUS_ONLY_SUPPORT_AOT_ASSEMBLY, // 不能给解释器assembly补充元数据
 		HOMOLOGOUS_ASSEMBLY_HAS_LOADED, // 已经补充过了，不能再次补充
 		INVALID_HOMOLOGOUS_MODE, // 非法HomologousImageMode
-	};
+        DHE_NOT_DIFFERENTIAL_HYBRID_ASSEMBLY, // 不是DHE assembly
+        DHE_HAS_BEEN_LOADED, // DHE assembly 已经加载过了
+        DHE_BAD_OPTION_DATA, // DHE option data有问题
+    };
 }
 

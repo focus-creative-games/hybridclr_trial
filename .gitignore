@@ -35,5 +35,7 @@
 Build-Mac
 /Build-iOS
 /HybridCLRData
+/Assets/StreamingAssets/build_info
 /Packages/com.focus-creative-games.hybridclr_unity
+/Packages/com.code-philosophy.hybridclr
 /UserSettings

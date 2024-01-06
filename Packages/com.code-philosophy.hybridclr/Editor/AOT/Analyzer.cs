@@ -66,7 +66,7 @@ namespace HybridCLR.Editor.AOT
 
         private bool NeedWalk(MethodDef callFrom, TypeDef type)
         {
-            return _hotUpdateAssemblyFiles.Contains(type.Module.Name) || callFrom == null || callFrom.HasGenericParameters;
+            return !IsAotType(type) || callFrom == null || callFrom.HasGenericParameters;
         }
 
         private bool IsAotType(TypeDef type)

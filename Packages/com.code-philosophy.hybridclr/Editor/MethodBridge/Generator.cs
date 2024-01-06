@@ -25,6 +25,8 @@ namespace HybridCLR.Editor.MethodBridge
             public string OutputFile { get; set; }
 
             public IReadOnlyCollection<GenericMethod> GenericMethods { get; set; }
+
+            public List<string> DHEAssemblyNames { get; set; }
         }
 
         private readonly List<GenericMethod> _genericMethods;
@@ -41,8 +43,11 @@ namespace HybridCLR.Editor.MethodBridge
 
         private readonly HashSet<MethodDesc> _adjustThunkMethodSet = new HashSet<MethodDesc>();
 
+        private readonly HashSet<string> _dheAssemblyFiles;
+
         public Generator(Options options)
         {
+            _dheAssemblyFiles = new HashSet<string>(options.DHEAssemblyNames.Concat(options.DHEAssemblyNames.Select(n => n + ".dll")));
             List<(GenericMethod, string)> genericMethodInfo = options.GenericMethods.Select(m => (m, m.ToString())).ToList();
             genericMethodInfo.Sort((a, b) => string.CompareOrdinal(a.Item2, b.Item2));
             _genericMethods = genericMethodInfo.Select(m => m.Item1).ToList();
@@ -118,6 +123,50 @@ namespace HybridCLR.Editor.MethodBridge
 
         private void ProcessMethod(MethodDef method, List<TypeSig> klassInst, List<TypeSig> methodInst)
         {
+            if (_dheAssemblyFiles.Contains(method.DeclaringType.DefinitionAssembly.Name))
+            {
+                ProcessDHEMethod(method, klassInst, methodInst);
+            }
+            else
+            {
+                ProcessNotDHEMethod(method, klassInst, methodInst);
+            }
+        }
+
+        private void ProcessDHEMethod(MethodDef method, List<TypeSig> klassInst, List<TypeSig> methodInst)
+        {
+            TypeSig returnType;
+            List<TypeSig> parameters;
+            if (klassInst == null && methodInst == null)
+            {
+                returnType = method.ReturnType;
+                parameters = method.Parameters.Select(p => p.Type).ToList();
+            }
+            else
+            {
+                var gc = new GenericArgumentContext(klassInst, methodInst);
+                returnType = MetaUtil.Inflate(method.ReturnType, gc);
+                parameters = method.Parameters.Select(p => MetaUtil.Inflate(p.Type, gc)).ToList();
+            }
+
+            var m2nMethod = CreateMethodDesc(method, false, returnType, parameters);
+            AddManaged2NativeMethod(m2nMethod);
+
+            if (!method.IsStatic && (method.DeclaringType.IsInterface || method.DeclaringType.IsValueType))
+            {
+                AddAdjustThunkMethod(m2nMethod);
+            }
+            AddNative2ManagedMethod(m2nMethod);
+
+            if (method.Name == "Invoke" && method.DeclaringType.IsDelegate)
+            {
+                var openMethod = CreateMethodDesc(method, true, returnType, parameters);
+                AddNative2ManagedMethod(openMethod);
+            }
+        }
+
+        private void ProcessNotDHEMethod(MethodDef method, List<TypeSig> klassInst, List<TypeSig> methodInst)
+        {
             if (method.IsPrivate || (method.IsAssembly && !method.IsPublic && !method.IsFamily))
             {
                 if (klassInst == null && methodInst == null)
@@ -187,209 +236,31 @@ namespace HybridCLR.Editor.MethodBridge
             }
         }
 
-
-        private List<MethodDesc> _managed2NativeMethodList0;
-        private List<MethodDesc> _native2ManagedMethodList0;
-        private List<MethodDesc> _adjustThunkMethodList0;
-
-        private List<TypeInfo> _structTypes0;
-
-        private void CollectTypesAndMethods()
-        {
-            _managed2NativeMethodList0 = _managed2nativeMethodSet.ToList();
-            _managed2NativeMethodList0.Sort((a, b) => string.CompareOrdinal(a.Sig, b.Sig));
-
-            _native2ManagedMethodList0 = _native2managedMethodSet.ToList();
-            _native2ManagedMethodList0.Sort((a, b) => string.CompareOrdinal(a.Sig, b.Sig));
-
-            _adjustThunkMethodList0 = _adjustThunkMethodSet.ToList();
-            _adjustThunkMethodList0.Sort((a, b) => string.CompareOrdinal(a.Sig, b.Sig));
-
-
-            var structTypeSet = new HashSet<TypeInfo>();
-            CollectStructDefs(_managed2NativeMethodList0, structTypeSet);
-            CollectStructDefs(_native2ManagedMethodList0, structTypeSet);
-            CollectStructDefs(_adjustThunkMethodList0, structTypeSet);
-            _structTypes0 = structTypeSet.ToList();
-            _structTypes0.Sort((a, b) => a.TypeId - b.TypeId);
-
-            CheckUnique(_structTypes0.Select(t => ToFullName(t.Klass)));
-            CheckUnique(_structTypes0.Select(t => t.CreateSigName()));
-
-            Debug.LogFormat("== before optimization struct:{3} managed2native:{0} native2managed:{1} adjustThunk:{2}",
-                _managed2NativeMethodList0.Count, _native2ManagedMethodList0.Count, _adjustThunkMethodList0.Count, _structTypes0.Count);
-        }
-
-        private class AnalyzeTypeInfo
-        {
-            public TypeInfo toSharedType;
-            public List<TypeInfo> fields;
-            public string signature;
-        }
-
-        private readonly Dictionary<TypeInfo, AnalyzeTypeInfo> _analyzeTypeInfos = new Dictionary<TypeInfo, AnalyzeTypeInfo>();
-
-        private readonly Dictionary<string, TypeInfo> _signature2Type = new Dictionary<string, TypeInfo>();
-
-        private AnalyzeTypeInfo CalculateAnalyzeTypeInfoBasic(TypeInfo typeInfo)
-        {
-            TypeSig type = typeInfo.Klass;
-            TypeDef typeDef = type.ToTypeDefOrRef().ResolveTypeDefThrow();
-
-            List<TypeSig> klassInst = type.ToGenericInstSig()?.GenericArguments?.ToList();
-            GenericArgumentContext ctx = klassInst != null ? new GenericArgumentContext(klassInst, null) : null;
-
-            ClassLayout sa = typeDef.ClassLayout;
-            var analyzeTypeInfo = new AnalyzeTypeInfo();
-
-            // don't share type with explicit layout
-            if (sa != null)
-            {
-                analyzeTypeInfo.toSharedType = typeInfo;
-                analyzeTypeInfo.signature = typeInfo.CreateSigName();
-                _signature2Type.Add(analyzeTypeInfo.signature, typeInfo);
-                return analyzeTypeInfo;
-            }
-
-            var fields = analyzeTypeInfo.fields = new List<TypeInfo>();
-
-            foreach (FieldDef field in typeDef.Fields)
-            {
-                if (field.IsStatic)
-                {
-                    continue;
-                }
-                TypeSig fieldType = ctx != null ? MetaUtil.Inflate(field.FieldType, ctx) : field.FieldType;
-                fields.Add(GetSharedTypeInfo(fieldType));
-            }
-            return analyzeTypeInfo;
-        }
-
-        private string GetOrCalculateTypeInfoSignature(TypeInfo typeInfo)
-        {
-            if (!typeInfo.IsStruct)
-            {
-                return typeInfo.CreateSigName();
-            }
-
-            var ati = _analyzeTypeInfos[typeInfo];
-
-            //if (_analyzeTypeInfos.TryGetValue(typeInfo, out var ati))
-            //{
-            //    return ati.signature;
-            //}
-            //ati = CalculateAnalyzeTypeInfoBasic(typeInfo);
-            //_analyzeTypeInfos.Add(typeInfo, ati);
-            if (ati.signature != null)
-            {
-                return ati.signature;
-            }
-            
-            var sigBuf = new StringBuilder();
-            foreach (var field in ati.fields)
-            {
-                sigBuf.Append(GetOrCalculateTypeInfoSignature(ToIsomorphicType(field)));
-            }
-            return ati.signature = sigBuf.ToString();
-        }
-
-        private TypeInfo ToIsomorphicType(TypeInfo type)
-        {
-            if (!type.IsStruct)
-            {
-                return type;
-            }
-            if (!_analyzeTypeInfos.TryGetValue(type, out var ati))
-            {
-                ati = CalculateAnalyzeTypeInfoBasic(type);
-                _analyzeTypeInfos.Add(type, ati);
-            }
-            if (ati.toSharedType == null)
-            {
-                string signature = GetOrCalculateTypeInfoSignature(type);
-                Debug.Assert(signature == ati.signature);
-                if (_signature2Type.TryGetValue(signature, out var sharedType))
-                {
-                    // Debug.Log($"[ToIsomorphicType] type:{type.Klass} ==> sharedType:{sharedType.Klass} signature:{signature} ");
-                    ati.toSharedType = sharedType;
-                }
-                else
-                {
-                    ati.toSharedType = type;
-                    _signature2Type.Add(signature, type);
-                }
-            }
-            return ati.toSharedType;
-        }
-
-        private MethodDesc ToIsomorphicMethod(MethodDesc method)
-        {
-            var paramInfos = new List<ParamInfo>();
-            foreach (var paramInfo in method.ParamInfos)
-            {
-                paramInfos.Add(new ParamInfo() { Type = ToIsomorphicType(paramInfo.Type) });
-            }
-            var mbs = new MethodDesc()
-            {
-                MethodDef = method.MethodDef,
-                ReturnInfo = new ReturnInfo() { Type = ToIsomorphicType(method.ReturnInfo.Type) },
-                ParamInfos = paramInfos,
-            };
-            mbs.Init();
-            return mbs;
-        }
-
-        private List<MethodDesc> _managed2NativeMethodList;
-        private List<MethodDesc> _native2ManagedMethodList;
-        private List<MethodDesc> _adjustThunkMethodList;
-
-        private List<TypeInfo> structTypes;
-
-        private void BuildAnalyzeTypeInfos()
-        {
-            foreach (var type in _structTypes0)
-            {
-                ToIsomorphicType(type);
-            }
-            structTypes = _signature2Type.Values.ToList();
-            structTypes.Sort((a, b) => a.TypeId - b.TypeId);
-        }
-
-        private List<MethodDesc> ToUniqueOrderedList(List<MethodDesc> methods)
-        {
-            var methodMap = new SortedDictionary<string, MethodDesc>();
-            foreach (var method in methods)
-            {
-                var sharedMethod = ToIsomorphicMethod(method);
-                var sig = sharedMethod.Sig;
-                if (!methodMap.TryGetValue(sig, out var _))
-                {
-                    methodMap.Add(sig, sharedMethod);
-                }
-            }
-            return methodMap.Values.ToList();
-        }
-
-        private void BuildOptimizedMethods()
-        {
-            _managed2NativeMethodList = ToUniqueOrderedList(_managed2NativeMethodList0);
-            _native2ManagedMethodList = ToUniqueOrderedList(_native2ManagedMethodList0);
-            _adjustThunkMethodList = ToUniqueOrderedList(_adjustThunkMethodList0);
-        }
-
-        private void OptimizationTypesAndMethods()
-        {
-            BuildAnalyzeTypeInfos();
-            BuildOptimizedMethods();
-            Debug.LogFormat("== after optimization struct:{3} managed2native:{0} native2managed:{1} adjustThunk:{2}",
-                               _managed2NativeMethodList.Count, _native2ManagedMethodList.Count, _adjustThunkMethodList.Count, structTypes.Count);
-        }
-
-        private void GenerateCode()
+        public void Generate()
         {
             var frr = new FileRegionReplace(_templateCode);
 
             List<string> lines = new List<string>(20_0000);
+
+            List<MethodDesc> managed2NativeMethodList = _managed2nativeMethodSet.ToList();
+            managed2NativeMethodList.Sort((a, b) => string.CompareOrdinal(a.Sig, b.Sig));
+
+            List<MethodDesc> native2ManagedMethodList = _native2managedMethodSet.ToList();
+            native2ManagedMethodList.Sort((a, b) => string.CompareOrdinal(a.Sig, b.Sig));
+
+            List<MethodDesc> adjustThunkMethodList = _adjustThunkMethodSet.ToList();
+            adjustThunkMethodList.Sort((a, b) => string.CompareOrdinal(a.Sig, b.Sig));
+            
+            Debug.LogFormat("== managed2native:{0} native2managed:{1} adjustThunk:{2}",
+                managed2NativeMethodList.Count, native2ManagedMethodList.Count, adjustThunkMethodList.Count);
+
+
+            var structTypeSet = new HashSet<TypeInfo>();
+            CollectStructDefs(managed2NativeMethodList, structTypeSet);
+            CollectStructDefs(native2ManagedMethodList, structTypeSet);
+            CollectStructDefs(adjustThunkMethodList, structTypeSet);
+            List<TypeInfo> structTypes = structTypeSet.ToList();
+            structTypes.Sort((a, b) => a.TypeId - b.TypeId);
 
             var classInfos = new List<ClassInfo>();
             var classTypeSet = new HashSet<TypeInfo>();
@@ -398,44 +269,38 @@ namespace HybridCLR.Editor.MethodBridge
                 GenerateClassInfo(type, classTypeSet, classInfos);
             }
 
+            CheckUnique(structTypes.Select(t => ToFullName(t.Klass)));
+            CheckUnique(structTypes.Select(t => t.CreateSigName()));
+
             GenerateStructDefines(classInfos, lines);
+            GenerateStructureSignatureStub(structTypes, lines);
 
-            // use structTypes0 to generate signature
-            GenerateStructureSignatureStub(_structTypes0, lines);
-
-            foreach (var method in _managed2NativeMethodList)
+            foreach(var method in managed2NativeMethodList)
             {
                 GenerateManaged2NativeMethod(method, lines);
             }
 
-            GenerateManaged2NativeStub(_managed2NativeMethodList, lines);
+            GenerateManaged2NativeStub(managed2NativeMethodList, lines);
 
-            foreach (var method in _native2ManagedMethodList)
+            foreach (var method in native2ManagedMethodList)
             {
                 GenerateNative2ManagedMethod(method, lines);
             }
 
-            GenerateNative2ManagedStub(_native2ManagedMethodList, lines);
+            GenerateNative2ManagedStub(native2ManagedMethodList, lines);
 
-            foreach (var method in _adjustThunkMethodList)
+            foreach (var method in adjustThunkMethodList)
             {
                 GenerateAdjustThunkMethod(method, lines);
             }
 
-            GenerateAdjustThunkStub(_adjustThunkMethodList, lines);
+            GenerateAdjustThunkStub(adjustThunkMethodList, lines);
 
             frr.Replace("CODE", string.Join("\n", lines));
 
             Directory.CreateDirectory(Path.GetDirectoryName(_outputFile));
 
             frr.Commit(_outputFile);
-        }
-
-        public void Generate()
-        {
-            CollectTypesAndMethods();
-            OptimizationTypesAndMethods();
-            GenerateCode();
         }
 
         private void CollectStructDefs(List<MethodDesc> methods, HashSet<TypeInfo> structTypes)
@@ -508,7 +373,7 @@ namespace HybridCLR.Editor.MethodBridge
                 }
                 TypeSig fieldType = ctx != null ? MetaUtil.Inflate(field.FieldType, ctx) : field.FieldType;
                 fieldType = MetaUtil.ToShareTypeSig(corLibTypes, fieldType);
-                var fieldTypeInfo = ToIsomorphicType(_typeCreator.CreateTypeInfo(fieldType));
+                var fieldTypeInfo = _typeCreator.CreateTypeInfo(fieldType);
                 if (fieldTypeInfo.IsStruct)
                 {
                     GenerateClassInfo(fieldTypeInfo, typeSet, classInfos);
@@ -681,8 +546,7 @@ namespace HybridCLR.Editor.MethodBridge
             lines.Add("FullName2Signature hybridclr::interpreter::g_fullName2SignatureStub[] = {");
             foreach (var type in types)
             {
-                TypeInfo isoType = ToIsomorphicType(type);
-                lines.Add($"\t{{\"{ToFullName(type.Klass)}\", \"{isoType.CreateSigName()}\"}},");
+                lines.Add($"\t{{\"{ToFullName(type.Klass)}\", \"{type.CreateSigName()}\"}},");
             }
             lines.Add("\t{ nullptr, nullptr},");
             lines.Add("};");

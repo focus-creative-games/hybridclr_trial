@@ -33,11 +33,14 @@ namespace HybridCLR.Editor.Settings
         [Header("外部热更新dll搜索路径")]
         public string[] externalHotUpdateAssembliyDirs;
 
-        [Header("裁减后AOT dll输出根目录")]
-        public string strippedAOTDllOutputRootDir = "HybridCLRData/AssembliesPostIl2CppStrip";
+        [Header("裁减后AOT dll的输出目录")]
+        public string strippedAOTDllOutputRootDir = "HybridCLRData/AOTDllOutput";
 
         [Header("补充元数据AOT dlls")]
         public string[] patchAOTAssemblies;
+
+        [Header("差分混合热更新 dlls")]
+        public string[] differentialHybridAssemblies;
 
         [Header("生成的link.xml路径")]
         public string outputLinkFile = "HybridCLRGenerate/link.xml";

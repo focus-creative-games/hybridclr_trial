@@ -60,6 +60,11 @@ namespace HybridCLR.Editor.Meta
 			return ctx.Resolve(sig);
 		}
 
+        public static ITypeDefOrRef Inflate(ITypeDefOrRef type, GenericArgumentContext ctx)
+        {
+            return Inflate(type.ToTypeSig(), ctx).ToTypeDefOrRef();
+        }
+
 		public static TypeSig ToShareTypeSig(ICorLibTypes corTypes, TypeSig typeSig)
         {
 			var a = typeSig.RemovePinnedAndModifiers();
@@ -188,6 +193,11 @@ namespace HybridCLR.Editor.Meta
                 methodGenericParams.Add(module.CorLibTypes.Object);
             }
             return methodGenericParams;
+        }
+
+        public static bool IsThreadStaticField(FieldDef field)
+        {
+            return field.CustomAttributes.Any(ca => ca.TypeFullName == "System.ThreadStaticAttribute");
         }
     }
 }

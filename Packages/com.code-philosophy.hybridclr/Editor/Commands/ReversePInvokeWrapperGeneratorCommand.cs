@@ -29,7 +29,7 @@ namespace HybridCLR.Editor.Commands
 
         public static void GenerateReversePInvokeWrapper(BuildTarget target)
         {
-            List<string> hotUpdateDlls = SettingsUtil.HotUpdateAssemblyNamesExcludePreserved;
+            List<string> hotUpdateDlls = SettingsUtil.HotUpdateAndDHEAssemblyNamesExcludePreserved;
             using (var cache = new AssemblyCache(MetaUtil.CreateHotUpdateAndAOTAssemblyResolver(target, hotUpdateDlls)))
             {
                 var analyzer = new ReversePInvokeWrap.Analyzer(cache, hotUpdateDlls);

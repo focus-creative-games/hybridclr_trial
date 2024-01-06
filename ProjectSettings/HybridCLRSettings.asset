@@ -16,18 +16,18 @@ MonoBehaviour:
   useGlobalIl2cpp: 0
   hybridclrRepoURL: https://gitee.com/focus-creative-games/hybridclr
   il2cppPlusRepoURL: https://gitee.com/focus-creative-games/il2cpp_plus
-  hotUpdateAssemblyDefinitions:
-  - {fileID: 5897886265953266890, guid: 8fbf9762e4d9906438d9b26ab8a5caad, type: 3}
+  hotUpdateAssemblyDefinitions: []
   hotUpdateAssemblies: []
   preserveHotUpdateAssemblies: []
   hotUpdateDllCompileOutputRootDir: HybridCLRData/HotUpdateDlls
   externalHotUpdateAssembliyDirs: []
-  strippedAOTDllOutputRootDir: HybridCLRData/AssembliesPostIl2CppStrip
-  patchAOTAssemblies:
-  - mscorlib
-  - System
-  - System.Core
-  outputLinkFile: HybridCLRData/Generated/link.xml
-  outputAOTGenericReferenceFile: HybridCLRData/Generated/AOTGenericReferences.cs
-  maxGenericReferenceIteration: 4
-  maxMethodBridgeGenericIteration: 4
+  strippedAOTDllOutputRootDir: HybridCLRData/AOTDllOutput
+  patchAOTAssemblies: []
+  differentialHybridAssemblies:
+  - HotUpdate
+  outputLinkFile: HybridCLRGenerate/link.xml
+  outputAOTGenericReferenceFile: HybridCLRGenerate/AOTGenericReferences.cs
+  maxGenericReferenceIteration: 10
+  maxMethodBridgeGenericIteration: 10
+  enableEncryption: 0
+  encryptionSeed: 12358132

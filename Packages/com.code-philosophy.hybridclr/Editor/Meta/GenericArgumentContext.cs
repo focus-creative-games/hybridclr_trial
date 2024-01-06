@@ -63,6 +63,10 @@ namespace HybridCLR.Editor.Meta
 
 				case ElementType.MVar:
                 {
+                    if (methodArgsStack == null)
+                        {
+                        return typeSig;
+                    }
                     GenericMVar genericVar = (GenericMVar)typeSig;
                     var newSig = Resolve(methodArgsStack, genericVar.Number, true);
                     if (newSig == null)
