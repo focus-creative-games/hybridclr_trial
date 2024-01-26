@@ -115,6 +115,18 @@ public class LoadDll : MonoBehaviour
         entryType.GetMethod("Start").Invoke(null, null);
 
         Run_InstantiateComponentByAsset();
+
+        StartCoroutine(DelayAndQuit());
+    }
+
+    IEnumerator DelayAndQuit()
+    {
+        for (int i = 5; i >= 1 ; i--)
+        {
+            UnityEngine.Debug.Log($"将于{i}s后自动退出");
+            yield return new WaitForSeconds(1f);
+        }
+        Application.Quit();
     }
 
     private static void Run_InstantiateComponentByAsset()
