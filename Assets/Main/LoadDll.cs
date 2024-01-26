@@ -121,7 +121,10 @@ public class LoadDll : MonoBehaviour
 
     IEnumerator DelayAndQuit()
     {
-        for (int i = 5; i >= 1 ; i--)
+#if UNITY_STANDALONE_WIN
+        File.WriteAllText(Directory.GetCurrentDirectory() + "/run.log", "ok", System.Text.Encoding.UTF8);
+#endif
+        for (int i = 10; i >= 1 ; i--)
         {
             UnityEngine.Debug.Log($"将于{i}s后自动退出");
             yield return new WaitForSeconds(1f);
