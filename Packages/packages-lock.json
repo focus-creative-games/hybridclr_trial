@@ -5,7 +5,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "4d0fef095b5af314b06e204ea0f6c17681f3ec3c"
+      "hash": "b176d63d93a6b8fd1a873769af7f7fa4c43a4288"
     },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
