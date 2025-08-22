@@ -11,8 +11,8 @@
 
 ## 文档
 
-- [文档](https://hybridclr.doc.code-philosophy.com/)
-- [快速上手](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)
+- [文档](https://hybridclr.cn/)
+- [快速上手](https://hybridclr.cn/docs/beginner/quickstart)
 
 ## 代码目录介绍
 
@@ -23,13 +23,13 @@
 
 - `HybridCLR/Settings` 打开HybridCLR相关设置
 - `HybridCLR/Build` 一键打包相关快捷命令
-- 其他菜单介绍请参见 [hybridclr package](https://hybridclr.doc.code-philosophy.com/docs/basic/com.code-philosophy.hybridclr)
+- 其他菜单介绍请参见 [hybridclr package](https://hybridclr.cn/docs/basic/com.code-philosophy.hybridclr)
 
 
 ## 预备工作
 
 - 安装适当的Unity版本，目前已经支持2019.4.x、2020.3.x、2021.3.x、2022.3.x、2023.2.x、**6000.x.y**
-- 打开`HybridCLR/Installer...`菜单，点击安装按钮完成安装。如有疑问，可参考 [快速上手](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)
+- 打开`HybridCLR/Installer...`菜单，点击安装按钮完成安装。如有疑问，可参考 [快速上手](https://hybridclr.cn/docs/beginner/quickstart)
 
 ## Editor中预览(可选)
 
@@ -49,7 +49,7 @@
 - 菜单 HybridCLR/Build/Win64 ，运行完成后，会在Release_Win64目录下生成程序
 - 运行Release_Win64/HybridCLRTrial.exe，会看到打出 hello, HybridCLR.prefab
 
-注意，如果你使用最新版本的vs，有可能遇到 遇到 `xxxx\il2cpp\libil2cpp\utils\Il2CppHashMap.h(71): error C2039: 'hash_compare': is not a member of 'stdext'` 编译错误。这是.net 7发布后最新版本vs改动打破了一些向后兼容性引起。详细解决办法请查看[常见错误](https://hybridclr.doc.code-philosophy.com/docs/help/commonerrors)。
+注意，如果你使用最新版本的vs，有可能遇到 遇到 `xxxx\il2cpp\libil2cpp\utils\Il2CppHashMap.h(71): error C2039: 'hash_compare': is not a member of 'stdext'` 编译错误。这是.net 7发布后最新版本vs改动打破了一些向后兼容性引起。详细解决办法请查看[常见错误](https://hybridclr.cn/docs/help/commonerrors)。
 
 ### 其他平台
 
