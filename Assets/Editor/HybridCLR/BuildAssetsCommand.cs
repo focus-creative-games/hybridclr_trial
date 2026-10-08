@@ -1,4 +1,4 @@
-﻿using HybridCLR.Editor.Commands;
+﻿using HybridCLR.Commands;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -99,7 +99,9 @@ namespace HybridCLR.Editor
             string aotAssembliesSrcDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
             string aotAssembliesDstDir = Application.streamingAssetsPath;
 
-            foreach (var dll in SettingsUtil.AOTAssemblyNames)
+            var aotAssemblies = new string[] { "mscorlib", "System", "System.Core" };
+
+            foreach (var dll in aotAssemblies)
             {
                 string srcDllPath = $"{aotAssembliesSrcDir}/{dll}.dll";
                 if (!File.Exists(srcDllPath))

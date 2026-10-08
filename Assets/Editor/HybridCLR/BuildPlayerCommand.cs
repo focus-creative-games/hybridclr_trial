@@ -1,5 +1,6 @@
-using HybridCLR.Editor.Commands;
-using HybridCLR.Editor.Installer;
+using HybridCLR.Commands;
+using HybridCLR.Installer;
+using HybridCLR.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -79,7 +80,7 @@ namespace HybridCLR.Editor
 
             Debug.Log("====> 复制热更新资源和代码");
             BuildAssetsCommand.BuildAndCopyABAOTHotUpdateDlls();
-            BashUtil.CopyDir(Application.streamingAssetsPath, $"{outputPath}/HybridCLRTrial_Data/StreamingAssets", true);
+            DirectoryUtil.CopyDir(Application.streamingAssetsPath, $"{outputPath}/HybridCLRTrial_Data/StreamingAssets", true);
         }
     }
 }

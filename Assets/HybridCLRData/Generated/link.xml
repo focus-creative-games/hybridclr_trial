@@ -1,17 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <linker>
+  <assembly fullname="System">
+    <type fullname="System.CodeDom.Compiler.GeneratedCodeAttribute" preserve="all" />
+    <type fullname="System.ComponentModel.EditorBrowsableAttribute" preserve="all" />
+    <type fullname="System.ComponentModel.EditorBrowsableState" preserve="all" />
+  </assembly>
   <assembly fullname="UnityEngine.CoreModule">
     <type fullname="UnityEngine.Debug" preserve="all" />
+    <type fullname="UnityEngine.Events.UnityEvent" preserve="all" />
     <type fullname="UnityEngine.GameObject" preserve="all" />
     <type fullname="UnityEngine.MonoBehaviour" preserve="all" />
   </assembly>
   <assembly fullname="mscorlib">
+    <type fullname="System.Array" preserve="all" />
+    <type fullname="System.Byte" preserve="all" />
     <type fullname="System.Collections.Generic.List`1" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute/DebuggingModes" preserve="all" />
     <type fullname="System.Object" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.CompilationRelaxationsAttribute" preserve="all" />
+    <type fullname="System.Runtime.CompilerServices.CompilerGeneratedAttribute" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.RuntimeCompatibilityAttribute" preserve="all" />
+    <type fullname="System.Runtime.CompilerServices.RuntimeHelpers" preserve="all" />
+    <type fullname="System.RuntimeFieldHandle" preserve="all" />
     <type fullname="System.String" preserve="all" />
     <type fullname="System.ValueType" preserve="all" />
   </assembly>
